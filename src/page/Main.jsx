@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
+import { useState } from "react";
 
 const Wrapper = styled.div`
     display: flex;
@@ -18,11 +19,11 @@ const Button = styled.button`
     cursor: pointer;
 `;
 
-
 function Main(props) {
 
     const navigate = useNavigate();
-    
+
+
     return(
         <Wrapper>메인페이지입니다
             <Button onClick={()=>{navigate("/chat");}}>채팅 페이지로</Button>
