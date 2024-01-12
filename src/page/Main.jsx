@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
-import { useState } from "react";
 
 const Wrapper = styled.div`
     display: flex;
@@ -25,12 +24,11 @@ function Main(props) {
 
 
     return(
-        <Wrapper>메인페이지입니다
+        <Wrapper>
             <Button onClick={()=>{navigate("/chat");}}>채팅 페이지로</Button>
             <Button onClick={()=>{navigate("/findId");}}>아이디 찾기 페이지로</Button>
             <Button onClick={()=>{navigate("/logIn");}}>로그인 페이지로</Button>
             <Button onClick={()=>{navigate("/myPage");}}>마이페이지 페이지로</Button>
-            <Button onClick={()=>{navigate("/postList");}}>게시판 페이지로</Button>
             <Button onClick={()=>{navigate("/resetPw");}}>비밀번호 재설정 페이지로</Button>
             <Button onClick={()=>{navigate("/signUp");}}>회원가입 페이지로</Button>
             <Button onClick={()=>{navigate("/viewPost");}}>게시글 보기 페이지로</Button>
