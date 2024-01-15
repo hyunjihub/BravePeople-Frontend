@@ -26,6 +26,7 @@ const Input = styled.input`
     &::placeholder {
         color: #ababab;
     }
+    font-family: 'SUITE-Regular';
 `;
 
 const Button = styled.button`
@@ -65,8 +66,6 @@ const Text = styled.div`
     gap: 10px;
 `;
 
-
-/*현재 : 비밀번호 찾기, 회원가입 제외*/
 function LogIn(props) {
     const navigate = useNavigate();
     return (

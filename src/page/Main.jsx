@@ -4,9 +4,8 @@ import styled from "styled-components";
 
 const Wrapper = styled.div`
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
 `;
-
 
 const Button = styled.button`
     background-color: white;
@@ -14,8 +13,10 @@ const Button = styled.button`
     border: 1px solid #000;
     width: 150px;
     height: 50px;
-    margin-bottom: 10px;
+    margin-top: 100px;
+    margin-left: 20px;
     cursor: pointer;
+    font-family: 'SUITE-Regular';
 `;
 
 function Main(props) {
@@ -25,10 +26,9 @@ function Main(props) {
 
     return(
         <Wrapper>
+            <p />
             <Button onClick={()=>{navigate("/chat");}}>채팅 페이지로</Button>
             <Button onClick={()=>{navigate("/findId");}}>아이디 찾기 페이지로</Button>
-            <Button onClick={()=>{navigate("/logIn");}}>로그인 페이지로</Button>
-            <Button onClick={()=>{navigate("/myPage");}}>마이페이지 페이지로</Button>
             <Button onClick={()=>{navigate("/resetPw");}}>비밀번호 재설정 페이지로</Button>
             <Button onClick={()=>{navigate("/signUp");}}>회원가입 페이지로</Button>
             <Button onClick={()=>{navigate("/viewPost");}}>게시글 보기 페이지로</Button>
