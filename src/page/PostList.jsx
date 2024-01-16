@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import PostItem from "../components/PostItem";
@@ -42,6 +42,12 @@ function PostList(props) {
     const [ num, setNum ] = useState(0);
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
+    
+    useEffect(()=>{
+        setPostItems([]);
+        setNum(0);
+    }, [type]);
+
     return(
         <Wrapper>
             <Title>{type}</Title>

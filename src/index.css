@@ -13,11 +13,6 @@
     font-style: normal;
 }
 
-html{
-    min-width: 100%;
-}
-
 body{
-    min-width: 100vw;
     font-family: 'SUITE-Regular';
 }
