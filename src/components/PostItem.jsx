@@ -31,7 +31,7 @@ const UploadTime = styled.div`
     margin: 3px 0 0px 30px;
 `;
 
-
+/* 성별, 카테고리 추가 */
 
 function PostItem(props) {
 

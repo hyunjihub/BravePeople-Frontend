@@ -73,6 +73,12 @@ const Button = styled.button`
     padding: 0px;
 `;
 
+const RadioButton = styled.input`
+
+`;
+
+
+/* 성별 버튼 만들고 중복검사 없애고, 위치확인은 권한설정용도로*/
 function SignUp(props) {
     const navigate = useNavigate();
     return(
@@ -84,6 +90,7 @@ function SignUp(props) {
                 type="text"
                 placeholder="성함" 
             />
+            <Label>성별 *</Label>
             <Label>아이디 *</Label>
             <Detail>6글자 이상</Detail>
             <ForInset>            
@@ -115,7 +122,7 @@ function SignUp(props) {
                     type="email"
                     placeholder="이메일 주소 (ex : brave@naver.com)"
                 /> 
-                <UniqueButton>중복확인</UniqueButton>
+                <UniqueButton>인증</UniqueButton>
             </ForInset>
             <Label>닉네임 *</Label>
             <ForInset>            
@@ -125,6 +132,16 @@ function SignUp(props) {
                     placeholder="닉네임"
                 /> 
                 <UniqueButton>중복확인</UniqueButton>
+            </ForInset>
+            <Label>내 위치 *</Label>
+            <ForInset>            
+                <Input
+                    name="location"
+                    type="text"
+                    placeholder="위치확인 버튼을 눌러주세요"
+                    disabled
+                /> 
+                <UniqueButton>위치확인</UniqueButton>
             </ForInset>
             <Button onClick={()=>navigate("/main")}>회원가입</Button>
             <Button onClick={()=>navigate("/main")}>취소</Button>

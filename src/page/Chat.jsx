@@ -54,6 +54,7 @@ const Profile = styled.img`
     width: 50px;
     height: 50px;
     margin: 30px 15px;
+    z-index: 999;
 `;
 
 const User = styled.div`
