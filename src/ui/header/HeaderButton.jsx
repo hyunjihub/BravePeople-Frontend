@@ -11,14 +11,18 @@ const StyledButton = styled.button`
         text-align: center;
         cursor: pointer;
         background-color: #fff;
-        color: #333;
+        color: #777;
+
+        &:hover {
+            color: #000;
+        }
     `;
 
-function Button(props){
+function HeaderButton(props){
 
     return(
         <StyledButton onClick={props.onClick}>{props.children}</StyledButton>
     );
 }
 
-export default Button;
+export default HeaderButton;

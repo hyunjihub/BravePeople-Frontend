@@ -4,12 +4,13 @@ import styled from "styled-components";
 import logo from "./logo.png";
 import { useInView } from "react-intersection-observer"
 
-import Button from "./HeaderButton";
+import HeaderButton from "./HeaderButton";
 
 
 const Wrapper = styled.div`
     width : 100vw;
     height : 70px;
+    min-width: 1024px;
     border-bottom: 1px solid #efefef;
     position: sticky;
     top: 0;
@@ -101,8 +102,8 @@ function Header(props) {
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             <RightContainer>
                 {isLoggedIn ? <Location>위치정보</Location>: <HiddenLocation />}
-                <Button onClick={handleLogOut}>{isLoggedIn?"로그아웃":"로그인"}</Button>
-                {isLoggedIn ? <Button onClick={()=>{navigate("/mypage");}}>마이페이지</Button>: null}   
+                <HeaderButton onClick={handleLogOut}>{isLoggedIn?"로그아웃":"로그인"}</HeaderButton>
+                {isLoggedIn ? <HeaderButton onClick={()=>{navigate("/mypage");}}>마이페이지</HeaderButton>: null}   
             </RightContainer>
         </Wrapper>
     );

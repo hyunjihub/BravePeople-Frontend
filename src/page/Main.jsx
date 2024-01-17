@@ -28,11 +28,11 @@ function Main(props) {
         <Wrapper>
             <p />
             <Button onClick={()=>{navigate("/chat");}}>채팅 페이지로</Button>
-            <Button onClick={()=>{navigate("/findId");}}>아이디 찾기 페이지로</Button>
-            <Button onClick={()=>{navigate("/resetPw");}}>비밀번호 재설정 페이지로</Button>
-            <Button onClick={()=>{navigate("/signUp");}}>회원가입 페이지로</Button>
-            <Button onClick={()=>{navigate("/viewPost");}}>게시글 보기 페이지로</Button>
-            <Button onClick={()=>{navigate("/writePost");}}>게시글 작성 페이지로</Button>
+            <Button onClick={()=>{navigate("/findid");}}>아이디 찾기 페이지로</Button>
+            <Button onClick={()=>{navigate("/resetpw");}}>비밀번호 재설정 페이지로</Button>
+            <Button onClick={()=>{navigate("/signup");}}>회원가입 페이지로</Button>
+            <Button onClick={()=>{navigate("/viewpost");}}>게시글 보기 페이지로</Button>
+            <Button onClick={()=>{navigate("/writepost");}}>게시글 작성 페이지로</Button>
         </Wrapper>
     );
 }

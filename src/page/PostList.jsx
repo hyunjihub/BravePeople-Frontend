@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import PostItem from "../components/PostItem";
@@ -38,10 +38,16 @@ const PostListBox = styled.div`
 `;
 
 function PostList(props) {
-    const [ postItems, setPostItems ] = useState([]);
+    const [ postItems, setPostItems ] = useState([]); //1번째 게시글 POSTID, 2번째게시글 POSTID
     const [ num, setNum ] = useState(0);
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
+
+    useEffect(()=>{
+        setPostItems([]);
+        setNum(0);
+    },[type]);
+
     return(
         <Wrapper>
             <Title>{type}</Title>
