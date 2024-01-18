@@ -13,6 +13,8 @@ import SignUp from "./page/SignUp";
 import ViewPost from "./page/ViewPost";
 import WritePost from "./page/WritePost";
 import MyPage from "./page/MyPage";
+import Error from "./page/Error";
+import Authentication from "./page/Authentication";
 
 function App(props) {
 
@@ -29,9 +31,11 @@ function App(props) {
                     <Route path="/mypage" element={<MyPage />}/>
                     <Route path="/postlist/:ishelped" element={<PostList />}/>
                     <Route path="/resetpw" element={<ResetPw />}/>
+                    <Route path="/authentication" element={<Authentication />} />
                     <Route path="/signup" element={<SignUp />}/>
                     <Route path="/viewpost" element={<ViewPost />}/>
                     <Route path="/writepost" element={<WritePost />}/>
+                    <Route path="/error" element={<Error />} />
                 </Routes>
             </BrowserRouter>
         </div>

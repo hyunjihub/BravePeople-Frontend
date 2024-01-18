@@ -80,7 +80,7 @@ const Button = styled.button`
     color: #fff;
     border: none;
     border-radius: 5px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
     margin-right: 5px;
 `;
 
@@ -93,7 +93,7 @@ const DisableButton = styled.button`
     color: #fff;
     border: none;
     border-radius: 5px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
     margin-right: 5px;
 `;
 
@@ -116,7 +116,7 @@ const SendBox = styled.textarea`
         display: none;
     }
     margin: 15px 10px 0 10px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
     box-sizing: border-box;
     padding: 10px;
 `;

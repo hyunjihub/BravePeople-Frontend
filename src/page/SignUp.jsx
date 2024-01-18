@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
@@ -37,7 +37,7 @@ const Input = styled.input`
     &::placeholder {
         color: #ababab;
     }
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const UniqueButton = styled.button`
@@ -50,7 +50,7 @@ const UniqueButton = styled.button`
     position: absolute;
     right: 20px;
     top: 10px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const ForInset = styled.div`
@@ -74,7 +74,8 @@ const Button = styled.button`
 `;
 
 const RadioButton = styled.input`
-
+    width : 20px;
+    height: 20px;
 `;
 
 
@@ -92,15 +93,12 @@ function SignUp(props) {
             />
             <Label>성별 *</Label>
             <Label>아이디 *</Label>
-            <Detail>6글자 이상</Detail>
-            <ForInset>            
-                <Input
-                name="userid"
-                type="text"
-                placeholder="아이디" 
-                />
-                <UniqueButton>중복확인</UniqueButton>
-            </ForInset>
+            <Detail>6글자 이상</Detail>           
+            <Input
+            name="userid"
+            type="text"
+            placeholder="아이디" 
+            />
             <Label>비밀번호 *</Label>
             <Detail>영문과 숫자를 조합한 8글자 이상</Detail>
             <Input
@@ -124,21 +122,18 @@ function SignUp(props) {
                 /> 
                 <UniqueButton>인증</UniqueButton>
             </ForInset>
-            <Label>닉네임 *</Label>
-            <ForInset>            
-                <Input
-                    name="nickname"
-                    type="text"
-                    placeholder="닉네임"
-                /> 
-                <UniqueButton>중복확인</UniqueButton>
-            </ForInset>
+            <Label>닉네임 *</Label>          
+            <Input
+                name="nickname"
+                type="text"
+                placeholder="닉네임"
+            /> 
             <Label>내 위치 *</Label>
             <ForInset>            
                 <Input
                     name="location"
                     type="text"
-                    placeholder="위치확인 버튼을 눌러주세요"
+                    placeholder="이 문구가 나타날 시, 위치확인 버튼을 눌러주세요"
                     disabled
                 /> 
                 <UniqueButton>위치확인</UniqueButton>

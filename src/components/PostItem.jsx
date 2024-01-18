@@ -21,7 +21,7 @@ const Title = styled.button`
     border: none;
     background-color: #f7f8fd;
     padding: 0px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const UploadTime = styled.div`

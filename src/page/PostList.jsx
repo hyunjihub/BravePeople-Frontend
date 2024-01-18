@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import PostItem from "../components/PostItem";
@@ -23,7 +23,7 @@ const Title = styled.div`
     font-size: 40px;
     font-weight: 700;
     text-align: center;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
     margin: 50px 0 50px;
 `;
 
@@ -34,20 +34,14 @@ const PostListBox = styled.div`
     overflow-y: scroll;
     &::-webkit-scrollbar {
         display: none;
-      }
+    }
 `;
 
 function PostList(props) {
-    const [ postItems, setPostItems ] = useState([]); //1번째 게시글 POSTID, 2번째게시글 POSTID
+    const [ postItems, setPostItems ] = useState([]);
     const [ num, setNum ] = useState(0);
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
-
-    useEffect(()=>{
-        setPostItems([]);
-        setNum(0);
-    },[type]);
-
     return(
         <Wrapper>
             <Title>{type}</Title>

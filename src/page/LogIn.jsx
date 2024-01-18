@@ -26,7 +26,7 @@ const Input = styled.input`
     &::placeholder {
         color: #ababab;
     }
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const Button = styled.button`
