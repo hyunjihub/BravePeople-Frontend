@@ -21,7 +21,7 @@ const Title = styled.button`
     border: none;
     background-color: #f7f8fd;
     padding: 0px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const UploadTime = styled.div`
@@ -32,14 +32,15 @@ const UploadTime = styled.div`
 `;
 
 /* 성별, 카테고리 추가 */
-
+// 받은 POSTID로 백엔드와 RESTAPI통신하여 해당 ID의 게시글 정보를 불러온다.(작성자성별, 제목, 글작성시간, 가격, 카테고리)
+// AXIOS.머시기ㅣ머시기({props.value}) => 여기서 받은 데이터를 PostItem 리턴에 담아서 PostList component로
 function PostItem(props) {
 
     const navigate = useNavigate();
     return(
         <Wrapper>
             <Title onClick={()=>{navigate("/viewPost");}}>벌레 잡아주실 분 찾습니다</Title>
-            <UploadTime>1시간 전</UploadTime>
+            <UploadTime>{props.value}시간 전</UploadTime>
         </Wrapper>
     );
 } 

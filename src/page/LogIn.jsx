@@ -31,7 +31,7 @@ const Input = styled.input`
     &::placeholder {
         color: #ababab;
     }
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const Button = styled.button`
@@ -103,7 +103,7 @@ function LogIn({ isLogin, changeLoginState, setTokken1, setTokken2 }) {
             <Button type="submit">로그인</Button>
             <Text>
                 <LinkText to="/signUp">회원가입</LinkText>
-                <LinkText to="/findId">비밀번호 찾기 </LinkText>
+                <LinkText to="/findId">계정 찾기 </LinkText>
             </Text>  
         </Form>
     );

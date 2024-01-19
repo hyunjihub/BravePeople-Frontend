@@ -23,7 +23,7 @@ const Title = styled.div`
     font-size: 40px;
     font-weight: 700;
     text-align: center;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
     margin: 50px 0 50px;
 `;
 
@@ -34,7 +34,7 @@ const PostListBox = styled.div`
     overflow-y: scroll;
     &::-webkit-scrollbar {
         display: none;
-      }
+    }
 `;
 
 function PostList(props) {

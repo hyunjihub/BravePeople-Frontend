@@ -26,7 +26,7 @@ const Input = styled.input`
     &::placeholder {
         color: #ababab;
     }
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const IdForm = styled.form`
@@ -53,7 +53,7 @@ const Button = styled.button`
     font-size: 15px;
     margin: 24px 0;
     padding: 0px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const Container = styled.div`

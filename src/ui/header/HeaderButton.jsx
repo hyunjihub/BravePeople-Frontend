@@ -2,23 +2,26 @@ import styled from "styled-components";
 
 
 const StyledButton = styled.button`
-        font-family: 'SUITE-Regular';
+        font-family: 'SUITE';
         width : 100px;
         height : 30px;
-        float : right;
         font-size: medium;
         border: none;
         text-align: center;
         cursor: pointer;
         background-color: #fff;
-        color: #333;
+        color: #777;
+        margin-top: 3%;
+        &:hover {
+            color: #000;
+        }
     `;
 
-function Button(props){
+function HeaderButton(props){
 
     return(
         <StyledButton onClick={props.onClick}>{props.children}</StyledButton>
     );
 }
 
-export default Button;
+export default HeaderButton;
