@@ -2,10 +2,12 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
-import axios from "axios";
+
+// restapi
+import axios from 'axios';
 
 // redux
-import { changeLoginState, setTokken1, setTokken2 } from "../reducer/modules/login";
+import { changeLoginState, setAccessToken, setRefreshToken } from "../reducer/modules/login";
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -72,29 +74,32 @@ const Text = styled.div`
     gap: 10px;
 `;
 
-function LogIn({ isLogin, changeLoginState, setTokken1, setTokken2 }) {
+function LogIn({ changeLoginState, setAccessToken, setRefreshToken }) {
 
     const navigate = useNavigate();
 
-    const handleLogin = (e) => {
-        //처음 submit하면 들어갈 함수는 axios로 백에 post요청
-        //데이터를 백으로부터 받게 된다. 받은 토큰, 위치정보를 다시 redux변수에 저장한다.
-        
-        axios.post('http://13.209.77.50:8080/auth/login', {
-            username: 'yny3533',
-            pw: 'rktlrhrl123'
-        })
-        .then(function (response) {
-            console.log(response);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
 
-        changeLoginState(true);
-        setTokken1("tokken1");
-        setTokken2("tokken2");
-        navigate("/main");
+    const handleLogin = (e) => {
+    
+        if(e.target[0].value !== "" && e.target[1].value !== "") {
+            axios.post('http://13.209.77.50:8080/auth/login', {
+            username: e.target[0].value,
+            pw: e.target[1].value
+          })
+          .then(function (response) {
+            console.log(response);
+            console.log(response.data.AccessToken);
+            navigate("/main");
+          })
+          .catch(function (error) {
+            console.log(error);
+            navigate(0);
+          });
+        }else{
+            alert("아이디 또는 비밀번호를 입력해주세요.");
+            navigate(0);
+        }
+
         e.preventDefault();
     }
 
@@ -122,20 +127,15 @@ function LogIn({ isLogin, changeLoginState, setTokken1, setTokken2 }) {
     );
 };
 
-const mapStateToProps = (state) => ({
-    isLogin: state.login.isLogin
-});
-
 const mapDispatchToProps = (dispatch) => bindActionCreators(
     {
         changeLoginState,
-        setTokken1,
-        setTokken2
+        setAccessToken,
+        setRefreshToken,
     },
     dispatch
 );
 
 export default connect(
-    mapStateToProps,
     mapDispatchToProps
 )(LogIn);
