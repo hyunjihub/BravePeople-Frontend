@@ -1,7 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
+
+// redux
+import { changeLoginState, setTokken1, setTokken2 } from "../reducer/modules/login";
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
 const Form = styled.form`
     width: 400px;
@@ -66,10 +71,22 @@ const Text = styled.div`
     gap: 10px;
 `;
 
-function LogIn(props) {
+function LogIn({ isLogin, changeLoginState, setTokken1, setTokken2 }) {
+
     const navigate = useNavigate();
+
+    const handleLogin = (e) => {
+        //처음 submit하면 들어갈 함수는 axios로 백에 post요청
+        //데이터를 백으로부터 받게 된다. 받은 토큰, 위치정보를 다시 redux변수에 저장한다.
+        changeLoginState(true);
+        setTokken1("tokken1");
+        setTokken2("tokken2");
+        navigate("/main");
+        e.preventDefault();
+    }
+
     return (
-        <Form>
+        <Form onSubmit={handleLogin}>
             <Title>로그인</Title>
             <Label>아이디</Label>
             <Input
@@ -83,7 +100,7 @@ function LogIn(props) {
                 type="password"
                 placeholder="비밀번호"
             /> 
-            <Button onClick={()=>navigate("/main")}>로그인</Button>
+            <Button type="submit">로그인</Button>
             <Text>
                 <LinkText to="/signUp">회원가입</LinkText>
                 <LinkText to="/findId">계정 찾기 </LinkText>
@@ -92,4 +109,20 @@ function LogIn(props) {
     );
 };
 
-export default LogIn;
+const mapStateToProps = (state) => ({
+    isLogin: state.login.isLogin
+});
+
+const mapDispatchToProps = (dispatch) => bindActionCreators(
+    {
+        changeLoginState,
+        setTokken1,
+        setTokken2
+    },
+    dispatch
+);
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(LogIn);

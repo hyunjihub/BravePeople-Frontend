@@ -16,7 +16,7 @@ import MyPage from "./page/MyPage";
 import Error from "./page/Error";
 import Authentication from "./page/Authentication";
 
-function App(props) {
+export default function App(props) {
 
     return(
         <div id="App">
@@ -41,5 +41,3 @@ function App(props) {
         </div>
     );
 }
-
-export default App;
