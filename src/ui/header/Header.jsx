@@ -5,13 +5,10 @@ import logo from "./logo.png";
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 
-import HeaderButton from "./HeaderButton";
-
 // redux
-import { changeLoginState, setAccessToken, setRefreshToken, setLong, setLati } from "../../reducer/modules/login"
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-
+import HeaderButton from "./HeaderButton";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import { setLogin, setAccessToken, setRefreshToken } from "../../redux/modules/login";
 
 const Wrapper = styled.div`
     width : 100vw;
@@ -114,21 +111,32 @@ const HiddenMyPage = styled.div`
     background-color: #fff;
 `;
 
-function Header( { isLogin, accessToken, refreshToken, longitude, latitude, changeLoginState, setAccessToken, setRefreshToken, setLong, setLati } ) {
+export default function Header(props) {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { isLog, access, refresh } = useSelector( state => ({
+        isLog: state.login.isLogin,
+        access: state.login.accessToken,
+        refresh: state.login.refreshToken
+    }), shallowEqual);
+
+    const setLog = (isLogin) => dispatch(setLogin(isLogin));
+    const setAccess = (accessTk) => dispatch(setAccessToken(accessTk));
+    const setRefresh = (refreshTk) => dispatch(setRefreshToken(refreshTk));
 
     const handleLogOut = () => {
-        if(isLogin) {
-            changeLoginState(false);
-            setAccessToken("");
-            setRefreshToken("");
+        if(isLog) {
+            setLog(false);
+            setAccess("");
+            setRefresh("");
             navigate("/main");
         }else{
             navigate("/login")
         }
     };
-
+    
     return (
         <Wrapper>
             <Logo onClick={()=>{navigate("/main");}}>
@@ -138,37 +146,12 @@ function Header( { isLogin, accessToken, refreshToken, longitude, latitude, chan
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             
             <RightContainer>
-                {isLogin ? <Location><IoLocationSharp size="30" color="#f8332f"/> 춘천시</Location>: <HiddenLocation />}
-                {isLogin ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
-                {isLogin ? <HeaderButton onClick={()=>{navigate("/mypage");}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
-                <HeaderButton onClick={handleLogOut}>{isLogin?"로그아웃":"로그인"}</HeaderButton>
+                {isLog ? <Location><IoLocationSharp size="30" color="#f8332f"/> 춘천시</Location>: <HiddenLocation />}
+                {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
+                {isLog ? <HeaderButton onClick={()=>{navigate("/mypage");}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
+                <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
             </RightContainer>
         </Wrapper>
     );
 }
 
-// state 변수
-const mapStateToProps = (state) => ({
-    isLogin: state.login.isLogin,
-    accessToken: state.login.accessToken,
-    refreshToken: state.login.refreshToken,
-    longitude: state.login.longitude,
-    latitude: state.login.latitude
-});
-
-// action
-const mapDispatchToProps = (dispatch) => bindActionCreators(
-    {
-        changeLoginState,
-        setAccessToken,
-        setRefreshToken,
-        setLong,
-        setLati
-    },
-    dispatch
-);
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Header);
