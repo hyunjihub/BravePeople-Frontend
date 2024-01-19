@@ -122,14 +122,8 @@ function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginSt
             navigate("/main");
         }else{
             navigate("/login")
-
+        }
     };
-
-    useEffect(()=>{
-        console.log(isLogin);
-        console.log(tokken1);
-        console.log(tokken2);
-    }, [isLogin]);
     
     return (
         <Wrapper>
@@ -142,7 +136,7 @@ function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginSt
             <RightContainer>
                 {isLogin ? <Location><IoLocationSharp size="30" color="#f8332f"/> 춘천시</Location>: <HiddenLocation />}
                 {isLogin ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
-                {isLogin ? <Button onClick={()=>{navigate("/mypage");}}>마이페이지</Button>: <HiddenMyPage />}   
+                {isLogin ? <HeaderButton onClick={()=>{navigate("/mypage");}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLogin?"로그아웃":"로그인"}</HeaderButton>
             </RightContainer>
         </Wrapper>

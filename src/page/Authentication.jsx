@@ -55,8 +55,13 @@ const Form = styled.form`
 function Authentication(props) {
     const navigate = useNavigate();
 
+    const handleAuth = (e) =>{
+        navigate("/resetpw");
+        e.preventDefault();
+    }
+
     return(
-        <Form>
+        <Form onSubmit={handleAuth}>
             <Title>본인 인증</Title>
             <Label>비밀번호</Label>
             <Input
@@ -64,7 +69,7 @@ function Authentication(props) {
                 type="password"
                 placeholder="비밀번호" 
             />
-            <Button onClick={()=>navigate("/resetpw")}>본인 인증</Button>
+            <Button type="submit">본인 인증</Button>
         </Form>
         
 

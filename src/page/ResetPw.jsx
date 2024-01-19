@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 
@@ -58,8 +58,19 @@ const Detail = styled.label`
 
 function ResetPw(props) {
     const navigate = useNavigate();
+    const [isReset, setIsReset] = useState(true);
+
+    const handleReset = (e) =>{
+        if(isReset){
+            navigate("/main");
+        }else{
+            navigate("/main");
+        }
+        
+        e.preventDefault();
+    }
     return(
-        <Form>
+        <Form onSubmit={handleReset}>
             <Title>비밀번호 재설정</Title>
             <Label>비밀번호</Label>
             <Detail>영문과 숫자를 조합한 8글자 이상</Detail>
@@ -74,8 +85,8 @@ function ResetPw(props) {
                 type="password"
                 placeholder="비밀번호"
             /> 
-            <Button onClick={()=>navigate("/main")}>재설정</Button>
-            <Button onClick={()=>navigate("/main")}>취소</Button>
+            <Button onClick={()=>setIsReset(true)} type="submit" >재설정</Button>
+            <Button onClick={()=>setIsReset(false)}>취소</Button>
         </Form>
     );
 }
