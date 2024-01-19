@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import logo from "./logo.png";
@@ -8,7 +8,7 @@ import { IoLocationSharp } from "react-icons/io5";
 import HeaderButton from "./HeaderButton";
 
 // redux
-import { changeLoginState, setTokken1, setTokken2, setLong, setLati } from "../../reducer/modules/login"
+import { changeLoginState, setAccessToken, setRefreshToken, setLong, setLati } from "../../reducer/modules/login"
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 
@@ -114,21 +114,21 @@ const HiddenMyPage = styled.div`
     background-color: #fff;
 `;
 
-function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginState, setTokken1, setTokken2, setLong, setLati } ) {
+function Header( { isLogin, accessToken, refreshToken, longitude, latitude, changeLoginState, setAccessToken, setRefreshToken, setLong, setLati } ) {
 
     const navigate = useNavigate();
 
     const handleLogOut = () => {
         if(isLogin) {
             changeLoginState(false);
-            setTokken1("");
-            setTokken2("");
+            setAccessToken("");
+            setRefreshToken("");
             navigate("/main");
         }else{
             navigate("/login")
         }
     };
-    
+
     return (
         <Wrapper>
             <Logo onClick={()=>{navigate("/main");}}>
@@ -150,8 +150,8 @@ function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginSt
 // state 변수
 const mapStateToProps = (state) => ({
     isLogin: state.login.isLogin,
-    tokken1: state.login.tokken1,
-    tokken2: state.login.tokken2,
+    accessToken: state.login.accessToken,
+    refreshToken: state.login.refreshToken,
     longitude: state.login.longitude,
     latitude: state.login.latitude
 });
@@ -160,8 +160,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => bindActionCreators(
     {
         changeLoginState,
-        setTokken1,
-        setTokken2,
+        setAccessToken,
+        setRefreshToken,
         setLong,
         setLati
     },
