@@ -14,7 +14,7 @@ import ViewPost from "./page/ViewPost";
 import WritePost from "./page/WritePost";
 import MyPage from "./page/MyPage";
 
-function App(props) {
+export default function App(props) {
 
     return(
         <div id="App">
@@ -37,5 +37,3 @@ function App(props) {
         </div>
     );
 }
-
-export default App;

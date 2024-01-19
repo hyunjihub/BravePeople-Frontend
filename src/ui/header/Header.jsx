@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import logo from "./logo.png";
 import { useInView } from "react-intersection-observer"
+
+// redux
+import { changeLoginState, setTokken1, setTokken2, setLong, setLati } from "../../reducer/modules/login"
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
 
 import Button from "./HeaderButton";
 
@@ -76,21 +81,25 @@ const PostListMenu = styled.div`
     letter-spacing: 5px;
 `;
 
-function Header(props) {
-    const [isLoggedIn, setLoggedIn] = useState(false);
+function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginState, setTokken1, setTokken2, setLong, setLati } ) {
     const navigate = useNavigate();
 
     const handleLogOut = () => {
-        if(isLoggedIn) {
-            setLoggedIn(false);
+        if(isLogin) {
+            changeLoginState(false);
+            setTokken1("");
+            setTokken2("");
             navigate("/main");
-        }
-        else {
-            setLoggedIn(true);
-            navigate("/logIn");
-            /*setTimeout(()=>{navigate("/main")}, 2000);*/
+        }else{
+            navigate("/login")
         }
     };
+
+    useEffect(()=>{
+        console.log(isLogin);
+        console.log(tokken1);
+        console.log(tokken2);
+    }, [isLogin]);
     
     return (
         <Wrapper>
@@ -100,12 +109,36 @@ function Header(props) {
             <PostListMenu onClick={()=>navigate("/postlist/helping")}>원정대</PostListMenu>
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             <RightContainer>
-                {isLoggedIn ? <Location>위치정보</Location>: <HiddenLocation />}
-                <Button onClick={handleLogOut}>{isLoggedIn?"로그아웃":"로그인"}</Button>
-                {isLoggedIn ? <Button onClick={()=>{navigate("/mypage");}}>마이페이지</Button>: null}   
+                {isLogin ? <Location>위치정보</Location>: <HiddenLocation />}
+                <Button onClick={handleLogOut}>{isLogin?"로그아웃":"로그인"}</Button>
+                {isLogin ? <Button onClick={()=>{navigate("/mypage");}}>마이페이지</Button>: null}   
             </RightContainer>
         </Wrapper>
     );
 }
 
-export default Header;
+// state 변수
+const mapStateToProps = (state) => ({
+    isLogin: state.login.isLogin,
+    tokken1: state.login.tokken1,
+    tokken2: state.login.tokken2,
+    longitude: state.login.longitude,
+    latitude: state.login.latitude
+});
+
+// action
+const mapDispatchToProps = (dispatch) => bindActionCreators(
+    {
+        changeLoginState,
+        setTokken1,
+        setTokken2,
+        setLong,
+        setLati
+    },
+    dispatch
+);
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Header);
