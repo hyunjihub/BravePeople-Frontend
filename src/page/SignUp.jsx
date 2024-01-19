@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
 
+// restapi
+import axios from 'axios';
+
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -51,6 +54,7 @@ const UniqueButton = styled.button`
     right: 20px;
     top: 10px;
     font-family: 'SUITE';
+    cursor: pointer;
 `;
 
 const ForInset = styled.div`
@@ -72,6 +76,7 @@ const Button = styled.button`
     margin: 24px 0;
     padding: 0px;
     font-family: 'SUITE';
+    cursor: pointer;
 `;
 
 const RadioButton = styled.input`
@@ -80,6 +85,7 @@ const RadioButton = styled.input`
 
     accent-color: #f8332f;
     margin-right: 5px;
+    cursor: pointer;
 `;
 
 const RadioBox = styled.div`
@@ -98,7 +104,8 @@ const RadioLabel = styled.label`
 `;
 
 
-/* 성별 버튼 만들고 중복검사 없애고, 위치확인은 권한설정용도로*/
+/* 인증 버튼 클릭시 인증 완료 버튼으로 변경되고 인증 완료 버튼 누를시 백으로 인증여부 물어봄, 위치확인은 권한설정*/
+/* 인증 버튼 누를 시, 위에 안내 문구를 이메일 인증 완료 후, 인증 완료 버튼을 눌러주세요로 변경돼야 함*/
 function SignUp(props) {
     const navigate = useNavigate();
     const [gender, setGender] = useState('0');
@@ -106,8 +113,50 @@ function SignUp(props) {
     const handleGender = (e) => {
         setGender(e.target.value);
     }
+
+    // 여기서 위도랑 경도 파라미터 추가해야하고, 중복검사 추가해야함 
+    const handleSignUp = (e) => {
+        if(e.target[0].value !== "" && e.target[3].value !== ""){
+            if(e.target[3].value.length>6) {
+                if(e.target[4].value == e.target[5].value) {
+                    axios.post('http://13.209.77.50:8080/auth/signup', {
+                    name: e.target[0].value,
+                    gender: gender,
+                    username: e.target[3].value,
+                    pw: e.target[4].value,
+                    email: e.target[6].value,
+                    nickname: e.target[7].value,
+                    })
+                    .then(function(response){
+                        navigate("/main");
+                    })
+                    .catch(function(error){
+                        alert("에러문구 안내 문구");
+                    });
+                } else {
+                    alert("입력하신 비밀번호가 일치하지 않습니다.");
+                }
+            } else {
+                alert("아이디는 6글자 이상으로 작성해야 합니다.");
+            }  
+        }else{
+            alert("모든 항목이 입력되지 않았습니다.");
+        }
+        e.preventDefault();
+    }
+
+    // 인증버튼 누를시 인증완료 버튼 + 안내문구 수정 (위 주석 참고) 인증완료 버튼 누를시 백에서부터 인증 완료됐는지 정보 가져옴 -> alert로 인증완료 여부 알려줌
+    const handleAuth = (e) => {
+        
+    }
+
+    // 버튼 클릭시 위치정보 (시,군,구) 위치정보 input의 기본 텍스트로 입력됨, 위도와 경도 값을 받아와서 나중에 회원가입할 때 같이 보낼 수 있게 저장해야 할 듯
+    const handleLocation = (e) => {
+
+    }
+
     return(
-        <Form>
+        <Form onSubmit={handleSignUp}>
             <Title>회원가입</Title>
             <Label>성함 *</Label>
             <Input
@@ -168,7 +217,7 @@ function SignUp(props) {
                 /> 
                 <UniqueButton>위치확인</UniqueButton>
             </ForInset>
-            <Button onClick={()=>navigate("/main")}>회원가입</Button>
+            <Button type="submit">회원가입</Button>
             <Button onClick={()=>navigate("/main")}>취소</Button>
         </Form>
     );

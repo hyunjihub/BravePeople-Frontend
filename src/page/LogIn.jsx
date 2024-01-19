@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
 
+// restapi
+import axios from 'axios';
+
 // redux
-import { changeLoginState, setTokken1, setTokken2 } from "../reducer/modules/login";
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
+import { useDispatch } from "react-redux";
+import { setAccessToken, setLogin, setRefreshToken } from "../redux/modules/login";
 
 const Form = styled.form`
     width: 400px;
@@ -55,11 +57,6 @@ const Title = styled.div`
     text-align: center;
 `;
 
-const Forget = styled.a`
-    font-size: 15px;
-    text-align: center;
-`;
-
 const LinkText = styled(Link)`
     text-decoration: none;
     color: inherit;
@@ -71,17 +68,33 @@ const Text = styled.div`
     gap: 10px;
 `;
 
-function LogIn({ isLogin, changeLoginState, setTokken1, setTokken2 }) {
-
+export default function LogIn(props) {
     const navigate = useNavigate();
 
+    const dispatch = useDispatch();
+    const setLog = (isLogin) => dispatch(setLogin(isLogin));
+    const setAccess = (access) => dispatch(setAccessToken(access));
+    const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
+
     const handleLogin = (e) => {
-        //처음 submit하면 들어갈 함수는 axios로 백에 post요청
-        //데이터를 백으로부터 받게 된다. 받은 토큰, 위치정보를 다시 redux변수에 저장한다.
-        changeLoginState(true);
-        setTokken1("tokken1");
-        setTokken2("tokken2");
-        navigate("/main");
+        // yny3533, rktlrhrl123
+        if(e.target[0].value !== "" && e.target[1].value !== ""){
+            axios.post('http://13.209.77.50:8080/auth/login', {
+            username: e.target[0].value,
+            pw: e.target[1].value
+            })
+            .then(function(response){
+                setLog(true);
+                setAccess(response.data.tokenDto.accessToken);
+                setRefresh(response.data.tokenDto.refreshToken);
+                navigate("/main");
+            })
+            .catch(function(error){
+                alert("로그인 정보를 확인해주세요.");
+            });
+        }else{
+            alert("아이디 또는 비밀번호를 입력해주세요.");
+        }
         e.preventDefault();
     }
 
@@ -108,21 +121,3 @@ function LogIn({ isLogin, changeLoginState, setTokken1, setTokken2 }) {
         </Form>
     );
 };
-
-const mapStateToProps = (state) => ({
-    isLogin: state.login.isLogin
-});
-
-const mapDispatchToProps = (dispatch) => bindActionCreators(
-    {
-        changeLoginState,
-        setTokken1,
-        setTokken2
-    },
-    dispatch
-);
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(LogIn);

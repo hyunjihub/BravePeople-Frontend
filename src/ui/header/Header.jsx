@@ -1,17 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import logo from "./logo.png";
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 
-import HeaderButton from "./HeaderButton";
-
 // redux
-import { changeLoginState, setTokken1, setTokken2, setLong, setLati } from "../../reducer/modules/login"
-import { bindActionCreators } from 'redux';
-import { connect } from 'react-redux';
-
+import HeaderButton from "./HeaderButton";
+import { useSelector, shallowEqual, useDispatch } from "react-redux";
+import { setLogin, setAccessToken, setRefreshToken } from "../../redux/modules/login";
 
 const Wrapper = styled.div`
     width : 100vw;
@@ -44,19 +41,20 @@ const Logo = styled.div`
     cursor: pointer;
 `;
 
-const LocationBox = styled.div`
+const LocationBox = styled.button`
     width : 130px;
     height : 40px;
     background-color: #fff;
     border-radius : 15px;
     border: 1px solid rgba(18, 23, 42, 0.1);
     margin-right: 5%;
-    box-shadow: 0px 4px 15px -5px rgba(18, 23, 42, 0.1);
     padding: 0px 0px 0px 10px;
+    box-shadow: 0px 4px 15px -5px rgba(18, 23, 42, 0.1);
     box-sizing: border-box;
     display: flex;
     justify-items: space-between;
     align-items: center; 
+    cursor: pointer;
 `;
 
 const HiddenLocation = styled.div`
@@ -71,6 +69,7 @@ const Location = styled.span`
     color: #000;
     font-weight: bold;
     font-size: 20px;
+    font-family: 'SUITE';
 `;
 
 const PostListMenu = styled.div`
@@ -114,15 +113,26 @@ const HiddenMyPage = styled.div`
     background-color: #fff;
 `;
 
-function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginState, setTokken1, setTokken2, setLong, setLati } ) {
+export default function Header(props) {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { isLog, access, refresh } = useSelector( state => ({
+        isLog: state.login.isLogin,
+        access: state.login.accessToken,
+        refresh: state.login.refreshToken
+    }), shallowEqual);
+
+    const setLog = (isLogin) => dispatch(setLogin(isLogin));
+    const setAccess = (accessTk) => dispatch(setAccessToken(accessTk));
+    const setRefresh = (refreshTk) => dispatch(setRefreshToken(refreshTk));
 
     const handleLogOut = () => {
-        if(isLogin) {
-            changeLoginState(false);
-            setTokken1("");
-            setTokken2("");
+        if(isLog) {
+            setLog(false);
+            setAccess("");
+            setRefresh("");
             navigate("/main");
         }else{
             navigate("/login")
@@ -138,37 +148,11 @@ function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginSt
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             
             <RightContainer>
-                {isLogin ? <LocationBox><IoLocationSharp size="30" color="#f8332f"/> <Location>춘천시</Location></LocationBox>: <HiddenLocation />}
-                {isLogin ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
-                {isLogin ? <HeaderButton onClick={()=>{navigate("/mypage");}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
-                <HeaderButton onClick={handleLogOut}>{isLogin?"로그아웃":"로그인"}</HeaderButton>
+                {isLog ? <LocationBox><IoLocationSharp size="30" color="#f8332f"/> <Location>춘천시</Location></LocationBox>: <HiddenLocation />}
+                {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
+                {isLog ? <HeaderButton onClick={()=>{navigate("/mypage");}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
+                <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
             </RightContainer>
         </Wrapper>
     );
 }
-
-// state 변수
-const mapStateToProps = (state) => ({
-    isLogin: state.login.isLogin,
-    tokken1: state.login.tokken1,
-    tokken2: state.login.tokken2,
-    longitude: state.login.longitude,
-    latitude: state.login.latitude
-});
-
-// action
-const mapDispatchToProps = (dispatch) => bindActionCreators(
-    {
-        changeLoginState,
-        setTokken1,
-        setTokken2,
-        setLong,
-        setLati
-    },
-    dispatch
-);
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Header);

@@ -30,6 +30,7 @@ function Main(props) {
             <Button onClick={()=>{navigate("/viewpost");}}>게시글 보기 페이지로</Button>
             <Button onClick={()=>{navigate("/writepost");}}>게시글 작성 페이지로</Button>
             <Button onClick={()=>{navigate("/error");}}>잘못된 404 페이지로</Button>
+            <Button onClick={()=>{navigate("/resetpw");}}>비밀번호 재설정 페이지로</Button>
         </Wrapper>
     );
 }
