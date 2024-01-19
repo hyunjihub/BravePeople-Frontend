@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 // redux
 import { changeLoginState, setTokken1, setTokken2 } from "../reducer/modules/login";
@@ -78,6 +79,18 @@ function LogIn({ isLogin, changeLoginState, setTokken1, setTokken2 }) {
     const handleLogin = (e) => {
         //처음 submit하면 들어갈 함수는 axios로 백에 post요청
         //데이터를 백으로부터 받게 된다. 받은 토큰, 위치정보를 다시 redux변수에 저장한다.
+        
+        axios.post('http://13.209.77.50:8080/auth/login', {
+            username: 'yny3533',
+            pw: 'rktlrhrl123'
+        })
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
         changeLoginState(true);
         setTokken1("tokken1");
         setTokken2("tokken2");
