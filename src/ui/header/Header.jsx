@@ -138,7 +138,7 @@ function Header( { isLogin, tokken1, tokken2, longitude, latitude, changeLoginSt
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             
             <RightContainer>
-                {isLogin ? <Location><IoLocationSharp size="30" color="#f8332f"/> 춘천시</Location>: <HiddenLocation />}
+                {isLogin ? <LocationBox><IoLocationSharp size="30" color="#f8332f"/> <Location>춘천시</Location></LocationBox>: <HiddenLocation />}
                 {isLogin ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 {isLogin ? <HeaderButton onClick={()=>{navigate("/mypage");}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLogin?"로그아웃":"로그인"}</HeaderButton>
