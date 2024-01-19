@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
@@ -6,7 +6,7 @@ import { useNavigate } from "react-router";
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
-    margin: 120px 0 50px;
+    margin: 70px 0 50px;
     text-align: center;
 `;
 
@@ -71,17 +71,41 @@ const Button = styled.button`
     font-size: 15px;
     margin: 24px 0;
     padding: 0px;
+    font-family: 'SUITE';
 `;
 
 const RadioButton = styled.input`
     width : 20px;
     height: 20px;
+
+    accent-color: #f8332f;
+    margin-right: 5px;
+`;
+
+const RadioBox = styled.div`
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 8px;
+`;
+
+const RadioLabel = styled.label`
+    font-family: 'SUITE';
+    font-size: 17px;
+    margin-right: 10px;
 `;
 
 
 /* 성별 버튼 만들고 중복검사 없애고, 위치확인은 권한설정용도로*/
 function SignUp(props) {
     const navigate = useNavigate();
+    const [gender, setGender] = useState('0');
+
+    const handleGender = (e) => {
+        setGender(e.target.value);
+    }
     return(
         <Form>
             <Title>회원가입</Title>
@@ -92,6 +116,12 @@ function SignUp(props) {
                 placeholder="성함" 
             />
             <Label>성별 *</Label>
+            <RadioBox>
+                <RadioButton type="radio" value="0" checked={gender==='0'} onChange={handleGender}></RadioButton>
+                <RadioLabel>남성</RadioLabel>
+                <RadioButton type="radio" value="1" checked={gender==='1'} onChange={handleGender}></RadioButton>
+                <RadioLabel>여성</RadioLabel>
+            </RadioBox>
             <Label>아이디 *</Label>
             <Detail>6글자 이상</Detail>           
             <Input

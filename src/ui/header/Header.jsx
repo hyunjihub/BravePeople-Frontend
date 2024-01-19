@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import logo from "./logo.png";
-import { useInView } from "react-intersection-observer"
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
+
 import HeaderButton from "./HeaderButton";
 
 // redux
 import { changeLoginState, setTokken1, setTokken2, setLong, setLati } from "../../reducer/modules/login"
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-
-
 
 
 const Wrapper = styled.div`
@@ -32,7 +30,7 @@ const RightContainer = styled.div`
     float: right;
     background-color: #fff;
     margin-right: 4%;
-    margin-top: 0.7%;
+    margin-top: 1.1%;
     display: flex;
 `;
 
@@ -46,20 +44,18 @@ const Logo = styled.div`
     cursor: pointer;
 `;
 
-const Location = styled.div`
+const LocationBox = styled.div`
     width : 130px;
-    height : 45px;
+    height : 40px;
     background-color: #fff;
     border-radius : 15px;
-    font-weight : bold;
     border: 1px solid rgba(18, 23, 42, 0.1);
-    font-size : 20px;
     margin-right: 5%;
     box-shadow: 0px 4px 15px -5px rgba(18, 23, 42, 0.1);
-    padding: 0px 0px 0px 20px;
+    padding: 0px 0px 0px 10px;
     box-sizing: border-box;
     display: flex;
-    justify-items: center;
+    justify-items: space-between;
     align-items: center; 
 `;
 
@@ -68,6 +64,13 @@ const HiddenLocation = styled.div`
     height: 30px;
     background-color: #fff;
     margin-right: 5%;
+`;
+
+const Location = styled.span`
+    margin-left: 10%;
+    color: #000;
+    font-weight: bold;
+    font-size: 20px;
 `;
 
 const PostListMenu = styled.div`
@@ -95,7 +98,8 @@ const Chat = styled.button`
     background-color: #fff;
     width: 10%;
     height: 10%;
-    margin-top: 3%;
+    margin-top: 2%;
+    cursor: pointer;
 `;
 
 const HiddenChat = styled.div`
