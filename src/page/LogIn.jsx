@@ -78,19 +78,23 @@ export default function LogIn(props) {
 
     const handleLogin = (e) => {
         // yny3533, rktlrhrl123
-        axios.post('http://13.209.77.50:8080/auth/login', {
+        if(e.target[0].value !== "" && e.target[1].value !== ""){
+            axios.post('http://13.209.77.50:8080/auth/login', {
             username: e.target[0].value,
             pw: e.target[1].value
-        })
-        .then(function(response){
-            setLog(true);
-            setAccess(response.data.tokenDto.accessToken);
-            setRefresh(response.data.tokenDto.refreshToken);
-            navigate("/main");
-        })
-        .catch(function(error){
-            alert("로그인 정보를 확인해주세요.");
-        });
+            })
+            .then(function(response){
+                setLog(true);
+                setAccess(response.data.tokenDto.accessToken);
+                setRefresh(response.data.tokenDto.refreshToken);
+                navigate("/main");
+            })
+            .catch(function(error){
+                alert("로그인 정보를 확인해주세요.");
+            });
+        }else{
+            alert("아이디 또는 비밀번호를 입력해주세요.");
+        }
         e.preventDefault();
     }
 
