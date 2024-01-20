@@ -8,7 +8,7 @@ import axios from 'axios';
 
 // redux
 import { useDispatch } from "react-redux";
-import { setAccessToken, setLogin, setRefreshToken } from "../redux/modules/login";
+import { setAccessToken, setLogin, setRefreshToken, setMemberId } from "../redux/modules/login";
 
 const Form = styled.form`
     width: 400px;
@@ -75,18 +75,20 @@ export default function LogIn(props) {
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setAccess = (access) => dispatch(setAccessToken(access));
     const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
+    const setId = (id) => dispatch(setMemberId(id));
 
     const handleLogin = (e) => {
         // yny3533, rktlrhrl123
         if(e.target[0].value !== "" && e.target[1].value !== ""){
             axios.post('http://13.209.77.50:8080/auth/login', {
-            username: e.target[0].value,
-            pw: e.target[1].value
+                username: e.target[0].value,
+                pw: e.target[1].value
             })
             .then(function(response){
                 setLog(true);
                 setAccess(response.data.tokenDto.accessToken);
                 setRefresh(response.data.tokenDto.refreshToken);
+                setId(response.data.memberId);
                 navigate("/main");
             })
             .catch(function(error){

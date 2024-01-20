@@ -1,9 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import profile from '../ui/dummy/profile.png';
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { FaRegStar, FaStar, FaStarHalfAlt, FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
+import StarRating from "../components/StarRating";
+
+import axios from "axios";
+
+//redux
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
 
 const Container = styled.div`
     width: 1200px;
@@ -146,18 +153,78 @@ const ButtonContainer = styled.div`
 /* 상태변경 누를시 본인이 아닌 상대페이지를 보는 기준 재클릭시 본인페이지 */
 /* 다만, 현재는 수정버튼 눌러놓고 상태변경 누르면 수정 상태 유지 (수정해야 함)*/
 function MyPage(props) {
+
+    const navigate = useNavigate();
+    
+    // state 선언부
     const [myself, setMySelf] = useState(true);
     const [isClicked, setIsClicked] = useState(false);
-    const navigate = useNavigate();
+    const [userInfo, setUserInfo] = useState({
+        profileImage: "",
+        nickname: "",
+        introduction: "",
+        score: 0,
+        medalCount: 0
+    });
 
-    const handleMyself = () => {
-        if(myself) {
-            setMySelf(false);
+    // redux로 변수, 함수 가져오기
+    const { isLog, id, access, refresh, param } = useSelector((state)=>({
+        isLog: state.login.isLogin,
+        id: state.login.memberId,
+        access: state.login.accessToken,
+        refresh: state.login.refreshToken,
+        param : state.login.paramId
+    }), shallowEqual);
+
+    const dispatch = useDispatch();
+    const setAccess = (access) => dispatch(setAccessToken(access));
+    const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
+    const setParam = (paramid) => dispatch(setParamId(paramid));
+
+    const parameter = useParams();
+
+    useEffect(()=>{
+        if(!isLog){
+            alert("로그인 상태에서만 마이페이지를 이용할 수 있습니다.");
+            navigate("/main");
+        }else{
+            setParam(parameter.memberid);
+            axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
+                headers:{
+                    Authorization: `Bearer ${access}`
+                }
+            })
+            .then(function(response){
+                console.log(response);
+                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                    console.log("토큰 기한 만료!");
+                    axios.post("http://13.209.77.50:8080/auth/reissue",{
+                        accessToken: access,
+                        refreshToken: refresh
+                    })
+                    .then(function(response){
+                        setAccess(response.data.accessToken);
+                        setRefresh(response.data.refreshToken);
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                }else{
+                    setUserInfo({
+                        profileImage: response.data.profileImage,
+                        nickname: response.data.nickname,
+                        introduction: response.data.introduction,
+                        score: response.data.score,
+                        medalCount: response.data.medalCount
+                    });
+                }
+            })
+            .catch(function(error){
+                console.log(error);
+            });
         }
-        else {
-            setMySelf(true);
-        }
-    };
+        (param === id) ? setMySelf(true) : setMySelf(false);
+    }, [])
 
     const handleIsClicked = () => {
         if(isClicked) {
@@ -170,15 +237,16 @@ function MyPage(props) {
 
     return(
         <Container>
-            <button onClick={handleMyself}>상태 변경</button>
+            <button onClick={()=>{console.log(userInfo);}} >확인버튼</button>
             <Profile>
                 <ProfileButton><FaCamera className="icon" size="45" color="ccc"/></ProfileButton>
                 <Myself>
-                    <Nickname>원정대원</Nickname>
+                    <Nickname>{userInfo.nickname}</Nickname>
                     {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
                 </Myself>
-                <Introduce>안녕하세요! 잘 부탁드려요!</Introduce>
+                <Introduce>{(userInfo.introduction === "")?userInfo.introduction:"자기소개문구가 작성되지 않았습니다."}</Introduce>
                 <Rating>
+                    <StarRating value={userInfo.score} />
                     <FaStar size="40" color="#ffb400" /> 
                     <FaStar size="40" color="#ffb400" />
                     <FaStar size="40" color="#ffb400" />
