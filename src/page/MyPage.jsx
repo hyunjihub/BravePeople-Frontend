@@ -205,6 +205,8 @@ function MyPage(props) {
                     .then(function(response){
                         setAccess(response.data.accessToken);
                         setRefresh(response.data.refreshToken);
+                        alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
+                        navigate("/main");
                     })
                     .catch(function(error){
                         console.log(error);
