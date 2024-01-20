@@ -12,7 +12,7 @@ export const setLati = (lati) => ({ type: SET_LATI, lati});
 
 const initialState = {
     isLogin: false,
-    accessToken: "sdfsddfdsfsd",
+    accessToken: "",
     refreshToken: "",
     longitude: "",
     latitude: "",
