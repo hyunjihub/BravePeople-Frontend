@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 
+// restapi
+import axios from 'axios';
+
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -44,6 +47,7 @@ const Button = styled.button`
     margin: 24px 0;
     padding: 0px;
     font-family: 'SUITE-Regular';
+    cursor: pointer;
 `;
 
 const Form = styled.form`
@@ -61,14 +65,32 @@ function ResetPw(props) {
     const [isReset, setIsReset] = useState(true);
 
     const handleReset = (e) =>{
-        if(isReset){
-            navigate("/main");
-        }else{
-            navigate("/main");
+
+        console.log(e.target[0].value);
+        
+        if(e.target[0].value !== "") {
+            if(e.target[0].value == e.target[1].value) {
+                axios.patch('http://13.209.77.50:8080/member/pw', {
+                memberid: "",
+                authCode: "",
+                newPassword: e.target[0].value
+                })
+                .then(function(response){
+                    navigate("/resetpw");
+                })
+                .catch(function(error){
+                    alert("에러 문구");
+                });
+            } else {
+                alert("입력하신 비밀번호가 일치하지 않습니다.");
+            }
+        } else {
+            alert("비밀번호를 입력해주세요.");
         }
         
         e.preventDefault();
     }
+
     return(
         <Form onSubmit={handleReset}>
             <Title>비밀번호 재설정</Title>

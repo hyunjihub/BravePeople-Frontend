@@ -41,19 +41,20 @@ const Logo = styled.div`
     cursor: pointer;
 `;
 
-const LocationBox = styled.div`
+const LocationBox = styled.button`
     width : 130px;
     height : 40px;
     background-color: #fff;
     border-radius : 15px;
     border: 1px solid rgba(18, 23, 42, 0.1);
     margin-right: 5%;
-    box-shadow: 0px 4px 15px -5px rgba(18, 23, 42, 0.1);
     padding: 0px 0px 0px 10px;
+    box-shadow: 0px 4px 15px -5px rgba(18, 23, 42, 0.1);
     box-sizing: border-box;
     display: flex;
     justify-items: space-between;
     align-items: center; 
+    cursor: pointer;
 `;
 
 const HiddenLocation = styled.div`
@@ -68,6 +69,7 @@ const Location = styled.span`
     color: #000;
     font-weight: bold;
     font-size: 20px;
+    font-family: 'SUITE';
 `;
 
 const PostListMenu = styled.div`
@@ -140,6 +142,11 @@ export default function Header(props) {
         }
     };
 
+    useEffect(()=>{
+        console.log(access);
+        console.log(refresh);
+    }, [access, refresh])
+
     return (
         <Wrapper>
             <Logo onClick={()=>{navigate("/main");}}>
@@ -149,7 +156,7 @@ export default function Header(props) {
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             
             <RightContainer>
-                {isLog ? <Location><IoLocationSharp size="30" color="#f8332f"/> 춘천시</Location>: <HiddenLocation />}
+                {isLog ? <LocationBox><IoLocationSharp size="30" color="#f8332f"/> <Location>춘천시</Location></LocationBox>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 {isLog ? <HeaderButton onClick={()=>{navigate(`/mypage/${id}`);}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
@@ -157,4 +164,3 @@ export default function Header(props) {
         </Wrapper>
     );
 }
-
