@@ -2,15 +2,17 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import profile from '../ui/dummy/profile.png';
 import { useNavigate } from "react-router";
-import { FaRegStar, FaStar, FaStarHalfAlt, FaCamera } from "react-icons/fa";
+import { FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
-import StarRating from "../components/StarRating";
+
+import StarRating from "../components/Rating";
 
 import axios from "axios";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
+
 
 const Container = styled.div`
     width: 1200px;
@@ -46,7 +48,20 @@ const ProfileButton = styled.button`
     overflow: hidden;
     margin: 10% 20% 3%;
     border: none;
+    cursor: pointer;
+`;
 
+const ModifyProfile = styled.button`
+    width: 60%;
+    height: 30%;
+    background-image : url(${profile});
+    background-size: cover;
+    no-repeat: none;
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 10% 20% 3%;
+    border: none;
+    cursor: pointer;
     &:hover {
         filter: brightness(80%);
         .icon {
@@ -84,7 +99,7 @@ const Modify = styled.button`
     background-color: #fff;
     font-family: 'SUITE';
     margin-bottom: 3%;
-
+    cursor: pointer;
     &:hover {
         color: #000;
         font-weigh: 400;
@@ -112,11 +127,15 @@ const SettingButton = styled.button`
     border: none;
     background-color: #fff;
     margin-top: 13%;
+    cursor: pointer;
 `;
 
+
+//width 넓히기 설정버튼 고정되게
 const Myself = styled.div`
     display: flex;
     flex-direction: row;
+    width: 50%;
 `;
 
 const Box = styled.div`
@@ -139,6 +158,7 @@ const ModifyButton = styled.button`
     border: none;
     font-family: 'SUITE';
     font-size: 16px;
+    cursor: pointer;
 `;
 
 const ButtonContainer = styled.div`
@@ -162,7 +182,7 @@ function MyPage(props) {
     const [userInfo, setUserInfo] = useState({
         profileImage: "",
         nickname: "",
-        introduction: "",
+        intro: "",
         score: 0,
         medalCount: 0
     });
@@ -202,7 +222,7 @@ function MyPage(props) {
                     console.log("토큰 기한 만료!");
                     axios.post("http://13.209.77.50:8080/auth/reissue",{
                         accessToken: access,
-                        refreshToken: refresh
+                        refreshToken: refresh,
                     })
                     .then(function(response){
                         alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
@@ -217,14 +237,13 @@ function MyPage(props) {
                     setUserInfo({
                         profileImage: response.data.profileImage,
                         nickname: response.data.nickname,
-                        introduction: response.data.introduction,
+                        intro: response.data.introduction,
                         score: response.data.score,
                         medalCount: response.data.medalCount
                     });
                 }
             })
             .catch(function(error){
-                console.log("get 에러 발생!");
                 console.log(error);
             });
         };
@@ -243,19 +262,15 @@ function MyPage(props) {
         <Container>
             <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
             <Profile>
-                <ProfileButton><FaCamera className="icon" size="45" color="ccc"/></ProfileButton>
+                {isClicked?<ModifyProfile><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:<ProfileButton />}
+                
                 <Myself>
                     <Nickname>{userInfo.nickname}</Nickname>
                     {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
                 </Myself>
-                <Introduce>{(userInfo.introduction === "")?userInfo.introduction:"자기소개문구가 작성되지 않았습니다."}</Introduce>
+                <Introduce>{(userInfo.intro !== "")?(userInfo.intro):"자기소개문구가 작성되지 않았습니다."}</Introduce>
                 <Rating>
-                    <StarRating value={userInfo.score} />
-                    <FaStar size="40" color="#ffb400" /> 
-                    <FaStar size="40" color="#ffb400" />
-                    <FaStar size="40" color="#ffb400" />
-                    <FaStarHalfAlt size="40" color="#ffb400" /> 
-                    <FaRegStar size="40" color="#ffb400" /> 
+                    <StarRating value={userInfo.score}></StarRating>
                 </Rating>
                 <Badge>뱃지 들어갈 위치</Badge>
                 {isClicked?<Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>:null}

@@ -2,6 +2,10 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 
+// restapi
+import axios from 'axios';
+
+
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -45,6 +49,7 @@ const Button = styled.button`
     margin: 24px 0;
     padding: 0px;
     font-family: 'SUITE';
+    cursor: pointer;
 `;
 
 const Form = styled.form`
@@ -56,7 +61,22 @@ function Authentication(props) {
     const navigate = useNavigate();
 
     const handleAuth = (e) =>{
-        navigate("/resetpw");
+
+        console.log(e.target[0].value);
+        
+        if(e.target[0].value != "") {
+            axios.post('http://13.209.77.50:8080/member/pw', {
+            pw: e.target[0].value,
+            })
+            .then(function(response){
+                navigate("/resetpw");
+            })
+            .catch(function(error){
+                alert("비밀번호가 틀립니다.");
+            });
+        } else {
+            alert("비밀번호를 입력해주세요.");
+        }
         e.preventDefault();
     }
 

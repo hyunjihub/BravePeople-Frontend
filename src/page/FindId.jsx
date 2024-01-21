@@ -1,5 +1,9 @@
 import React from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router";
+
+// restapi
+import axios from 'axios';
 
 const Title = styled.div`
     font-size: 40px;
@@ -54,6 +58,7 @@ const Button = styled.button`
     margin: 24px 0;
     padding: 0px;
     font-family: 'SUITE';
+    cursor: pointer;
 `;
 
 const Container = styled.div`
@@ -65,9 +70,59 @@ const Container = styled.div`
 `;
 
 function FindId(props) {
+
+    const navigate = useNavigate();
+
+    const idFind = (e) => {
+        // yny3533, rktlrhrl123
+        console.log("확인");
+        if (e.target[0].value !== "") {
+            axios.get('http://13.209.77.50:8080/auth/username', {
+                params: {
+                    email: e.target[0].value
+                }
+            })
+            .then(function(response){
+                console.log(response);
+                navigate("/main");
+            })
+            .catch(function(error){
+                alert("등록된 이메일이 없습니다.");
+            });
+            e.preventDefault();
+        } else {
+            alert("이메일이 입력되지 않았습니다.");
+        }
+        
+    }
+
+    const pwFind = (e) => {
+        
+        if(e.target[0].value !== "" && e.target[1].value !== "") {
+            if(e.target[0].value.length>6) {
+                axios.post('http://13.209.77.50:8080/auth/pw', {
+                    username: e.target[0].value,
+                    email: e.target[1].value,
+                })
+                .then(function(response){
+                    navigate("/main");
+                })
+                .catch(function(error){
+                    alert("등록된 이메일이 없습니다.");
+                });
+                e.preventDefault();
+            } else {
+                alert("아이디는 6글자 이상입니다.");
+            }    
+        } else {
+            alert("아이디 또는 이메일이 입력되지 않았습니다.");
+        }
+        
+    }
+
     return(
         <Container>
-            <IdForm>
+            <IdForm onSubmit={idFind}>
                 <Title>아이디 찾기</Title>
                 <Label>아이디</Label>
                 <Input
@@ -77,7 +132,7 @@ function FindId(props) {
                 />
                 <Button>아이디 찾기</Button>
             </IdForm>
-            <PasswordForm>
+            <PasswordForm onSubmit={pwFind}>
                 <Title>비밀번호 찾기</Title>
                 <Label>아이디</Label>
                 <Input
