@@ -219,7 +219,6 @@ function MyPage(props) {
             })
             .then(function(response){
                 if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
-                    console.log("토큰 기한 만료!");
                     axios.post("http://13.209.77.50:8080/auth/reissue",{
                         accessToken: access,
                         refreshToken: refresh,
@@ -247,7 +246,7 @@ function MyPage(props) {
                 console.log(error);
             });
         };
-    }, [])
+    }, []);
 
     const handleIsClicked = () => {
         if(isClicked) {
