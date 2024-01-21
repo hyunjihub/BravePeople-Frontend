@@ -78,6 +78,7 @@ export default function LogIn(props) {
     const setId = (id) => dispatch(setMemberId(id));
 
     const handleLogin = (e) => {
+        e.preventDefault();
         // yny3533, rktlrhrl123
         if(e.target[0].value !== "" && e.target[1].value !== ""){
             axios.post('http://13.209.77.50:8080/auth/login', {
@@ -85,10 +86,10 @@ export default function LogIn(props) {
                 pw: e.target[1].value
             })
             .then(function(response){
-                setLog(true);
+                setId(response.data.memberId);
                 setAccess(response.data.tokenDto.accessToken);
                 setRefresh(response.data.tokenDto.refreshToken);
-                setId(response.data.memberId);
+                setLog(true);
                 navigate("/main");
             })
             .catch(function(error){
@@ -97,7 +98,6 @@ export default function LogIn(props) {
         }else{
             alert("아이디 또는 비밀번호를 입력해주세요.");
         }
-        e.preventDefault();
     }
 
     return (

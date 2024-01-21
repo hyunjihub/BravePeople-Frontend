@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import profile from '../ui/dummy/profile.png';
-import { useNavigate, useParams } from "react-router";
+import { useNavigate } from "react-router";
 import { FaRegStar, FaStar, FaStarHalfAlt, FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import StarRating from "../components/StarRating";
@@ -181,21 +181,23 @@ function MyPage(props) {
     const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
     const setParam = (paramid) => dispatch(setParamId(paramid));
 
-    const parameter = useParams();
+
+    useEffect(()=>{
+        (param === id) ? setMySelf(true) : setMySelf(false);
+    }, [])
 
     useEffect(()=>{
         if(!isLog){
             alert("로그인 상태에서만 마이페이지를 이용할 수 있습니다.");
             navigate("/main");
-        }else{
-            setParam(parameter.memberid);
+        }
+        else{
             axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
                 headers:{
                     Authorization: `Bearer ${access}`
                 }
             })
             .then(function(response){
-                console.log(response);
                 if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
                     console.log("토큰 기한 만료!");
                     axios.post("http://13.209.77.50:8080/auth/reissue",{
@@ -203,9 +205,9 @@ function MyPage(props) {
                         refreshToken: refresh
                     })
                     .then(function(response){
+                        alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
                         setAccess(response.data.accessToken);
                         setRefresh(response.data.refreshToken);
-                        alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
                         navigate("/main");
                     })
                     .catch(function(error){
@@ -222,10 +224,10 @@ function MyPage(props) {
                 }
             })
             .catch(function(error){
+                console.log("get 에러 발생!");
                 console.log(error);
             });
-        }
-        (param === id) ? setMySelf(true) : setMySelf(false);
+        };
     }, [])
 
     const handleIsClicked = () => {
@@ -239,7 +241,7 @@ function MyPage(props) {
 
     return(
         <Container>
-            <button onClick={()=>{console.log(userInfo);}} >확인버튼</button>
+            <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
             <Profile>
                 <ProfileButton><FaCamera className="icon" size="45" color="ccc"/></ProfileButton>
                 <Myself>

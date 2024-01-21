@@ -8,7 +8,7 @@ import { IoLocationSharp } from "react-icons/io5";
 // redux
 import HeaderButton from "./HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setAccessToken, setRefreshToken, setMemberId } from "../../redux/modules/login";
+import { setLogin, setAccessToken, setRefreshToken, setMemberId, setParamId } from "../../redux/modules/login";
 
 const Wrapper = styled.div`
     width : 100vw;
@@ -116,17 +116,19 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, access, refresh, id } = useSelector( state => ({
+    const { isLog, access, refresh, id, param } = useSelector( state => ({
         isLog: state.login.isLogin,
         access: state.login.accessToken,
         refresh: state.login.refreshToken,
-        id: state.login.memberId
+        id: state.login.memberId,
+        param: state.login.paramId
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setAccess = (accessTk) => dispatch(setAccessToken(accessTk));
     const setRefresh = (refreshTk) => dispatch(setRefreshToken(refreshTk));
     const setId = (memberId) => dispatch(setMemberId(memberId));
+    const setParam = (paramid) => dispatch(setParamId(paramid));
 
     const handleLogOut = () => {
         if(isLog) {
@@ -140,6 +142,11 @@ export default function Header(props) {
         }
     };
 
+    const MyPageButtonClicked = () => {
+        setParam(id);
+        navigate("/mypage");
+    }
+
     return (
         <Wrapper>
             <Logo onClick={()=>{navigate("/main");}}>
@@ -151,7 +158,7 @@ export default function Header(props) {
             <RightContainer>
                 {isLog ? <Location><IoLocationSharp size="30" color="#f8332f"/> 춘천시</Location>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
-                {isLog ? <HeaderButton onClick={()=>{navigate(`/mypage/${id}`);}}>마이페이지</HeaderButton>: <HiddenMyPage />}   
+                {isLog ? <HeaderButton onClick={MyPageButtonClicked}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
             </RightContainer>
         </Wrapper>
