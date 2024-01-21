@@ -130,11 +130,11 @@ const SettingButton = styled.button`
     cursor: pointer;
 `;
 
-
 //width 넓히기 설정버튼 고정되게
 const Myself = styled.div`
     display: flex;
     flex-direction: row;
+    flex: space-between;
     width: 50%;
 `;
 
@@ -218,7 +218,7 @@ function MyPage(props) {
                 }
             })
             .then(function(response){
-                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                    if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
                     console.log("토큰 기한 만료!");
                     axios.post("http://13.209.77.50:8080/auth/reissue",{
                         accessToken: access,
@@ -244,7 +244,7 @@ function MyPage(props) {
                 }
             })
             .catch(function(error){
-                console.log(error);
+                                console.log(error);
             });
         };
     }, [])
@@ -263,11 +263,8 @@ function MyPage(props) {
             <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
             <Profile>
                 {isClicked?<ModifyProfile><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:<ProfileButton />}
-                
-                <Myself>
-                    <Nickname>{userInfo.nickname}</Nickname>
-                    {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
-                </Myself>
+                <Nickname>{userInfo.nickname}</Nickname>
+                {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
                 <Introduce>{(userInfo.intro !== "")?(userInfo.intro):"자기소개문구가 작성되지 않았습니다."}</Introduce>
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
