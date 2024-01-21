@@ -75,7 +75,6 @@ function FindId(props) {
 
     const idFind = (e) => {
         // yny3533, rktlrhrl123
-        console.log("확인");
         if (e.target[0].value !== "") {
             axios.get('http://13.209.77.50:8080/auth/username', {
                 params: {
@@ -83,8 +82,7 @@ function FindId(props) {
                 }
             })
             .then(function(response){
-                console.log(response);
-                navigate("/main");
+                alert("사용자의 아이디는 " + response.data.username + "입니다.");
             })
             .catch(function(error){
                 alert("등록된 이메일이 없습니다.");

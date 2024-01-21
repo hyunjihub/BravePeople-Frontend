@@ -75,11 +75,32 @@ const ModifyProfile = styled.button`
 `;
 
 const Nickname = styled.div`
+    width: 60%;
+    margin-left: 20%;
     font-weight: 700;
     color: #000;
     text-align: center;
     font-size: 38px;
-    margin-right: 5px;
+    border: none;
+`;
+
+const ModifyNickname = styled.input`
+    width: 60%;
+    margin-left: 20%;
+    font-weight: 700;
+    color: #000;
+    text-align: center;
+    font-size: 38px;
+    font-family: 'SUITE';
+`;
+
+const ModifyIntro = styled.input`
+    font-weight: 200;
+    color: #777;
+    font-size: 15px;
+    text-align: center;
+    margin-bottom: 5%;
+    font-family: 'SUITE';
 `;
 
 const Introduce = styled.div`
@@ -125,17 +146,19 @@ const SettingButton = styled.button`
     height: 5%;
     padding: 0px;
     border: none;
-    background-color: #fff;
-    margin-top: 13%;
+    position: absolute;
+    top: 20%;
+    left: 83%;
     cursor: pointer;
+    background-color: #fff;
 `;
 
 //width 넓히기 설정버튼 고정되게
 const Myself = styled.div`
-    display: flex;
-    flex-direction: row;
-    flex: space-between;
-    width: 50%;
+    width: 100%;
+    height : 8%;
+    background-color: #fff;
+    position: relative;
 `;
 
 const Box = styled.div`
@@ -179,6 +202,7 @@ function MyPage(props) {
     // state 선언부
     const [myself, setMySelf] = useState(true);
     const [isClicked, setIsClicked] = useState(false);
+
     const [userInfo, setUserInfo] = useState({
         profileImage: "",
         nickname: "",
@@ -218,8 +242,7 @@ function MyPage(props) {
                 }
             })
             .then(function(response){
-                    if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
-                    console.log("토큰 기한 만료!");
+                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
                     axios.post("http://13.209.77.50:8080/auth/reissue",{
                         accessToken: access,
                         refreshToken: refresh,
@@ -244,10 +267,24 @@ function MyPage(props) {
                 }
             })
             .catch(function(error){
-                                console.log(error);
+                console.log(error);
             });
         };
-    }, [])
+    }, []);
+
+    const [currentName, setCurrentName] = useState(null);
+    const preName = userInfo.nickname;
+
+    const handleCurrentName = (e) => {
+        setCurrentName(e.target.value);
+    }
+
+    const [currentIntro, setCurrentIntro] = useState(null);
+    const preIntro = userInfo.intro;
+
+    const handleCurrentIntro = (e) => {
+        setCurrentIntro(e.target.value);
+    }
 
     const handleIsClicked = () => {
         if(isClicked) {
@@ -258,14 +295,48 @@ function MyPage(props) {
         }
     };
 
+    const handleModify = (e) => {
+        axios.patch("http://13.209.77.50:8080/member/profile", {
+            nickname: currentName,
+            introduction: currentIntro
+        }, {
+            headers:{
+                Authorization: `Bearer ${access}`
+            }
+        }).then(function(response){
+            setUserInfo({
+                profileImage: userInfo.profileImage,
+                nickname: response.data.nickname,
+                intro: response.data.introduction,
+                score: userInfo.score,
+                medalCount: userInfo.medalCount
+            });
+            setCurrentName(null);
+            setCurrentIntro(null);
+        })
+        .catch(function(error){
+            alert("에러 발생");
+            console.log(error);
+        });
+        setIsClicked(false);
+    }
+        
     return(
         <Container>
             <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
             <Profile>
-                {isClicked?<ModifyProfile><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:<ProfileButton />}
-                <Nickname>{userInfo.nickname}</Nickname>
-                {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
-                <Introduce>{(userInfo.intro !== "")?(userInfo.intro):"자기소개문구가 작성되지 않았습니다."}</Introduce>
+                {isClicked?<ModifyProfile><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
+                <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage})`}}/>}
+                <Myself>
+                    {isClicked?
+                    <ModifyNickname type="text" defaultValue={preName} onChange={handleCurrentName}></ModifyNickname>
+                    :<Nickname>{userInfo.nickname}</Nickname>}
+                    {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
+                </Myself>
+                {isClicked?
+                    <ModifyIntro type="text" defaultValue={preIntro} onChange={handleCurrentIntro}></ModifyIntro>
+                    :<Introduce value>{(userInfo.intro == null || userInfo.intro == "")?"자기소개문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
+                
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
                 </Rating>
@@ -273,9 +344,10 @@ function MyPage(props) {
                 {isClicked?<Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>:null}
                 {isClicked?<Modify >위치정보 재설정</Modify>:null}
                 <ButtonContainer>
-                    {isClicked?<ModifyButton onClick={handleIsClicked}>수정완료</ModifyButton>:null}
+                    {isClicked?<ModifyButton onClick={handleModify}>수정완료</ModifyButton>:null}
                     {isClicked?<ModifyButton onClick={handleIsClicked}>취소</ModifyButton>:null}
                 </ButtonContainer>
+                
                 
             </Profile>
 
