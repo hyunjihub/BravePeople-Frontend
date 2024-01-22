@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 // restapi
 import axios from 'axios';
@@ -46,8 +47,9 @@ const Button = styled.button`
     width: 100%;
     box-sizing: border-box;
     padding: 15px;
-    font-size: 15px;
+    font-size: 18px;
     margin: 24px 0;
+    font-family: 'SUITE';
 `;
 
 const Title = styled.div`
@@ -86,7 +88,6 @@ export default function LogIn(props) {
                 pw: e.target[1].value
             })
             .then(function(response){
-                console.log(response);
                 setId(response.data.memberId);
                 setAccess(response.data.tokenDto.accessToken);
                 setRefresh(response.data.tokenDto.refreshToken);
@@ -94,10 +95,22 @@ export default function LogIn(props) {
                 navigate("/main");
             })
             .catch(function(error){
-                alert("로그인 정보를 확인해주세요.");
+                Swal.fire({
+                    title: "로그인 정보 없음",
+                    text: "입력하신 아이디나 비밀번호를 다시 확인해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
             });
         }else{
-            alert("아이디 또는 비밀번호를 입력해주세요.");
+            Swal.fire({
+                title: "입력하지 않은 항목 있음",
+                text: "입력하지 않은 항목이 있는지 다시 한 번 확인해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
     }
 

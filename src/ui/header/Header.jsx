@@ -4,7 +4,8 @@ import styled from "styled-components";
 import logo from "./logo.png";
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
-import axios from "axios";
+
+import axios from 'axios';
 
 // redux
 import HeaderButton from "./HeaderButton";
@@ -14,7 +15,7 @@ import { setLogin, setAccessToken, setRefreshToken, setMemberId, setParamId } fr
 const Wrapper = styled.div`
     width : 100vw;
     height : 70px;
-    min-width: 1024px;
+    min-width: 1300px;
     border-bottom: 1px solid #efefef;
     position: sticky;
     top: 0;
@@ -151,11 +152,21 @@ export default function Header(props) {
 
     const handleLogOut = () => {
         if(isLog) {
-            setLog(false);
-            setAccess("");
-            setRefresh("");
-            setId("");
-            navigate("/main");
+            axios.post("http://13.209.77.50:8080/member/logout", {
+                headers: {
+                    'Authorization': `Bearer ${access}`
+                }
+            })
+            .then(function(response){
+                setLog(false);
+                setAccess("");
+                setRefresh("");
+                setId("");
+                navigate("/main");
+            })
+            .catch(function(error){
+                console.log(error);
+            });
         }else{
             navigate("/login")
         }

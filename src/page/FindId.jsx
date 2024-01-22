@@ -1,9 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 // restapi
 import axios from 'axios';
+
+//redux
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
 
 const Title = styled.div`
     font-size: 40px;
@@ -71,6 +76,36 @@ const Container = styled.div`
 
 function FindId(props) {
 
+    // redux로 변수, 함수 가져오기
+    const { isLog, id, access, refresh, param } = useSelector((state)=>({
+    isLog: state.login.isLogin,
+    id: state.login.memberId,
+    access: state.login.accessToken,
+    refresh: state.login.refreshToken,
+    param : state.login.paramId
+    }), shallowEqual);
+
+    const dispatch = useDispatch();
+    const setAccess = (acc) => dispatch(setAccessToken(acc));
+    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
+    const setParam = (paramid) => dispatch(setParamId(paramid));
+
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: access,
+            refreshToken: refresh,
+        })
+        .then(function(response){
+            setAccess(response.data.accessToken);
+            setRefresh(response.data.refreshToken);
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
+
     const navigate = useNavigate();
 
     const idFind = (e) => {
@@ -82,16 +117,37 @@ function FindId(props) {
                 }
             })
             .then(function(response){
-                alert("사용자의 아이디는 " + response.data.username + "입니다.");
+                Swal.fire({
+                    title: "아이디 찾기",
+                    text: "사용자의 아이디는 " + response.data.username + "입니다.",
+                    icon: "success",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
             })
             .catch(function(error){
-                alert("등록된 이메일이 없습니다.");
-            });
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                }else{
+                Swal.fire({
+                    title: "계정 정보 없음",
+                    text: "입력하신 이메일과 일치하는 계정 정보가 없습니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+            }});
             e.preventDefault();
         } else {
-            alert("이메일이 입력되지 않았습니다.");
+            Swal.fire({
+                title: "입력 정보 없음",
+                text: "이메일을 입력해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
-        
+        e.preventDefault();
     }
 
     const pwFind = (e) => {
@@ -103,19 +159,46 @@ function FindId(props) {
                     email: e.target[1].value,
                 })
                 .then(function(response){
+                    Swal.fire({
+                        title: "비밀번호 재설정 링크 전송",
+                        text: "입력하신 이메일로 재설정 링크가 전송되었습니다. 메일함을 확인해주세요.",
+                        icon: "success",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
                     navigate("/main");
                 })
                 .catch(function(error){
-                    alert("등록된 이메일이 없습니다.");
-                });
-                e.preventDefault();
+                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                    }else{
+                    Swal.fire({
+                        title: "계정 정보 없음",
+                        text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                }});
             } else {
-                alert("아이디는 6글자 이상입니다.");
+                Swal.fire({
+                    title: "입력 정보 없음",
+                    text: "아이디나 이메일이 입력되지 않았습니다. 다시 한 번 확인해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
             }    
         } else {
-            alert("아이디 또는 이메일이 입력되지 않았습니다.");
+            Swal.fire({
+                title: "계정 정보 없음",
+                text: "입력하신 이메일과 일치하는 계정 정보가 없습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
-        
+        e.preventDefault();
     }
 
     return(
