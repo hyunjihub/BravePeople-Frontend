@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 // restapi
 import axios from 'axios';
+import { shallowEqual, useSelector } from "react-redux";
 
 
 const Title = styled.div`
@@ -59,6 +60,10 @@ const Form = styled.form`
 
 function Authentication(props) {
     const navigate = useNavigate();
+    const { access, refresh } = useSelector((state)=>({
+        access: state.login.accessToken,
+        refresh: state.login.refreshToken
+    }), shallowEqual);
 
     const handleAuth = (e) =>{
 
@@ -66,12 +71,14 @@ function Authentication(props) {
         
         if(e.target[0].value != "") {
             axios.post('http://13.209.77.50:8080/member/pw', {
-            pw: e.target[0].value,
+                nowPassword: e.target[0].value,
             })
             .then(function(response){
+                console.log(response);
                 navigate("/resetpw");
             })
             .catch(function(error){
+                console.log(error);
                 alert("비밀번호가 틀립니다.");
             });
         } else {

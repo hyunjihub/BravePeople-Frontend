@@ -4,6 +4,7 @@ import styled from "styled-components";
 import logo from "./logo.png";
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
+import axios from "axios";
 
 // redux
 import HeaderButton from "./HeaderButton";
@@ -132,6 +133,22 @@ export default function Header(props) {
     const setId = (memberId) => dispatch(setMemberId(memberId));
     const setParam = (paramid) => dispatch(setParamId(paramid));
 
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: access,
+            refreshToken: refresh,
+        })
+        .then(function(response){
+            setAccess(response.data.accessToken);
+            setRefresh(response.data.refreshToken);
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
+
     const handleLogOut = () => {
         if(isLog) {
             setLog(false);
@@ -149,6 +166,48 @@ export default function Header(props) {
         navigate("/mypage");
     }
 
+    // 위치 정보
+    const { geolocation } = navigator;
+    const geolocationOptions = {
+        enableHighAccuracy: true,
+        timeout: 1000 * 10,
+        maximumAge: 1000 * 3600 * 24,
+    }
+
+    const SetLocation = () => {
+        const handleSuccess = (pos) => {
+            axios.patch("http://13.209.77.50:8080/member/location", {
+                lat:pos.coords.latitude,
+                lng:pos.coords.longitude
+            }, {
+                headers:{
+                    Authorization: `Bearer ${access}`
+                }
+            }).then(function(response){
+                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                }else{
+                    console.log(response);
+                }
+            }).catch(function(error){
+                console.log(error);
+            });
+        }
+        const handleError = (err) => {
+                console.log(err);
+        }
+        if(!geolocation){
+            console.log('Geolocation is not supported');
+            return;
+        }
+        if(window.confirm("위치 정보를 새로 저장하시겠습니까?")){
+            geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
+        }else{
+            console.log("위치 정보 저장 취소");
+        }
+        
+    }
+
     return (
         <Wrapper>
             <Logo onClick={()=>{navigate("/main");}}>
@@ -158,7 +217,7 @@ export default function Header(props) {
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             
             <RightContainer>
-                {isLog ? <LocationBox><IoLocationSharp size="30" color="#f8332f"/> <Location>춘천시</Location></LocationBox>: <HiddenLocation />}
+                {isLog ? <LocationBox onClick={SetLocation}><IoLocationSharp size="30" color="#f8332f"/> <Location>춘천시</Location></LocationBox>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 {isLog ? <HeaderButton onClick={MyPageButtonClicked}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>

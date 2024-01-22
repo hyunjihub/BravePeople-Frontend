@@ -13,7 +13,6 @@ import axios from "axios";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
 
-
 const Container = styled.div`
     width: 1200px;
     height: 700px;
@@ -225,10 +224,21 @@ function MyPage(props) {
     const setRefresh = (ref) => dispatch(setRefreshToken(ref));
     const setParam = (paramid) => dispatch(setParamId(paramid));
 
-
-    useEffect(()=>{
-        (param === id) ? setMySelf(true) : setMySelf(false);
-    }, [])
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: access,
+            refreshToken: refresh,
+        })
+        .then(function(response){
+            setAccess(response.data.accessToken);
+            setRefresh(response.data.refreshToken);
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
 
     useEffect(()=>{
         if(!isLog){
@@ -236,27 +246,15 @@ function MyPage(props) {
             navigate("/main");
         }
         else{
+            (param === id) ? setMySelf(true) : setMySelf(false);
             axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
                 headers:{
                     Authorization: `Bearer ${access}`
                 }
             })
             .then(function(response){
-                console.log(response);
                 if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
-                    axios.post("http://13.209.77.50:8080/auth/reissue",{
-                        accessToken: access,
-                        refreshToken: refresh,
-                    })
-                    .then(function(response){
-                        setAccess(response.data.accessToken);
-                        setRefresh(response.data.refreshToken);
-                        alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
-                        navigate("/main");
-                    })
-                    .catch(function(error){
-                        console.log(error);
-                    });
+                    ReissueToken("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");    
                 }else{
                     setUserInfo({
                         profileImage: response.data.profileImage,
@@ -278,6 +276,7 @@ function MyPage(props) {
 
     const handleCurrentName = (e) => {
         setCurrentName(e.target.value);
+        e.preventDefault();
     }
 
     const [currentIntro, setCurrentIntro] = useState(null);
@@ -285,6 +284,7 @@ function MyPage(props) {
 
     const handleCurrentIntro = (e) => {
         setCurrentIntro(e.target.value);
+        e.preventDefault();
     }
 
     const handleIsClicked = () => {
@@ -305,26 +305,65 @@ function MyPage(props) {
                 Authorization: `Bearer ${access}`
             }
         }).then(function(response){
-            setUserInfo({
-                profileImage: userInfo.profileImage,
-                nickname: response.data.nickname,
-                intro: response.data.introduction,
-                score: userInfo.score,
-                medalCount: userInfo.medalCount
-            });
-            setCurrentName(null);
-            setCurrentIntro(null);
+            if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+            }else{
+                setUserInfo({
+                    profileImage: userInfo.profileImage,
+                    nickname: response.data.nickname,
+                    intro: response.data.introduction,
+                    score: userInfo.score,
+                    medalCount: userInfo.medalCount
+                });
+                setCurrentName(null);
+                setCurrentIntro(null);
+            }
         })
         .catch(function(error){
-            alert("에러 발생");
             console.log(error);
         });
         setIsClicked(false);
     }
-        
+    // 위치 정보
+    const { geolocation } = navigator;
+    const geolocationOptions = {
+        enableHighAccuracy: true,
+        timeout: 1000 * 10,
+        maximumAge: 1000 * 3600 * 24,
+    }
+
+    const SetLocation = () => {
+        const handleSuccess = (pos) => {
+            axios.patch("http://13.209.77.50:8080/member/location", {
+                lat:pos.coords.latitude,
+                lng:pos.coords.longitude
+            }, {
+                headers:{
+                    Authorization: `Bearer ${access}`
+                }
+            }).then(function(response){
+                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                }else{
+                    console.log(response);
+                }
+            }).catch(function(error){
+                console.log(error);
+            });
+        }
+        const handleError = (err) => {
+                console.log(err);
+        }
+        if(!geolocation){
+            console.log('Geolocation is not supported');
+            return;
+        }
+        geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
+    }
+
     return(
         <Container>
-            <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
+            <button onClick={()=>{console.log(userInfo)}} >확인버튼</button>
             <Profile>
                 {isClicked?<ModifyProfile><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
                 <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage})`}}/>}
@@ -341,8 +380,8 @@ function MyPage(props) {
                     <StarRating value={userInfo.score}></StarRating>
                 </Rating>
                 <Badge>뱃지 들어갈 위치</Badge>
-                {isClicked?<Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>:null}
-                {isClicked?<Modify >위치정보 재설정</Modify>:null}
+                {isClicked?<Modify onClick={()=>{navigate("/authentication")}}>비밀번호 재설정</Modify>:null}
+                {isClicked?<Modify onClick={SetLocation}>위치정보 재설정</Modify>:null}
                 <ButtonContainer>
                     {isClicked?<ModifyButton onClick={handleModify}>수정완료</ModifyButton>:null}
                     {isClicked?<ModifyButton onClick={handleIsClicked}>취소</ModifyButton>:null}
