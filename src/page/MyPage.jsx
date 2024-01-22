@@ -54,7 +54,6 @@ const ProfileButton = styled.button`
 const ModifyProfile = styled.button`
     width: 60%;
     height: 30%;
-    background-image : url(${profile});
     background-size: cover;
     no-repeat: none;
     border-radius: 999px;
@@ -138,7 +137,7 @@ const Badge = styled.div`
     height: 12%;
     background-color: #000;
     color: #fff;
-    margin-bottom: 15%;
+    margin-bottom: 10%;
 `;
 
 const SettingButton = styled.button`
@@ -189,7 +188,7 @@ const ButtonContainer = styled.div`
     height: 5%;
     display: flex;
     justify-content: space-between;
-    margin-top: 5%;
+    margin-bottom: 10%;
 `;
 
 
@@ -325,7 +324,7 @@ function MyPage(props) {
         <Container>
             <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
             <Profile>
-                {isClicked?<ModifyProfile><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
+                {isClicked?<ModifyProfile style={{backgroundImage: `url(${userInfo.profileImage})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
                 <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage})`}}/>}
                 <Myself>
                     {isClicked?
@@ -335,18 +334,19 @@ function MyPage(props) {
                 </Myself>
                 {isClicked?
                     <ModifyIntro type="text" defaultValue={preIntro} onChange={handleCurrentIntro}></ModifyIntro>
-                    :<Introduce value>{(userInfo.intro == null || userInfo.intro == "")?"자기소개문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
+                    :<Introduce value>{(userInfo.intro == null || userInfo.intro == "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
                 
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
                 </Rating>
                 <Badge>뱃지 들어갈 위치</Badge>
-                {isClicked?<Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>:null}
-                {isClicked?<Modify >위치정보 재설정</Modify>:null}
                 <ButtonContainer>
                     {isClicked?<ModifyButton onClick={handleModify}>수정완료</ModifyButton>:null}
                     {isClicked?<ModifyButton onClick={handleIsClicked}>취소</ModifyButton>:null}
                 </ButtonContainer>
+                <Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>
+                <Modify >위치정보 재설정</Modify>
+                
                 
                 
             </Profile>
