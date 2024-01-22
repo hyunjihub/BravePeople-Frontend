@@ -197,8 +197,8 @@ function MyPage(props) {
     }), shallowEqual);
 
     const dispatch = useDispatch();
-    const setAccess = (access) => dispatch(setAccessToken(access));
-    const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
+    const setAccess = (acc) => dispatch(setAccessToken(acc));
+    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
     const setParam = (paramid) => dispatch(setParamId(paramid));
 
 
@@ -218,15 +218,16 @@ function MyPage(props) {
                 }
             })
             .then(function(response){
+                console.log(response);
                 if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
                     axios.post("http://13.209.77.50:8080/auth/reissue",{
                         accessToken: access,
                         refreshToken: refresh,
                     })
                     .then(function(response){
-                        alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
                         setAccess(response.data.accessToken);
                         setRefresh(response.data.refreshToken);
+                        alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
                         navigate("/main");
                     })
                     .catch(function(error){
@@ -267,7 +268,7 @@ function MyPage(props) {
                     <Nickname>{userInfo.nickname}</Nickname>
                     {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
                 </Myself>
-                <Introduce>{(userInfo.intro !== "")?(userInfo.intro):"자기소개문구가 작성되지 않았습니다."}</Introduce>
+                <Introduce>{(userInfo.intro !== null)?(userInfo.intro):"자기소개문구가 작성되지 않았습니다."}</Introduce>
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
                 </Rating>
