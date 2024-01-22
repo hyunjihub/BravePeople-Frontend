@@ -147,7 +147,7 @@ function FindId(props) {
                 confirmButtonText: "확인",
             });
         }
-        
+        e.preventDefault();
     }
 
     const pwFind = (e) => {
@@ -180,7 +180,6 @@ function FindId(props) {
                         confirmButtonText: "확인",
                     });
                 }});
-                e.preventDefault();
             } else {
                 Swal.fire({
                     title: "입력 정보 없음",
@@ -199,7 +198,7 @@ function FindId(props) {
                 confirmButtonText: "확인",
             });
         }
-        
+        e.preventDefault();
     }
 
     return(
