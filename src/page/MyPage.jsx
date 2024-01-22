@@ -305,22 +305,20 @@ function MyPage(props) {
                 Authorization: `Bearer ${access}`
             }
         }).then(function(response){
-            if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
-                ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-            }else{
-                setUserInfo({
-                    profileImage: userInfo.profileImage,
-                    nickname: response.data.nickname,
-                    intro: response.data.introduction,
-                    score: userInfo.score,
-                    medalCount: userInfo.medalCount
-                });
-                setCurrentName(null);
-                setCurrentIntro(null);
-            }
+            setUserInfo({
+                profileImage: userInfo.profileImage,
+                nickname: response.data.nickname,
+                intro: response.data.introduction,
+                score: userInfo.score,
+                medalCount: userInfo.medalCount
+            });
+            setCurrentName(null);
+            setCurrentIntro(null);
         })
-        .catch(function(error){
-            console.log(error);
+        .catch(function(err){
+            if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
+                ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+            }
         });
         setIsClicked(false);
     }
@@ -342,13 +340,11 @@ function MyPage(props) {
                     Authorization: `Bearer ${access}`
                 }
             }).then(function(response){
-                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                console.log(response);
+            }).catch(function(err){
+                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                }else{
-                    console.log(response);
                 }
-            }).catch(function(error){
-                console.log(error);
             });
         }
         const handleError = (err) => {

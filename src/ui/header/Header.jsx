@@ -184,17 +184,15 @@ export default function Header(props) {
                     Authorization: `Bearer ${access}`
                 }
             }).then(function(response){
-                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                mapApi(response.data.lat, response.data.lng);
+            }).catch(function(err){
+                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                }else{
-                    console.log(response);
                 }
-            }).catch(function(error){
-                console.log(error);
             });
         }
         const handleError = (err) => {
-                console.log(err);
+            console.log(err);
         }
         if(!geolocation){
             console.log('Geolocation is not supported');
@@ -206,6 +204,25 @@ export default function Header(props) {
             console.log("위치 정보 저장 취소");
         }
         
+    }
+
+    // 카카오맵 api 활용
+    const [sigudong, setSigudong] = useState(""); 
+
+    const mapApi = (latitude, longitude) => {
+        console.log(latitude);
+        console.log(longitude);
+        axios.get(`https://dapi.kakao.com/v2/local/geo/coord2address.json?input_coord=WGS84&x=${latitude}&y=${longitude}`,{
+            headers:{
+                Authorization: 'KakaoAK ae9e0cedf9e82516ded7194a84881362',
+            }
+        })
+        .then(function(response){
+            console.log(response);
+        })
+        .catch(function(error){
+            console.log(error);
+        });
     }
 
     return (
