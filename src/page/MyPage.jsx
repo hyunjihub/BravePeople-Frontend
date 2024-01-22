@@ -137,6 +137,7 @@ const Rating = styled.div`
 const Badge = styled.div`
     width: 20%;
     height: 12%;
+    margin-right: 5%;
     margin-bottom: 10%;
 `;
 
@@ -243,7 +244,7 @@ function MyPage(props) {
                 }
             })
             .then(function(response){
-                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                if(response.data.status === 401 && response.data.message === "Access Token 만료"){
                     axios.post("http://13.209.77.50:8080/auth/reissue",{
                         accessToken: access,
                         refreshToken: refresh,
@@ -251,6 +252,8 @@ function MyPage(props) {
                     .then(function(response){
                         setAccess(response.data.accessToken);
                         setRefresh(response.data.refreshToken);
+                        alert("토큰 만료");
+                        navigate("/main");
                     })
                     .catch(function(error){
                         console.log(error);
@@ -303,7 +306,7 @@ function MyPage(props) {
                 Authorization: `Bearer ${access}`
             }
         }).then(function(response){
-            if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+            if(response.data.status === 401 && response.data.message === "Access Token 만료"){
                 axios.post("http://13.209.77.50:8080/auth/reissue",{
                     accessToken: access,
                     refreshToken: refresh,
@@ -311,6 +314,8 @@ function MyPage(props) {
                 .then(function(response){
                     setAccess(response.data.accessToken);
                     setRefresh(response.data.refreshToken);
+                    alert("토큰 만료");
+                    navigate("/main");
                 })
                 .catch(function(error){
                     console.log(error);
@@ -365,14 +370,30 @@ function MyPage(props) {
                 'Authorization': `Bearer ${access}`
             }
             }).then(function(response){
-                console.log(response);
-                setUserInfo({
-                    profileImage: response.data.profileImage,
-                    nickname: userInfo.nickname,
-                    intro: userInfo.introduction,
-                    score: userInfo.score,
-                    medalCount: userInfo.medalCount
-                });
+                if(response.data.status === 401 && response.data.message === "Access Token 만료"){
+                    axios.post("http://13.209.77.50:8080/auth/reissue",{
+                        accessToken: access,
+                        refreshToken: refresh,
+                    })
+                    .then(function(response){
+                        setAccess(response.data.accessToken);
+                        setRefresh(response.data.refreshToken);
+                        alert("토큰 만료");
+                        navigate("/main");
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                } else {
+                    setUserInfo({
+                        profileImage: response.data.profileImage,
+                        nickname: userInfo.nickname,
+                        intro: userInfo.introduction,
+                        score: userInfo.score,
+                        medalCount: userInfo.medalCount
+                    });
+                }
+                
             })
             .catch(function(error){
                 alert("에러 발생");
@@ -383,7 +404,6 @@ function MyPage(props) {
 
     return(
         <Container>
-            <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
             <Profile>
                 {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${userInfo.profileImage ? userInfo.profileImage : profile})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
                 <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage ? userInfo.profileImage : profile})`}}/>}

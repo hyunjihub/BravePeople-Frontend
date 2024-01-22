@@ -109,13 +109,16 @@ const RadioLabel = styled.label`
 function SignUp(props) {
     const navigate = useNavigate();
     const [gender, setGender] = useState("남성");
+    const [isDisabled, setIsDisabled] = useState(false);
+    const [email, setEmail] = useState('');
+    const [emailId, setEmailId] = useState('');
 
     const handleGender = (e) => {
         if(e.target.value === "1") setGender("여성");
         else setGender("남성");
     }
 
-    // 여기서 위도랑 경도 파라미터 추가해야하고, 중복검사 추가해야함 
+    // 위도랑 경도 파라미터 추가해야하고, 중복검사 추가해야함 
     const handleSignUp = (e) => {
         console.log(e);
         if(e.target[0].value !== "" && e.target[3].value !== ""){
@@ -126,17 +129,42 @@ function SignUp(props) {
                     gender: gender,
                     username: e.target[3].value,
                     pw: e.target[4].value,
-                    email: e.target[6].value,
+                    email: email,
                     nickname: e.target[8].value,
                     lat: "123.123456789012345",
-                    lng: "123.123456789012345"
+                    lng: "123.123456789012345",
+                    emailId: emailId
                     })
                     .then(function(response){
                         console.log(response);
                         navigate("/main");
                     })
                     .catch(function(error){
-                        console.log(error);
+                        if(error.response.data.errorMessage ==="이메일 미인증" && error.response.status === 400) {
+                            Swal.fire({
+                                title: "이메일 미인증",
+                                text: "입력하신 이메일로 본인인증을 진행해주세요. 전송된 이메일이 없을 시 스팸함을 확인해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else if (error.response.data.errorMessage ==="아이디 중복" && error.response.status === 400) {
+                            Swal.fire({
+                                title: "아이디 중복",
+                                text: "입력하신 아이디는 현재 가입되어 있습니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else if (error.response.data.errorMessage ==="닉네임 중복" && error.response.status === 400) {
+                            Swal.fire({
+                                title: "닉네임 중복",
+                                text: "현재 입력하신 닉네임을 사용하는 회원이 존재합니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        }
                     });
                 } else {
                     Swal.fire({
@@ -163,6 +191,7 @@ function SignUp(props) {
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
+        
             });
         }
         e.preventDefault();
@@ -170,7 +199,57 @@ function SignUp(props) {
 
     // 인증버튼 누를시 인증완료 버튼 + 안내문구 수정 (위 주석 참고) 인증완료 버튼 누를시 백에서부터 인증 완료됐는지 정보 가져옴 -> alert로 인증완료 여부 알려줌
     const handleAuth = (e) => {
-        
+
+        const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
+        const emailCheck = (email) => {
+            return emailRegEx.test(email);
+        }
+
+        if(email==="") {
+            Swal.fire({
+                title: "이메일 입력 없음",
+                text: "이메일 주소를 입력해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        } else if (!emailCheck(email)) {
+            Swal.fire({
+                title: "이메일 형식 오류",
+                text: "올바른 이메일 주소를 입력해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        } else {
+            Swal.fire({
+                title: "이메일 주소 수정 불가",
+                text: "작성하신 이메일이 맞는지 다시 한 번 확인해주세요.",
+                icon: "warning",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+                showCancelButton: true, 
+                cancelButtonColor: '#3085d6', 
+                cancelButtonText: '취소',
+    
+            }).then(result => {
+                if (result.isConfirmed) {
+                    setIsDisabled(true);
+                    axios.get('http://13.209.77.50:8080/auth/email', {
+                        params: {
+                            address: email
+                        }
+                    }).then(function(response){
+                        Swal.fire('본인인증 메일이 전송되었습니다.', '입력하신 이메일주소로 본인인증을 진행하셔야 회원가입이 완료됩니다.', 'success');
+                        setEmailId(response.data.emailId);
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                    e.preventDefault();
+                }
+             });
+        }
     }
 
     // 버튼 클릭시 위치정보 (시,군,구) 위치정보 input의 기본 텍스트로 입력됨, 위도와 경도 값을 받아와서 나중에 회원가입할 때 같이 보낼 수 있게 저장해야 할 듯
@@ -222,8 +301,10 @@ function SignUp(props) {
                     name="useremail"
                     type="email"
                     placeholder="이메일 주소 (ex : brave@naver.com)"
+                    disabled={isDisabled}
+                    onChange={(e)=>setEmail(e.target.value)}
                 /> 
-                <UniqueButton>인증</UniqueButton>
+                <UniqueButton type="button" onClick={handleAuth} disabled={isDisabled}>인증</UniqueButton>
             </ForInset>
             <Label>닉네임 *</Label>          
             <Input
