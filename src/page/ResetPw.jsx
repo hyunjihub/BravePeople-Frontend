@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 // restapi
 import axios from 'axios';
@@ -82,10 +83,22 @@ function ResetPw(props) {
                     alert("에러 문구");
                 });
             } else {
-                alert("입력하신 비밀번호가 일치하지 않습니다.");
+                Swal.fire({
+                    title: "비밀번호 불일치",
+                    text: "비밀번호와 비밀번호 확인에 입력하신 두 비밀번호가 다릅니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
             }
         } else {
-            alert("비밀번호를 입력해주세요.");
+            Swal.fire({
+                title: "비밀번호 미입력",
+                text: "비밀번호가 입력되지 않았습니다",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
         
         e.preventDefault();

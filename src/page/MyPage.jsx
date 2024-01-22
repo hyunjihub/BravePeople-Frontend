@@ -4,8 +4,10 @@ import profile from '../ui/dummy/profile.png';
 import { useNavigate } from "react-router";
 import { FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 import StarRating from "../components/Rating";
+import BadgeCount from "../components/Badge";
 
 import axios from "axios";
 
@@ -135,8 +137,6 @@ const Rating = styled.div`
 const Badge = styled.div`
     width: 20%;
     height: 12%;
-    background-color: #000;
-    color: #fff;
     margin-bottom: 10%;
 `;
 
@@ -152,7 +152,6 @@ const SettingButton = styled.button`
     background-color: #fff;
 `;
 
-//width 넓히기 설정버튼 고정되게
 const Myself = styled.div`
     width: 100%;
     height : 8%;
@@ -191,9 +190,6 @@ const ButtonContainer = styled.div`
     margin-bottom: 10%;
 `;
 
-
-/* 상태변경 누를시 본인이 아닌 상대페이지를 보는 기준 재클릭시 본인페이지 */
-/* 다만, 현재는 수정버튼 눌러놓고 상태변경 누르면 수정 상태 유지 (수정해야 함)*/
 function MyPage(props) {
 
     const navigate = useNavigate();
@@ -220,8 +216,8 @@ function MyPage(props) {
     }), shallowEqual);
 
     const dispatch = useDispatch();
-    const setAccess = (access) => dispatch(setAccessToken(access));
-    const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
+    const setAccess = (acc) => dispatch(setAccessToken(acc));
+    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
     const setParam = (paramid) => dispatch(setParamId(paramid));
 
 
@@ -231,7 +227,13 @@ function MyPage(props) {
 
     useEffect(()=>{
         if(!isLog){
-            alert("로그인 상태에서만 마이페이지를 이용할 수 있습니다.");
+            Swal.fire({
+                title: "비정상적인 접속",
+                text: "비회원은 마이페이지에 접속하실 수 없습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
             navigate("/main");
         }
         else{
@@ -247,10 +249,8 @@ function MyPage(props) {
                         refreshToken: refresh,
                     })
                     .then(function(response){
-                        alert("토큰 기한이 만료되었습니다. 메인페이지로 이동합니다.");
                         setAccess(response.data.accessToken);
                         setRefresh(response.data.refreshToken);
-                        navigate("/main");
                     })
                     .catch(function(error){
                         console.log(error);
@@ -303,15 +303,29 @@ function MyPage(props) {
                 Authorization: `Bearer ${access}`
             }
         }).then(function(response){
-            setUserInfo({
-                profileImage: userInfo.profileImage,
-                nickname: response.data.nickname,
-                intro: response.data.introduction,
-                score: userInfo.score,
-                medalCount: userInfo.medalCount
-            });
-            setCurrentName(null);
-            setCurrentIntro(null);
+            if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                axios.post("http://13.209.77.50:8080/auth/reissue",{
+                    accessToken: access,
+                    refreshToken: refresh,
+                })
+                .then(function(response){
+                    setAccess(response.data.accessToken);
+                    setRefresh(response.data.refreshToken);
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+            } else {
+                setUserInfo({
+                    profileImage: userInfo.profileImage,
+                    nickname: response.data.nickname,
+                    intro: response.data.introduction,
+                    score: userInfo.score,
+                    medalCount: userInfo.medalCount
+                });
+                setCurrentName(null);
+                setCurrentIntro(null);
+            }
         })
         .catch(function(error){
             alert("에러 발생");
@@ -319,13 +333,61 @@ function MyPage(props) {
         });
         setIsClicked(false);
     }
-        
+
+    const ALLOW_FILE_EXTENSION = "jpg,jpeg,png";
+
+    const fileInput = React.createRef();
+    const handleProfile = (e) => {
+        fileInput.current.click();
+    }
+
+
+    
+    const handleChange = (e) => {
+        const files = e.target.files;
+        var reg = /(.*?)\.(jpg|jpeg|png)$/;
+
+        if (!files[0].name.match(reg)) {
+            Swal.fire({
+                title: "불가능한 파일 확장자",
+                text: "프로필 이미지는 jpg, jpeg, png만 사용가능합니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        }
+        else if (files && files.length > 0) {
+            const frm = new FormData();
+            frm.append('file', files[0]);
+
+            axios.patch("http://13.209.77.50:8080/member/profile/image", frm, {
+                headers: {'Content-Type' : 'Multipart/form-data',
+                'Authorization': `Bearer ${access}`
+            }
+            }).then(function(response){
+                console.log(response);
+                setUserInfo({
+                    profileImage: response.data.profileImage,
+                    nickname: userInfo.nickname,
+                    intro: userInfo.introduction,
+                    score: userInfo.score,
+                    medalCount: userInfo.medalCount
+                });
+            })
+            .catch(function(error){
+                alert("에러 발생");
+                console.log(error);
+            });
+        }
+    }
+
     return(
         <Container>
             <button onClick={()=>{console.log(access);console.log(refresh)}} >확인버튼</button>
             <Profile>
-                {isClicked?<ModifyProfile style={{backgroundImage: `url(${userInfo.profileImage})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
-                <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage})`}}/>}
+                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${userInfo.profileImage ? userInfo.profileImage : profile})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
+                <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage ? userInfo.profileImage : profile})`}}/>}
+                <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                 <Myself>
                     {isClicked?
                     <ModifyNickname type="text" defaultValue={preName} onChange={handleCurrentName}></ModifyNickname>
@@ -334,12 +396,11 @@ function MyPage(props) {
                 </Myself>
                 {isClicked?
                     <ModifyIntro type="text" defaultValue={preIntro} onChange={handleCurrentIntro}></ModifyIntro>
-                    :<Introduce value>{(userInfo.intro == null || userInfo.intro == "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
-                
+                    :<Introduce>{(userInfo.intro == null || userInfo.intro == "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
                 </Rating>
-                <Badge>뱃지 들어갈 위치</Badge>
+                <Badge><BadgeCount value={userInfo.medalCount} /></Badge>
                 <ButtonContainer>
                     {isClicked?<ModifyButton onClick={handleModify}>수정완료</ModifyButton>:null}
                     {isClicked?<ModifyButton onClick={handleIsClicked}>취소</ModifyButton>:null}

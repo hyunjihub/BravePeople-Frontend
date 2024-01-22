@@ -1,9 +1,14 @@
 import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 // restapi
 import axios from 'axios';
+
+//redux
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
 
 
 const Title = styled.div`
@@ -60,22 +65,70 @@ const Form = styled.form`
 function Authentication(props) {
     const navigate = useNavigate();
 
-    const handleAuth = (e) =>{
+    // redux로 변수, 함수 가져오기
+    const { isLog, id, access, refresh, param } = useSelector((state)=>({
+        isLog: state.login.isLogin,
+        id: state.login.memberId,
+        access: state.login.accessToken,
+        refresh: state.login.refreshToken,
+        param : state.login.paramId
+    }), shallowEqual);
 
-        console.log(e.target[0].value);
-        
+    const dispatch = useDispatch();
+    const setAccess = (acc) => dispatch(setAccessToken(acc));
+    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
+    const setParam = (paramid) => dispatch(setParamId(paramid));
+    
+
+    const handleAuth = (e) =>{
         if(e.target[0].value != "") {
             axios.post('http://13.209.77.50:8080/member/pw', {
-            pw: e.target[0].value,
+            nowPassword: e.target[0].value,
+            }, {headers:{
+                    Authorization: `Bearer ${access}`
+                }
             })
             .then(function(response){
-                navigate("/resetpw");
+                if(response.data.status === 401 && response.data.message === "토큰 기한 만료"){
+                    axios.post("http://13.209.77.50:8080/auth/reissue",{
+                        accessToken: access,
+                        refreshToken: refresh,
+                    })
+                    .then(function(response){
+                        setAccess(response.data.accessToken);
+                        setRefresh(response.data.refreshToken);
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                } else {
+                    navigate("/resetpw");
+                }
             })
+            
             .catch(function(error){
-                alert("비밀번호가 틀립니다.");
+                if(error.response.status === 400) {
+                    Swal.fire({
+                        title: "비밀번호 오류",
+                        text: "비밀번호가 틀립니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                }
+                else {
+                    console.log(error);
+                    alert("에러 발생");
+                }
             });
         } else {
-            alert("비밀번호를 입력해주세요.");
+            Swal.fire({
+                title: "입력 정보 없음",
+                text: "비밀번호를 입력해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
         e.preventDefault();
     }

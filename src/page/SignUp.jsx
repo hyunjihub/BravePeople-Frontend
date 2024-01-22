@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 
 // restapi
 import axios from 'axios';
@@ -139,13 +139,31 @@ function SignUp(props) {
                         console.log(error);
                     });
                 } else {
-                    alert("입력하신 비밀번호가 일치하지 않습니다.");
+                    Swal.fire({
+                        title: "비밀번호 불일치",
+                        text: "비밀번호와 비밀번호 확인에 입력하신 두 비밀번호가 다릅니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
                 }
             } else {
-                alert("아이디는 6글자 이상으로 작성해야 합니다.");
+                Swal.fire({
+                    title: "아이디 사용 불가능",
+                    text: "아이디는 6글자 이상으로 작성해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
             }  
         }else{
-            alert("모든 항목이 입력되지 않았습니다.");
+            Swal.fire({
+                title: "모든 항목이 입력되지 않았습니다.",
+                text: "입력하지 않은 항목이 없는지 다시 한 번 확인해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
         e.preventDefault();
     }
