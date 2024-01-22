@@ -86,6 +86,7 @@ export default function LogIn(props) {
                 pw: e.target[1].value
             })
             .then(function(response){
+                console.log(response);
                 setId(response.data.memberId);
                 setAccess(response.data.tokenDto.accessToken);
                 setRefresh(response.data.tokenDto.refreshToken);

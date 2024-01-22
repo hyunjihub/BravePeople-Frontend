@@ -133,6 +133,7 @@ function SignUp(props) {
                     })
                     .then(function(response){
                         console.log(response);
+                        navigate("/main");
                     })
                     .catch(function(error){
                         console.log(error);
