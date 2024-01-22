@@ -15,7 +15,6 @@ import axios from "axios";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
 
-
 const Container = styled.div`
     width: 1200px;
     height: 700px;
@@ -221,10 +220,21 @@ function MyPage(props) {
     const setRefresh = (ref) => dispatch(setRefreshToken(ref));
     const setParam = (paramid) => dispatch(setParamId(paramid));
 
-
-    useEffect(()=>{
-        (param === id) ? setMySelf(true) : setMySelf(false);
-    }, [])
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: access,
+            refreshToken: refresh,
+        })
+        .then(function(response){
+            setAccess(response.data.accessToken);
+            setRefresh(response.data.refreshToken);
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
 
     useEffect(()=>{
         if(!isLog){
@@ -238,27 +248,13 @@ function MyPage(props) {
             navigate("/main");
         }
         else{
+            (param === id) ? setMySelf(true) : setMySelf(false);
             axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
                 headers:{
                     Authorization: `Bearer ${access}`
                 }
             })
             .then(function(response){
-                if(response.data.status === 401 && response.data.message === "Access Token 만료"){
-                    axios.post("http://13.209.77.50:8080/auth/reissue",{
-                        accessToken: access,
-                        refreshToken: refresh,
-                    })
-                    .then(function(response){
-                        setAccess(response.data.accessToken);
-                        setRefresh(response.data.refreshToken);
-                        alert("토큰 만료");
-                        navigate("/main");
-                    })
-                    .catch(function(error){
-                        console.log(error);
-                    });
-                }else{
                     setUserInfo({
                         profileImage: response.data.profileImage,
                         nickname: response.data.nickname,
@@ -267,9 +263,14 @@ function MyPage(props) {
                         medalCount: response.data.medalCount
                     });
                 }
-            })
+            )
             .catch(function(error){
-                console.log(error);
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
+                }
+                else {
+                    console.log(error);
+                }
             });
         };
     }, []);
@@ -279,6 +280,7 @@ function MyPage(props) {
 
     const handleCurrentName = (e) => {
         setCurrentName(e.target.value);
+        e.preventDefault();
     }
 
     const [currentIntro, setCurrentIntro] = useState(null);
@@ -286,6 +288,7 @@ function MyPage(props) {
 
     const handleCurrentIntro = (e) => {
         setCurrentIntro(e.target.value);
+        e.preventDefault();
     }
 
     const handleIsClicked = () => {
@@ -306,48 +309,29 @@ function MyPage(props) {
                 Authorization: `Bearer ${access}`
             }
         }).then(function(response){
-            if(response.data.status === 401 && response.data.message === "Access Token 만료"){
-                axios.post("http://13.209.77.50:8080/auth/reissue",{
-                    accessToken: access,
-                    refreshToken: refresh,
-                })
-                .then(function(response){
-                    setAccess(response.data.accessToken);
-                    setRefresh(response.data.refreshToken);
-                    alert("토큰 만료");
-                    navigate("/main");
-                })
-                .catch(function(error){
-                    console.log(error);
-                });
-            } else {
-                setUserInfo({
-                    profileImage: userInfo.profileImage,
-                    nickname: response.data.nickname,
-                    intro: response.data.introduction,
-                    score: userInfo.score,
-                    medalCount: userInfo.medalCount
-                });
-                setCurrentName(null);
-                setCurrentIntro(null);
+            setUserInfo({
+                profileImage: userInfo.profileImage,
+                nickname: response.data.nickname,
+                intro: response.data.introduction,
+                score: userInfo.score,
+                medalCount: userInfo.medalCount
+            });
+            setCurrentName(null);
+            setCurrentIntro(null);
             }
-        })
+        )
         .catch(function(error){
-            alert("에러 발생");
-            console.log(error);
-        });
+            if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+        }});
         setIsClicked(false);
     }
-
-    const ALLOW_FILE_EXTENSION = "jpg,jpeg,png";
 
     const fileInput = React.createRef();
     const handleProfile = (e) => {
         fileInput.current.click();
     }
 
-
-    
     const handleChange = (e) => {
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
@@ -370,22 +354,7 @@ function MyPage(props) {
                 'Authorization': `Bearer ${access}`
             }
             }).then(function(response){
-                if(response.data.status === 401 && response.data.message === "Access Token 만료"){
-                    axios.post("http://13.209.77.50:8080/auth/reissue",{
-                        accessToken: access,
-                        refreshToken: refresh,
-                    })
-                    .then(function(response){
-                        setAccess(response.data.accessToken);
-                        setRefresh(response.data.refreshToken);
-                        alert("토큰 만료");
-                        navigate("/main");
-                    })
-                    .catch(function(error){
-                        console.log(error);
-                    });
-                } else {
-                    setUserInfo({
+                setUserInfo({
                         profileImage: response.data.profileImage,
                         nickname: userInfo.nickname,
                         intro: userInfo.introduction,
@@ -394,12 +363,52 @@ function MyPage(props) {
                     });
                 }
                 
-            })
+            )
             .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                } else {
                 alert("에러 발생");
                 console.log(error);
+                }
             });
         }
+    }
+    // 위치 정보
+    const { geolocation } = navigator;
+    const geolocationOptions = {
+        enableHighAccuracy: true,
+        timeout: 1000 * 10,
+        maximumAge: 1000 * 3600 * 24,
+    }
+
+    const SetLocation = () => {
+        const handleSuccess = (pos) => {
+            axios.patch("http://13.209.77.50:8080/member/location", {
+                lat:pos.coords.latitude,
+                lng:pos.coords.longitude
+            }, {
+                headers:{
+                    Authorization: `Bearer ${access}`
+                }
+            }).then(function(response){
+                    console.log(response);
+            }).catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                }else{
+                console.log(error);
+                }
+            });
+        }
+        const handleError = (err) => {
+                console.log(err);
+        }
+        if(!geolocation){
+            console.log('Geolocation is not supported');
+            return;
+        }
+        geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
     }
 
     return(
@@ -426,10 +435,7 @@ function MyPage(props) {
                     {isClicked?<ModifyButton onClick={handleIsClicked}>취소</ModifyButton>:null}
                 </ButtonContainer>
                 <Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>
-                <Modify >위치정보 재설정</Modify>
-                
-                
-                
+                <Modify onClick={SetLocation}>위치정보 재설정</Modify>  
             </Profile>
 
             <Board>

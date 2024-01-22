@@ -6,6 +6,10 @@ import Swal from "sweetalert2";
 // restapi
 import axios from 'axios';
 
+//redux
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
+
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -72,6 +76,36 @@ const Container = styled.div`
 
 function FindId(props) {
 
+    // redux로 변수, 함수 가져오기
+    const { isLog, id, access, refresh, param } = useSelector((state)=>({
+    isLog: state.login.isLogin,
+    id: state.login.memberId,
+    access: state.login.accessToken,
+    refresh: state.login.refreshToken,
+    param : state.login.paramId
+    }), shallowEqual);
+
+    const dispatch = useDispatch();
+    const setAccess = (acc) => dispatch(setAccessToken(acc));
+    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
+    const setParam = (paramid) => dispatch(setParamId(paramid));
+
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: access,
+            refreshToken: refresh,
+        })
+        .then(function(response){
+            setAccess(response.data.accessToken);
+            setRefresh(response.data.refreshToken);
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
+
     const navigate = useNavigate();
 
     const idFind = (e) => {
@@ -92,6 +126,9 @@ function FindId(props) {
                 });
             })
             .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                }else{
                 Swal.fire({
                     title: "계정 정보 없음",
                     text: "입력하신 이메일과 일치하는 계정 정보가 없습니다.",
@@ -99,7 +136,7 @@ function FindId(props) {
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
-            });
+            }});
             e.preventDefault();
         } else {
             Swal.fire({
@@ -132,6 +169,9 @@ function FindId(props) {
                     navigate("/main");
                 })
                 .catch(function(error){
+                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                    }else{
                     Swal.fire({
                         title: "계정 정보 없음",
                         text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",
@@ -139,7 +179,7 @@ function FindId(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                });
+                }});
                 e.preventDefault();
             } else {
                 Swal.fire({

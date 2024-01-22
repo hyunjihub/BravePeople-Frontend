@@ -47,8 +47,9 @@ const Button = styled.button`
     width: 100%;
     box-sizing: border-box;
     padding: 15px;
-    font-size: 15px;
+    font-size: 18px;
     margin: 24px 0;
+    font-family: 'SUITE';
 `;
 
 const Title = styled.div`

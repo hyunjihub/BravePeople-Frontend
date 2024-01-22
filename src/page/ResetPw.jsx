@@ -104,6 +104,11 @@ function ResetPw(props) {
         e.preventDefault();
     }
 
+    const handleCancel = () => {
+        setIsReset(false);
+        navigate("/main");
+    }
+
     return(
         <Form onSubmit={handleReset}>
             <Title>비밀번호 재설정</Title>
@@ -121,7 +126,7 @@ function ResetPw(props) {
                 placeholder="비밀번호"
             /> 
             <Button onClick={()=>setIsReset(true)} type="submit" >재설정</Button>
-            <Button onClick={()=>setIsReset(false)}>취소</Button>
+            <Button onClick={handleCancel} type="button">취소</Button>
         </Form>
     );
 }

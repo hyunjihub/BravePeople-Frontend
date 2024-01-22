@@ -79,6 +79,21 @@ function Authentication(props) {
     const setRefresh = (ref) => dispatch(setRefreshToken(ref));
     const setParam = (paramid) => dispatch(setParamId(paramid));
     
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: access,
+            refreshToken: refresh,
+        })
+        .then(function(response){
+            setAccess(response.data.accessToken);
+            setRefresh(response.data.refreshToken);
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
 
     const handleAuth = (e) =>{
         if(e.target[0].value != "") {
@@ -89,21 +104,7 @@ function Authentication(props) {
                 }
             })
             .then(function(response){
-                if(response.data.status === 401 && response.data.message === "Access Token 만료"){
-                    axios.post("http://13.209.77.50:8080/auth/reissue",{
-                        accessToken: access,
-                        refreshToken: refresh,
-                    })
-                    .then(function(response){
-                        setAccess(response.data.accessToken);
-                        setRefresh(response.data.refreshToken);
-                    })
-                    .catch(function(error){
-                        console.log(error);
-                    });
-                } else {
                     navigate("/resetpw");
-                }
             })
             
             .catch(function(error){
@@ -115,7 +116,9 @@ function Authentication(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                }
+                } else if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken("토큰 기한이 만료로 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
+                    }
                 else {
                     console.log(error);
                     alert("에러 발생");
@@ -144,8 +147,6 @@ function Authentication(props) {
             />
             <Button type="submit">본인 인증</Button>
         </Form>
-        
-
     );
 }
 
