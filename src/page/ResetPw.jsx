@@ -2,9 +2,14 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import { useSearchParams } from 'react-router-dom';
 
 // restapi
 import axios from 'axios';
+
+//redux
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
 
 const Title = styled.div`
     font-size: 40px;
@@ -64,24 +69,64 @@ const Detail = styled.label`
 function ResetPw(props) {
     const navigate = useNavigate();
     const [isReset, setIsReset] = useState(true);
+    let [query, setQuery] = useSearchParams();
 
-    const handleReset = (e) =>{
+    // redux로 변수, 함수 가져오기
+    const { isLog, id, access, refresh, param } = useSelector((state)=>({
+        isLog: state.login.isLogin,
+        id: state.login.memberId,
+        access: state.login.accessToken,
+        refresh: state.login.refreshToken,
+        param : state.login.paramId
+    }), shallowEqual);
 
-        console.log(e.target[0].value);
-        
+    const dispatch = useDispatch();
+    const setAccess = (access) => dispatch(setAccessToken(access));
+
+    const handleReset = (e) =>{     
         if(e.target[0].value !== "") {
-            if(e.target[0].value == e.target[1].value) {
-                axios.patch('http://13.209.77.50:8080/member/pw', {
-                memberid: "",
-                authCode: "",
-                newPassword: e.target[0].value
-                })
-                .then(function(response){
-                    navigate("/resetpw");
-                })
-                .catch(function(error){
-                    alert("에러 문구");
-                });
+            if(e.target[0].value === e.target[1].value) {
+                if(access==="") {
+                    e.preventDefault();
+                    axios.patch('http://13.209.77.50:8080/member/pw', {
+                        newPassword: e.target[0].value,
+                        emailId: parseInt(query.get('emailid'), 10),
+                        authCode: parseInt(query.get('code'), 10),
+                    })
+                    .then(function(response){
+                        Swal.fire({
+                            title: "비밀번호 재설정 완료",
+                            text: "입력하신 비밀번호로 재설정되었습니다.",
+                            icon: "success",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                        navigate("/main");
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                } else {
+                    e.preventDefault();
+                    axios.patch('http://13.209.77.50:8080/member/pw', {
+                        newPassword: e.target[0].value},
+                        {headers:{
+                            Authorization: `Bearer ${access}`
+                        }})
+                    .then(function(response){
+                        Swal.fire({
+                            title: "비밀번호 재설정 완료",
+                            text: "입력하신 비밀번호로 재설정되었습니다. 다시 로그인 해주세요.",
+                            icon: "success",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                        navigate("/main");
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                    });
+                }
             } else {
                 Swal.fire({
                     title: "비밀번호 불일치",

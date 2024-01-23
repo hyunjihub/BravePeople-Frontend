@@ -154,11 +154,14 @@ function FindId(props) {
         
         if(e.target[0].value !== "" && e.target[1].value !== "") {
             if(e.target[0].value.length>6) {
-                axios.post('http://13.209.77.50:8080/auth/pw', {
-                    username: e.target[0].value,
-                    email: e.target[1].value,
+                axios.get('http://13.209.77.50:8080/auth/pw', {
+                    params: {
+                        username: e.target[0].value,
+                        email: e.target[1].value,
+                    }
                 })
                 .then(function(response){
+                    console.log(response);
                     Swal.fire({
                         title: "비밀번호 재설정 링크 전송",
                         text: "입력하신 이메일로 재설정 링크가 전송되었습니다. 메일함을 확인해주세요.",
@@ -171,7 +174,15 @@ function FindId(props) {
                 .catch(function(error){
                     if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                         ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                    }else{
+                    } else if(error.response.status === 400 && error.response.data.errorMessage === "이메일 전송 오류") {
+                        Swal.fire({
+                            title: "이메일 전송 오류",
+                            text: "이메일 전송 오류가 발생했습니다. 다시 클릭해주세요.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                    } else {
                     Swal.fire({
                         title: "계정 정보 없음",
                         text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",

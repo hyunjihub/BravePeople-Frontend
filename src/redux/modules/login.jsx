@@ -15,7 +15,7 @@ const initialState = {
     accessToken: "",
     refreshToken: "",
     memberId: "",
-    paramId: ""
+    paramId: "",
 }
 
 export default function login(state=initialState, action){

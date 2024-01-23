@@ -125,7 +125,7 @@ export default function Header(props) {
         access: state.login.accessToken,
         refresh: state.login.refreshToken,
         id: state.login.memberId,
-        param: state.login.paramId
+        param: state.login.paramId,
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
@@ -195,12 +195,11 @@ export default function Header(props) {
                     Authorization: `Bearer ${access}`
                 }
             }).then(function(response){
-                if(response.data.status === 401 && response.data.message === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                }else{
-                    console.log(response);
-                }
+                console.log(response);
             }).catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                }
                 console.log(error);
             });
         }

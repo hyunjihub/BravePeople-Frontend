@@ -122,7 +122,7 @@ function SignUp(props) {
     const handleSignUp = (e) => {
         console.log(e);
         if(e.target[0].value !== "" && e.target[3].value !== ""){
-            if(e.target[3].value.length>6) {
+            if(e.target[3].value.length>=6) {
                 if(e.target[4].value === e.target[5].value) {
                     axios.post('http://13.209.77.50:8080/auth/signup', {
                     name: e.target[0].value,
@@ -197,7 +197,6 @@ function SignUp(props) {
         e.preventDefault();
     }
 
-    // 인증버튼 누를시 인증완료 버튼 + 안내문구 수정 (위 주석 참고) 인증완료 버튼 누를시 백에서부터 인증 완료됐는지 정보 가져옴 -> alert로 인증완료 여부 알려줌
     const handleAuth = (e) => {
 
         const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
