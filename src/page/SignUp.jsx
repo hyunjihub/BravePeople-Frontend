@@ -6,6 +6,8 @@ import Swal from "sweetalert2";
 // restapi
 import axios from 'axios';
 
+// redux
+
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -120,7 +122,7 @@ function SignUp(props) {
 
     // 위도랑 경도 파라미터 추가해야하고, 중복검사 추가해야함 
     const handleSignUp = (e) => {
-        console.log(e);
+        console.log("회원가입 중!");
         if(e.target[0].value !== "" && e.target[3].value !== ""){
             if(e.target[3].value.length>=6) {
                 if(e.target[4].value === e.target[5].value) {
@@ -195,6 +197,7 @@ function SignUp(props) {
             });
         }
         e.preventDefault();
+        navigate("/main");
     }
 
     const handleAuth = (e) => {
@@ -252,13 +255,39 @@ function SignUp(props) {
     }
 
     // 버튼 클릭시 위치정보 (시,군,구) 위치정보 input의 기본 텍스트로 입력됨, 위도와 경도 값을 받아와서 나중에 회원가입할 때 같이 보낼 수 있게 저장해야 할 듯
-    const handleLocation = (e) => {
+    // 위치 정보
+    const { geolocation } = navigator;
+    const geolocationOptions = {
+        enableHighAccuracy: true,
+        timeout: 1000 * 10,
+        maximumAge: 1000 * 3600 * 24,
+    }
 
+    const SetLocation = () => {
+        const handleSuccess = (pos) => {
+            console.log(pos);
+        }
+        const handleError = (err) => {
+                console.log(err);
+        }
+        if(!geolocation){
+            console.log('Geolocation is not supported');
+            return;
+        }
+        if(window.confirm("위치 정보를 불러오시겠습니까?")){
+            geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
+        }else{
+            console.log("위치 정보 저장 취소");
+        }
+    }
+    
+    const handleLocation = (e) => {
+        SetLocation();
     }
 
     return(
         <div>
-            <Form onSubmit={handleSignUp}>
+            <Form>
             <Title>회원가입</Title>
             <Label>성함 *</Label>
             <Input
@@ -319,11 +348,11 @@ function SignUp(props) {
                     placeholder="이 문구가 나타날 시, 위치확인 버튼을 눌러주세요"
                     disabled
                 /> 
-                <UniqueButton>위치확인</UniqueButton>
+                <UniqueButton type="button" onClick={handleLocation}>위치확인</UniqueButton>
             </ForInset>
             <Button type="submit">회원가입</Button>
         </Form>
-        <Button onClick={()=>navigate("/main")} style={{"width":"400px", "margin":"0px auto 50px auto"}} >취소</Button>
+        <Button onClick={handleSignUp} style={{"width":"400px", "margin":"0px auto 50px auto"}} >취소</Button>
         </div>
         
     );

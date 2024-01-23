@@ -8,7 +8,7 @@ import axios from 'axios';
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
+import { setAccessToken, setRefreshToken } from "../redux/modules/login";
 
 const Title = styled.div`
     font-size: 40px;
@@ -77,18 +77,14 @@ const Container = styled.div`
 function FindId(props) {
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, access, refresh, param } = useSelector((state)=>({
-    isLog: state.login.isLogin,
-    id: state.login.memberId,
+    const { access, refresh } = useSelector((state)=>({
     access: state.login.accessToken,
     refresh: state.login.refreshToken,
-    param : state.login.paramId
     }), shallowEqual);
 
     const dispatch = useDispatch();
     const setAccess = (acc) => dispatch(setAccessToken(acc));
     const setRefresh = (ref) => dispatch(setRefreshToken(ref));
-    const setParam = (paramid) => dispatch(setParamId(paramid));
 
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
@@ -172,6 +168,7 @@ function FindId(props) {
                     navigate("/main");
                 })
                 .catch(function(error){
+                    console.log(error);
                     if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                         ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
                     } else if(error.response.status === 400 && error.response.data.errorMessage === "이메일 전송 오류") {

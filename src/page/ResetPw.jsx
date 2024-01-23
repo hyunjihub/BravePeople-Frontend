@@ -8,8 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 //redux
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
+import { shallowEqual, useSelector } from "react-redux";
 
 const Title = styled.div`
     font-size: 40px;
@@ -72,16 +71,9 @@ function ResetPw(props) {
     let [query, setQuery] = useSearchParams();
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, access, refresh, param } = useSelector((state)=>({
-        isLog: state.login.isLogin,
-        id: state.login.memberId,
+    const { access } = useSelector((state)=>({
         access: state.login.accessToken,
-        refresh: state.login.refreshToken,
-        param : state.login.paramId
     }), shallowEqual);
-
-    const dispatch = useDispatch();
-    const setAccess = (access) => dispatch(setAccessToken(access));
 
     const handleReset = (e) =>{     
         if(e.target[0].value !== "") {

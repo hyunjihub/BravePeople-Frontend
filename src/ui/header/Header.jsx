@@ -10,7 +10,7 @@ import axios from 'axios';
 // redux
 import HeaderButton from "./HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setAccessToken, setRefreshToken, setMemberId, setParamId } from "../../redux/modules/login";
+import { setLogin, setAccessToken, setRefreshToken, setMemberId, setParamId, setLocation } from "../../redux/modules/login";
 
 const Wrapper = styled.div`
     width : 100vw;
@@ -44,7 +44,7 @@ const Logo = styled.div`
 `;
 
 const LocationBox = styled.button`
-    width : 130px;
+    width : 160px;
     height : 40px;
     background-color: #fff;
     border-radius : 15px;
@@ -60,18 +60,20 @@ const LocationBox = styled.button`
 `;
 
 const HiddenLocation = styled.div`
-    width: 130px;
+    width: 160px;
     height: 30px;
     background-color: #fff;
     margin-right: 5%;
 `;
 
 const Location = styled.span`
-    margin-left: 10%;
+    margin-left: 5%;
     color: #000;
     font-weight: bold;
     font-size: 20px;
     font-family: 'SUITE';
+    text-align: center;
+    width: 100px;s
 `;
 
 const PostListMenu = styled.div`
@@ -120,12 +122,12 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, access, refresh, id, param } = useSelector( state => ({
+    const { isLog, access, refresh, id, loc } = useSelector( state => ({
         isLog: state.login.isLogin,
         access: state.login.accessToken,
         refresh: state.login.refreshToken,
         id: state.login.memberId,
-        param: state.login.paramId,
+        loc: state.login.location
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
@@ -133,6 +135,7 @@ export default function Header(props) {
     const setRefresh = (refreshTk) => dispatch(setRefreshToken(refreshTk));
     const setId = (memberId) => dispatch(setMemberId(memberId));
     const setParam = (paramid) => dispatch(setParamId(paramid));
+    const setLoc = (loc) => dispatch(setLocation(loc)); 
 
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
@@ -162,6 +165,11 @@ export default function Header(props) {
                 setAccess("");
                 setRefresh("");
                 setId("");
+                setParam("");
+                setLocation({
+                    latitude: "",
+                    longitude: ""
+                });
                 navigate("/main");
             })
             .catch(function(error){
@@ -196,20 +204,24 @@ export default function Header(props) {
                 }
             }).then(function(response){
                 console.log(response);
-            }).catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                setLoc({
+                    latitude: response.data.lat,
+                    longitude: response.data.lng}
+                    );
+            }).catch(function(err){
+                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
                 }
-                console.log(error);
             });
         }
         const handleError = (err) => {
-                console.log(err);
+            console.log(err);
         }
         if(!geolocation){
             console.log('Geolocation is not supported');
             return;
         }
+
         if(window.confirm("위치 정보를 새로 저장하시겠습니까?")){
             geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
         }else{
@@ -218,8 +230,40 @@ export default function Header(props) {
         
     }
 
+    // 카카오맵 api 활용
+
+    const [sigudong, setSigudong] = useState(""); 
+
+    const mapApi = (latitude, longitude) => {
+        axios.get(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${longitude}&y=${latitude}&input_coord=WGS84`,
+        {headers:{
+            Authorization: `KakaoAK ae9e0cedf9e82516ded7194a84881362`
+            }    
+        })
+        .then(function(response){
+            if(response.data.documents.length !== 0){
+                setSigudong(response.data.documents[0].address.region_2depth_name);
+            }
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+    }
+
+    useEffect(()=>{
+        if(loc.latitude !== "" && loc.longitude !== "") mapApi(loc.latitude, loc.longitude);
+    }, [loc]);
+
+    const SetLoc = () => {
+        setLoc({
+            latitude: "37.0789561558879",
+            longitude: "127.423084873712"
+        });
+    }
+
     return (
         <Wrapper>
+            {isLog?<button onClick={SetLoc}>안성으로 위치 설정하기</button>:<div></div>} {/* 안성에서 위치 설정 버튼 눌렀을 때 가정 */}
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
@@ -227,7 +271,7 @@ export default function Header(props) {
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
             
             <RightContainer>
-                {isLog ? <LocationBox onClick={SetLocation}><IoLocationSharp size="30" color="#f8332f"/> <Location>춘천시</Location></LocationBox>: <HiddenLocation />}
+                {isLog ? <LocationBox onClick={SetLocation}><IoLocationSharp size="30" color="#f8332f"/> <Location>{sigudong}</Location></LocationBox>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 {isLog ? <HeaderButton onClick={MyPageButtonClicked}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
