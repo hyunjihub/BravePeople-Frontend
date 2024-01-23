@@ -9,7 +9,7 @@ import axios from 'axios';
 
 // redux
 import { useDispatch } from "react-redux";
-import { setAccessToken, setLogin, setRefreshToken, setMemberId } from "../redux/modules/login";
+import { setAccessToken, setLogin, setRefreshToken, setMemberId, setLocation } from "../redux/modules/login";
 
 const Form = styled.form`
     width: 400px;
@@ -78,6 +78,7 @@ export default function LogIn(props) {
     const setAccess = (access) => dispatch(setAccessToken(access));
     const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
     const setId = (id) => dispatch(setMemberId(id));
+    const setLoc = (loc) => dispatch(setLocation(loc));
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -91,6 +92,10 @@ export default function LogIn(props) {
                 setId(response.data.memberId);
                 setAccess(response.data.tokenDto.accessToken);
                 setRefresh(response.data.tokenDto.refreshToken);
+                setLoc({
+                    latitude:response.data.lat, 
+                    longitude: response.data.lng
+                });
                 setLog(true);
                 navigate("/main");
             })

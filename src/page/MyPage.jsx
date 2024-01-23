@@ -13,7 +13,7 @@ import axios from "axios";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
+import { setAccessToken, setRefreshToken, setParamId, setLocation } from "../redux/modules/login";
 
 const Container = styled.div`
     width: 1200px;
@@ -219,7 +219,9 @@ function MyPage(props) {
     const setAccess = (acc) => dispatch(setAccessToken(acc));
     const setRefresh = (ref) => dispatch(setRefreshToken(ref));
     const setParam = (paramid) => dispatch(setParamId(paramid));
+    const setLoc = (loc) => dispatch(setLocation(loc));
 
+    // 토큰 재발급
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: access,
@@ -392,7 +394,10 @@ function MyPage(props) {
                     Authorization: `Bearer ${access}`
                 }
             }).then(function(response){
-                    console.log(response);
+                    setLoc({
+                        latitude: response.data.lat,
+                        longitude: response.data.lng
+                    })
             }).catch(function(error){
                 if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
@@ -408,7 +413,11 @@ function MyPage(props) {
             console.log('Geolocation is not supported');
             return;
         }
-        geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
+        if(window.confirm("위치 정보를 새로 저장하시겠습니까?")){
+            geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
+        }else{
+            console.log("위치 정보 저장 취소");
+        }
     }
 
     return(
