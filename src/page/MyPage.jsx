@@ -13,7 +13,7 @@ import axios from "axios";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken, setParamId, setLocation } from "../redux/modules/login";
+import { setAccessToken, setRefreshToken, setLocation } from "../redux/modules/login";
 
 const Container = styled.div`
     width: 1200px;
@@ -218,7 +218,6 @@ function MyPage(props) {
     const dispatch = useDispatch();
     const setAccess = (acc) => dispatch(setAccessToken(acc));
     const setRefresh = (ref) => dispatch(setRefreshToken(ref));
-    const setParam = (paramid) => dispatch(setParamId(paramid));
     const setLoc = (loc) => dispatch(setLocation(loc));
 
     // 토큰 재발급
@@ -434,7 +433,7 @@ function MyPage(props) {
                 </Myself>
                 {isClicked?
                     <ModifyIntro type="text" defaultValue={preIntro} onChange={handleCurrentIntro}></ModifyIntro>
-                    :<Introduce>{(userInfo.intro == null || userInfo.intro == "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
+                    :<Introduce>{(userInfo.intro === null || userInfo.intro === "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
                 </Rating>

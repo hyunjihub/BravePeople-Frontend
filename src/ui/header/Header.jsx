@@ -120,12 +120,11 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, access, refresh, id, param, loc } = useSelector( state => ({
+    const { isLog, access, refresh, id, loc } = useSelector( state => ({
         isLog: state.login.isLogin,
         access: state.login.accessToken,
         refresh: state.login.refreshToken,
         id: state.login.memberId,
-        param: state.login.paramId,
         loc: state.login.location
     }), shallowEqual);
 
@@ -238,8 +237,8 @@ export default function Header(props) {
         {headers:{
             Authorization: `KakaoAK ae9e0cedf9e82516ded7194a84881362`
             }    
-        }).
-        then(function(response){
+        })
+        .then(function(response){
             if(response.data.documents.length !== 0){
                 setSigudong(response.data.documents[0].address.region_2depth_name);
             }
