@@ -4,6 +4,7 @@ import styled from "styled-components";
 import logo from "./logo.png";
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
+import Swal from "sweetalert2";
 
 import axios from 'axios';
 
@@ -222,14 +223,24 @@ export default function Header(props) {
             return;
         }
 
-        if(window.confirm("위치 정보를 새로 저장하시겠습니까?")){
-            geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
-        }else{
-            console.log("위치 정보 저장 취소");
-        }
+        Swal.fire({
+            title: "위치 정보 재설정",
+            text: "위치 정보를 재설정 하시겠습니까?",
+            icon: "warning",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+    
+        }).then(result => {
+            if (result.isConfirmed) {
+                geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
+         }});
         
     }
 
+    
     // 카카오맵 api 활용
 
     const [sigudong, setSigudong] = useState(""); 

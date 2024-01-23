@@ -8,7 +8,8 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 //redux
-import { shallowEqual, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { setAccessToken, setRefreshToken } from "../redux/modules/login";
 
 const Title = styled.div`
     font-size: 40px;
@@ -71,12 +72,36 @@ function ResetPw(props) {
     let [query, setQuery] = useSearchParams();
 
     // redux로 변수, 함수 가져오기
-    const { access } = useSelector((state)=>({
+    const { access, refresh } = useSelector((state)=>({
+        isLog: state.login.isLogin,
+        id: state.login.memberId,
         access: state.login.accessToken,
+        refresh: state.login.refreshToken,
     }), shallowEqual);
 
-    const handleReset = (e) =>{     
-        if(e.target[0].value !== "") {
+    const dispatch = useDispatch();
+    const setAccess = (acc) => dispatch(setAccessToken(acc));
+    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
+
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: access,
+            refreshToken: refresh,
+        })
+        .then(function(response){
+            setAccess(response.data.accessToken);
+            setRefresh(response.data.refreshToken);
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
+
+    const handleReset = (e) =>{
+        
+        if(e.target[0].value!=="" && e.target[1].value!=="") {
             if(e.target[0].value === e.target[1].value) {
                 if(access==="") {
                     e.preventDefault();
@@ -96,7 +121,25 @@ function ResetPw(props) {
                         navigate("/main");
                     })
                     .catch(function(error){
-                        console.log(error);
+                        if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
+                            Swal.fire({
+                                title: "비밀번호 형식 오류",
+                                text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });  
+                        } else if((error.response.status === 400 && error.response.data.errorMessage === "기존 비밀번호와 새 비밀번호가 일치")) {
+                            Swal.fire({
+                                title: "기존 비밀번호와 일치",
+                                text: "새 비밀번호는 기존 비밀번호와 같을 수 없습니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            }); 
+                        } else {
+                            console.log(error);
+                        }
                     });
                 } else {
                     e.preventDefault();
@@ -116,7 +159,27 @@ function ResetPw(props) {
                         navigate("/main");
                     })
                     .catch(function(error){
-                        console.log(error);
+                        if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                            ReissueToken("토큰 기한이 만료로 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
+                        } else if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
+                            Swal.fire({
+                                title: "비밀번호 형식 오류",
+                                text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });  
+                        } else if((error.response.status === 400 && error.response.data.errorMessage === "기존 비밀번호와 새 비밀번호가 일치")) {
+                            Swal.fire({
+                                title: "기존 비밀번호와 일치",
+                                text: "새 비밀번호는 기존 비밀번호와 같을 수 없습니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            }); 
+                        } else {
+                            console.log(error);
+                        }
                     });
                 }
             } else {
