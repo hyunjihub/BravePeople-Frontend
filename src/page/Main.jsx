@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 
+
 const Wrapper = styled.div`
     display: flex;
     flex-direction: row;

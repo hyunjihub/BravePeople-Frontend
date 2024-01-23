@@ -323,6 +323,17 @@ function MyPage(props) {
         .catch(function(err){
             if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
                 ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+            } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '닉네임 중복 오류')) {
+                Swal.fire({
+                    title: "닉네임 중복",
+                    text: "현재 사용중인 닉네임입니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+                setIsClicked(true);
+            } else {
+                console.log(err);
             }
         });
         setIsClicked(false);
