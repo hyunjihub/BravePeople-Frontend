@@ -114,6 +114,10 @@ function SignUp(props) {
     const [isDisabled, setIsDisabled] = useState(false);
     const [email, setEmail] = useState('');
     const [emailId, setEmailId] = useState('');
+    const [loc, setLoc] = useState({
+        lat: "",
+        lng: ""
+    });
 
     const handleGender = (e) => {
         if(e.target.value === "1") setGender("여성");
@@ -133,12 +137,11 @@ function SignUp(props) {
                         pw: e.target[4].value,
                         email: email,
                         nickname: e.target[8].value,
-                        lat: "123.123456789012345",
-                        lng: "123.123456789012345",
+                        lat: loc.lat,
+                        lng: loc.lng,
                         emailId: emailId
                         })
                         .then(function(response){
-                            console.log(response);
                             navigate("/main");
                         })
                         .catch(function(error){
@@ -292,9 +295,33 @@ function SignUp(props) {
         maximumAge: 1000 * 3600 * 24,
     }
 
-    const SetLocation = () => {
+    // 카카오맵 api 활용
+    const [sigudong, setSigudong] = useState(""); 
+
+    const mapApi = (latitude, longitude) => {
+        axios.get(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${longitude}&y=${latitude}&input_coord=WGS84`,
+        {headers:{
+            Authorization: `KakaoAK ae9e0cedf9e82516ded7194a84881362`
+            }    
+        })
+        .then(function(response){
+            if(response.data.documents.length !== 0){
+                setSigudong(response.data.documents[0].address.region_2depth_name);
+            }
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+    }
+
+    const SetLocation = (e) => {
+        e.preventDefault();
         const handleSuccess = (pos) => {
-            console.log(pos);
+            setLoc({
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            });
+            mapApi(pos.coords.latitude, pos.coords.longitude);
         }
         const handleError = (err) => {
             console.log(err);
@@ -308,10 +335,6 @@ function SignUp(props) {
         }else{
             console.log("위치 정보 저장 취소");
         }
-    }
-    
-    const handleLocation = (e) => {
-        SetLocation();
     }
 
     const handleCancel = (e) => {
@@ -379,9 +402,10 @@ function SignUp(props) {
                     name="location"
                     type="text"
                     placeholder="이 문구가 나타날 시, 위치확인 버튼을 눌러주세요"
+                    value={sigudong}
                     disabled
                 /> 
-                <UniqueButton type="button" onClick={handleLocation}>위치확인</UniqueButton>
+                <UniqueButton type="button" onClick={SetLocation}>위치확인</UniqueButton>
             </ForInset>
             <Button type="submit">회원가입</Button>
         </Form>
