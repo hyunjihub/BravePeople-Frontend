@@ -8,7 +8,7 @@ import axios from 'axios';
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken, setParamId } from "../redux/modules/login";
+import { setAccessToken, setRefreshToken } from "../redux/modules/login";
 
 
 const Title = styled.div`
@@ -66,19 +66,16 @@ function Authentication(props) {
     const navigate = useNavigate();
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, access, refresh, param } = useSelector((state)=>({
-        isLog: state.login.isLogin,
-        id: state.login.memberId,
+    const { access, refresh } = useSelector((state)=>({
         access: state.login.accessToken,
         refresh: state.login.refreshToken,
-        param : state.login.paramId
     }), shallowEqual);
 
     const dispatch = useDispatch();
     const setAccess = (acc) => dispatch(setAccessToken(acc));
     const setRefresh = (ref) => dispatch(setRefreshToken(ref));
-    const setParam = (paramid) => dispatch(setParamId(paramid));
     
+    // 토큰 재발행 함수
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: access,
@@ -96,7 +93,7 @@ function Authentication(props) {
     }
 
     const handleAuth = (e) =>{
-        if(e.target[0].value != "") {
+        if(e.target[0].value !== "") {
             axios.post('http://13.209.77.50:8080/member/pw', {
             nowPassword: e.target[0].value,
             }, {headers:{
@@ -104,9 +101,8 @@ function Authentication(props) {
                 }
             })
             .then(function(response){
-                    navigate("/resetpw");
+                navigate("/resetpw");
             })
-            
             .catch(function(error){
                 if(error.response.status === 400) {
                     Swal.fire({

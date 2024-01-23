@@ -122,7 +122,7 @@ function SignUp(props) {
 
     // 위도랑 경도 파라미터 추가해야하고, 중복검사 추가해야함 
     const handleSignUp = (e) => {
-        console.log(e);
+        console.log("회원가입 중!");
         if(e.target[0].value !== "" && e.target[3].value !== ""){
             if(e.target[3].value.length>6) {
                 if(e.target[4].value === e.target[5].value) {
@@ -197,6 +197,7 @@ function SignUp(props) {
             });
         }
         e.preventDefault();
+        navigate("/main");
     }
 
     // 인증버튼 누를시 인증완료 버튼 + 안내문구 수정 (위 주석 참고) 인증완료 버튼 누를시 백에서부터 인증 완료됐는지 정보 가져옴 -> alert로 인증완료 여부 알려줌
@@ -287,7 +288,7 @@ function SignUp(props) {
 
     return(
         <div>
-            <Form onSubmit={handleSignUp}>
+            <Form>
             <Title>회원가입</Title>
             <Label>성함 *</Label>
             <Input
@@ -352,7 +353,7 @@ function SignUp(props) {
             </ForInset>
             <Button type="submit">회원가입</Button>
         </Form>
-        <Button onClick={()=>navigate("/main")} style={{"width":"400px", "margin":"0px auto 50px auto"}} >취소</Button>
+        <Button onClick={handleSignUp} style={{"width":"400px", "margin":"0px auto 50px auto"}} >취소</Button>
         </div>
         
     );

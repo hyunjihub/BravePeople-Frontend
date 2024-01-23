@@ -169,6 +169,7 @@ function FindId(props) {
                     navigate("/main");
                 })
                 .catch(function(error){
+                    console.log(error);
                     if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                         ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
                     }else{
