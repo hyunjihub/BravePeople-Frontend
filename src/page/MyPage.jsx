@@ -199,9 +199,9 @@ function MyPage(props) {
     const [isClicked, setIsClicked] = useState(false);
 
     const [userInfo, setUserInfo] = useState({
-        profileImage: null,
-        nickname: null,
-        intro: null,
+        profileImage: "",
+        nickname: "",
+        intro: "",
         score: 0,
         medalCount: 0
     });
@@ -294,7 +294,6 @@ function MyPage(props) {
             }
         };
     }, []);
-
     const [currentName, setCurrentName] = useState(null);
     const preName = userInfo.nickname;
 
@@ -388,7 +387,6 @@ function MyPage(props) {
                         profileImage: response.data.profileImage,
                     });
                 }
-                
             )
             .catch(function(error){
                 if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
