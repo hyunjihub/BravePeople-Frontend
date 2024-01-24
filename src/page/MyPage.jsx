@@ -13,7 +13,7 @@ import axios from "axios";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken, setLocation } from "../redux/modules/login";
+import { setLocation } from "../redux/modules/login";
 
 const Container = styled.div`
     width: 1200px;
@@ -207,7 +207,7 @@ function MyPage(props) {
     });
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, access, refresh, param } = useSelector((state)=>({
+    const { isLog, id, param } = useSelector((state)=>({
         isLog: state.login.isLogin,
         id: state.login.memberId,
         access: state.login.accessToken,
@@ -216,19 +216,19 @@ function MyPage(props) {
     }), shallowEqual);
 
     const dispatch = useDispatch();
-    const setAccess = (acc) => dispatch(setAccessToken(acc));
-    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
     const setLoc = (loc) => dispatch(setLocation(loc));
 
     // 토큰 재발급
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: access,
-            refreshToken: refresh,
+            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
         })
         .then(function(response){
-            setAccess(response.data.accessToken);
-            setRefresh(response.data.refreshToken);
+            sessionStorage.setItem('jwt',JSON.stringify({
+                access: response.data.accessToken,
+                refresh: response.data.refreshToken
+            }))
             alert(msg);
             navigate("/main");
         })
@@ -252,7 +252,7 @@ function MyPage(props) {
             (param === id) ? setMySelf(true) : setMySelf(false);
             axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
                 headers:{
-                    Authorization: `Bearer ${access}`
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             })
             .then(function(response){
@@ -307,7 +307,7 @@ function MyPage(props) {
             introduction: currentIntro
         }, {
             headers:{
-                Authorization: `Bearer ${access}`
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }
         }).then(function(response){
             setUserInfo({
@@ -363,7 +363,7 @@ function MyPage(props) {
 
             axios.patch("http://13.209.77.50:8080/member/profile/image", frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
-                'Authorization': `Bearer ${access}`
+                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }
             }).then(function(response){
                 setUserInfo({
@@ -401,7 +401,7 @@ function MyPage(props) {
                 lng:pos.coords.longitude
             }, {
                 headers:{
-                    Authorization: `Bearer ${access}`
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             }).then(function(response){
                     setLoc({

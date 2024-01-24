@@ -11,7 +11,7 @@ import axios from 'axios';
 // redux
 import HeaderButton from "./HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setAccessToken, setRefreshToken, setMemberId, setParamId, setLocation } from "../../redux/modules/login";
+import { setLogin, setMemberId, setParamId, setLocation } from "../../redux/modules/login";
 
 const Wrapper = styled.div`
     width : 100vw;
@@ -123,7 +123,7 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, access, refresh, id, loc } = useSelector( state => ({
+    const { isLog, id, loc } = useSelector( state => ({
         isLog: state.login.isLogin,
         access: state.login.accessToken,
         refresh: state.login.refreshToken,
@@ -132,20 +132,20 @@ export default function Header(props) {
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
-    const setAccess = (accessTk) => dispatch(setAccessToken(accessTk));
-    const setRefresh = (refreshTk) => dispatch(setRefreshToken(refreshTk));
     const setId = (memberId) => dispatch(setMemberId(memberId));
     const setParam = (paramid) => dispatch(setParamId(paramid));
     const setLoc = (loc) => dispatch(setLocation(loc)); 
 
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: access,
-            refreshToken: refresh,
+            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
         })
         .then(function(response){
-            setAccess(response.data.accessToken);
-            setRefresh(response.data.refreshToken);
+            sessionStorage.setItem('jwt',JSON.stringify({
+                access: response.data.accessToken,
+                refresh: response.data.refreshToken
+            }))
             alert(msg);
             navigate("/main");
         })
@@ -158,19 +158,21 @@ export default function Header(props) {
         if(isLog) {
             axios.post("http://13.209.77.50:8080/member/logout", {
                 headers: {
-                    'Authorization': `Bearer ${access}`
+                    'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             })
             .then(function(response){
                 setLog(false);
-                setAccess("");
-                setRefresh("");
                 setId("");
                 setParam("");
                 setLocation({
                     latitude: "",
                     longitude: ""
                 });
+                sessionStorage.setItem('jwt',JSON.stringify({
+                    access: "",
+                    refresh: ""
+                }));
                 navigate("/main");
             })
             .catch(function(error){
@@ -201,7 +203,7 @@ export default function Header(props) {
                 lng:pos.coords.longitude
             }, {
                 headers:{
-                    Authorization: `Bearer ${access}`
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             }).then(function(response){
                 console.log(response);
