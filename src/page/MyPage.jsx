@@ -199,9 +199,9 @@ function MyPage(props) {
     const [isClicked, setIsClicked] = useState(false);
 
     const [userInfo, setUserInfo] = useState({
-        profileImage: "",
-        nickname: "",
-        intro: "",
+        profileImage: null,
+        nickname: null,
+        intro: null,
         score: 0,
         medalCount: 0
     });
@@ -238,7 +238,7 @@ function MyPage(props) {
     }
 
     useEffect(()=>{
-        if(!isLog){
+        if(!JSON.parse(localStorage.getItem('savedData')).isLogin && !isLog){
             Swal.fire({
                 title: "비정상적인 접속",
                 text: "비회원은 마이페이지에 접속하실 수 없습니다.",
@@ -249,30 +249,49 @@ function MyPage(props) {
             navigate("/main");
         }
         else{
+            //마이페이지에 처음 접근할 때
             (param === id) ? setMySelf(true) : setMySelf(false);
-            axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
-                headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
-                    setUserInfo({
-                        profileImage: response.data.profileImage,
-                        nickname: response.data.nickname,
-                        intro: response.data.introduction,
-                        score: response.data.score,
-                        medalCount: response.data.medalCount
-                    });
-                }
-            )
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
-                }
-                else {
-                    console.log(error);
-                }
-            });
+            if(JSON.parse(localStorage.getItem('savedUserInfo')).nickname === null){
+                axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
+                    headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }
+                })
+                .then(function(response){
+                        setUserInfo({
+                            profileImage: response.data.profileImage,
+                            nickname: response.data.nickname,
+                            intro: response.data.introduction,
+                            score: response.data.score,
+                            medalCount: response.data.medalCount
+                        });
+                        localStorage.setItem('savedUserInfo', JSON.stringify({
+                            profileImage: response.data.profileImage,
+                            nickname: response.data.nickname,
+                            intro: response.data.introduction,
+                            score: response.data.score,
+                            medalCount: response.data.medalCount
+                        }));
+                    }
+                )
+                .catch(function(error){
+                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
+                    }
+                    else {
+                        console.log(error);
+                    }
+                });
+            }else{
+                // 마이페이지에 처음 접근하는 것이 아닐 때
+                setUserInfo({
+                    profileImage: JSON.parse(localStorage.getItem('savedUserInfo')).profileImage,
+                    nickname: JSON.parse(localStorage.getItem('savedUserInfo')).nickname,
+                    intro: JSON.parse(localStorage.getItem('savedUserInfo')).intro,
+                    score: JSON.parse(localStorage.getItem('savedUserInfo')).score,
+                    medalCount: JSON.parse(localStorage.getItem('savedUserInfo')).medalCount,
+                });
+            }
         };
     }, []);
 

@@ -134,7 +134,7 @@ export default function Header(props) {
     const setParam = (paramid) => dispatch(setParamId(paramid)); 
     const setLoc = (loc) => dispatch(setLocation(loc)); 
 
-    // 웹 스토리지에 데이터들 생성 및 초기값 설정
+    // 웹 스토리지에 데이터 생성 및 초기값 설정
     // sessionStorage - JWT
     if(sessionStorage.getItem('jwt') === null){
         sessionStorage.setItem('jwt', JSON.stringify({
@@ -203,6 +203,7 @@ export default function Header(props) {
                 });
                 sessionStorage.removeItem('jwt');
                 localStorage.removeItem('savedData');
+                localStorage.removeItem('savedUserInfo');
                 navigate("/main");
             })
             .catch(function(error){
@@ -215,6 +216,13 @@ export default function Header(props) {
 
     const MyPageButtonClicked = () => {
         setParam(id);
+        localStorage.setItem('savedUserInfo', JSON.stringify({
+            profileImage: null,
+            nickname: null,
+            intro: null,
+            score: null,
+            medalCount: null,
+        }));
         navigate("/mypage");
     }
 
