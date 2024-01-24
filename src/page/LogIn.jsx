@@ -87,15 +87,26 @@ export default function LogIn(props) {
                 pw: e.target[1].value
             })
             .then(function(response){
+                // redux 변수 저장
+                setLog(true);
                 setId(response.data.memberId);
                 setLoc({
                     latitude:response.data.lat, 
                     longitude: response.data.lng
                 });
-                setLog(true);
-                sessionStorage.setItem('jwt',JSON.stringify({
+                // 토큰 저장
+                sessionStorage.setItem('jwt', JSON.stringify({
                     access: response.data.tokenDto.accessToken,
                     refresh: response.data.tokenDto.refreshToken
+                }));
+                // 새로고침으로 인한 데이터 삭제 방지용 데이터 저장
+                localStorage.setItem('savedData', JSON.stringify({
+                    isLogin: true,
+                    id: response.data.memberId,
+                    loc : {
+                        latitude: response.data.lat,
+                        longitude: response.data.lng
+                    }
                 }));
                 navigate("/main");
             })

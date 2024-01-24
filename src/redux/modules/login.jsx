@@ -10,11 +10,11 @@ export const setLocation = (loc) => ({ type:SET_LOCATION, loc });
 
 const initialState = {
     isLogin: false,
-    memberId: "",
-    paramId: "",
+    memberId: null,
+    paramId: null,
     location: {
-        longitude: "",
-        latitude: ""
+        longitude: null,
+        latitude: null
     }
 }
 

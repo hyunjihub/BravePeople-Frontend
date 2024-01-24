@@ -125,22 +125,47 @@ export default function Header(props) {
 
     const { isLog, id, loc } = useSelector( state => ({
         isLog: state.login.isLogin,
-        access: state.login.accessToken,
-        refresh: state.login.refreshToken,
         id: state.login.memberId,
         loc: state.login.location
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
-    const setParam = (paramid) => dispatch(setParamId(paramid));
+    const setParam = (paramid) => dispatch(setParamId(paramid)); 
     const setLoc = (loc) => dispatch(setLocation(loc)); 
 
-    // 세션 스토리지에 토큰 생성
-    sessionStorage.setItem('jwt',JSON.stringify({
-        access: "",
-        refresh: ""
-    }))
+    // 웹 스토리지에 데이터들 생성 및 초기값 설정
+    // sessionStorage - JWT
+    if(sessionStorage.getItem('jwt') === null){
+        sessionStorage.setItem('jwt', JSON.stringify({
+            access: null,
+            refresh: null
+        }))
+    }
+    // webStorage - 새로고침 데이터 삭제 방지용(redux data)
+    if(localStorage.getItem('savedData') === null){
+        localStorage.setItem('savedData', JSON.stringify({
+            isLogin: false,
+            id: null,
+            loc : {
+                latitude: null,
+                longitude: null
+            }
+        }));
+    }
+
+    useEffect(()=>{
+        if(localStorage.getItem('savedData')!==null){  
+            if(JSON.parse(localStorage.getItem('savedData')).isLogin && !isLog){
+                setLog(JSON.parse(localStorage.getItem('savedData')).isLogin);
+                setId(JSON.parse(localStorage.getItem('savedData')).id);
+                setLoc({
+                    latitude: JSON.parse(localStorage.getItem('savedData')).loc.latitude, 
+                    longitude: JSON.parse(localStorage.getItem('savedData')).loc.longitude
+                });
+            }
+        }
+    },[isLog]);
 
     // 토큰 재발행 함수
     const ReissueToken = (msg) => {
@@ -159,7 +184,7 @@ export default function Header(props) {
         .catch(function(error){
             console.log(error);
         });
-    }
+    }    
 
     const handleLogOut = () => {
         if(isLog) {
@@ -170,16 +195,14 @@ export default function Header(props) {
             })
             .then(function(response){
                 setLog(false);
-                setId("");
-                setParam("");
+                setId(null);
+                setParam(null);
                 setLocation({
-                    latitude: "",
-                    longitude: ""
+                    latitude: null,
+                    longitude: null
                 });
-                sessionStorage.setItem('jwt',JSON.stringify({
-                    access: "",
-                    refresh: ""
-                }));
+                sessionStorage.removeItem('jwt');
+                localStorage.removeItem('savedData');
                 navigate("/main");
             })
             .catch(function(error){
@@ -213,11 +236,20 @@ export default function Header(props) {
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             }).then(function(response){
-                console.log(response);
                 setLoc({
                     latitude: response.data.lat,
-                    longitude: response.data.lng}
-                    );
+                    longitude: response.data.lng
+                });
+                const preLocalStorageId = JSON.parse(localStorage.getItem('savedData')).id;
+
+                localStorage.setItem('savedData', JSON.stringify({
+                    isLogin: true,
+                    id: preLocalStorageId,
+                    loc : {
+                        latitude: response.data.lat,
+                        longitude: response.data.lng
+                    }
+                }));
             }).catch(function(err){
                 if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
@@ -271,19 +303,35 @@ export default function Header(props) {
     }
 
     useEffect(()=>{
-        if(loc.latitude !== "" && loc.longitude !== "") mapApi(loc.latitude, loc.longitude);
+        if(loc.latitude !== null && loc.longitude !== null) mapApi(loc.latitude, loc.longitude);
     }, [loc]);
 
     const SetLoc = () => {
         setLoc({
-            latitude: "37.0789561558879",
-            longitude: "127.423084873712"
+            latitude: 37.0789561558879,
+            longitude: 127.423084873712
         });
+
+        const preLocalStorageId = JSON.parse(localStorage.getItem('savedData')).id;
+
+        localStorage.setItem('savedData', JSON.stringify({
+            isLogin: true,
+            id: preLocalStorageId,
+            loc : {
+                latitude: 37.0789561558879,
+                longitude: 127.423084873712
+            }
+        }));
+    }
+
+    const checkFunc = (e) => {
+        e.preventDefault();
+        SetLoc(e);
     }
 
     return (
         <Wrapper>
-            {isLog?<button onClick={SetLoc}>안성으로 위치 설정하기</button>:<div></div>} {/* 안성에서 위치 설정 버튼 눌렀을 때 가정 */}
+            {isLog?<button onClick={checkFunc}>안성으로 위치 설정하기</button>:<div></div>} {/* 안성에서 위치 설정 버튼 눌렀을 때 가정 */}
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
