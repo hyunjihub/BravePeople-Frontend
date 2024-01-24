@@ -31,7 +31,7 @@ const Input = styled.input`
     &::placeholder {
         color: #ababab;
     }
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
 `;
 
 const Button = styled.button`
@@ -48,7 +48,7 @@ const Button = styled.button`
     font-size: 15px;
     margin: 24px 0;
     padding: 0px;
-    font-family: 'SUITE-Regular';
+    font-family: 'SUITE';
     cursor: pointer;
 `;
 
@@ -99,7 +99,7 @@ function ResetPw(props) {
         if(e.target[0].value!=="" && e.target[1].value!=="") {
             if(isPassword(e.target[0].value)) {
                 if(e.target[0].value === e.target[1].value) {
-                    if(JSON.parse(sessionStorage.getItem('jwt')).access === "") {
+                    if(JSON.parse(sessionStorage.getItem('jwt')).access === null) {
                         axios.patch('http://13.209.77.50:8080/member/pw', {
                             newPassword: e.target[0].value,
                             emailId: parseInt(query.get('emailid'), 10),
@@ -116,14 +116,14 @@ function ResetPw(props) {
                             navigate("/main");
                         })
                         .catch(function(error){
-                            if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
+                            if(error.response.data.errorMessage ==="Invalid request content." && error.response.status === 400) {
                                 Swal.fire({
-                                    title: "비밀번호 형식 오류",
-                                    text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
+                                    title: "형식 오류",
+                                    html: "입력 항목 일부의 형식이 잘못되었습니다.",
                                     icon: "error",
                                     confirmButtonColor: "#d33",
                                     confirmButtonText: "확인",
-                                });  
+                                });
                             } else if((error.response.status === 400 && error.response.data.errorMessage === "기존 비밀번호와 새 비밀번호가 일치")) {
                                 Swal.fire({
                                     title: "기존 비밀번호와 일치",

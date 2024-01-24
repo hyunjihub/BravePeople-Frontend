@@ -6,8 +6,6 @@ import Swal from "sweetalert2";
 // restapi
 import axios from 'axios';
 
-// redux
-
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -105,9 +103,6 @@ const RadioLabel = styled.label`
     margin-right: 10px;
 `;
 
-
-/* 인증 버튼 클릭시 인증 완료 버튼으로 변경되고 인증 완료 버튼 누를시 백으로 인증여부 물어봄, 위치확인은 권한설정*/
-/* 인증 버튼 누를 시, 위에 안내 문구를 이메일 인증 완료 후, 인증 완료 버튼을 눌러주세요로 변경돼야 함*/
 function SignUp(props) {
     const navigate = useNavigate();
     const [gender, setGender] = useState("남성");
@@ -137,7 +132,7 @@ function SignUp(props) {
 
     }
 
-    // 위도랑 경도 파라미터 추가
+    // 모든 입력 들어갔는지 체크
     const handleSignUp = (e) => {
         if(e.target[0].value!=="" && e.target[3].value!==""){
             if(e.target[3].value.length>=6) {
@@ -158,6 +153,7 @@ function SignUp(props) {
                             navigate("/main");
                         })
                         .catch(function(error){
+                            console.log(error);
                             if(error.response.data.errorMessage ==="이메일 미인증" && error.response.status === 400) {
                                 Swal.fire({
                                     title: "이메일 미인증",
@@ -186,6 +182,14 @@ function SignUp(props) {
                                 Swal.fire({
                                     title: "본인인증 대기 중인 이메일",
                                     html: "입력하신 이메일로 이미 본인인증이 대기 중입니다. 메일함을 확인해주세요.<br>메일함에 없을 경우, 스팸함을 확인해주세요.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33",
+                                    confirmButtonText: "확인",
+                                });
+                            } else if (error.response.data.errorMessage ==="Invalid request content." && error.response.status === 400) {
+                                Swal.fire({
+                                    title: "형식 오류",
+                                    html: "입력 항목 일부의 형식이 잘못되었습니다.",
                                     icon: "error",
                                     confirmButtonColor: "#d33",
                                     confirmButtonText: "확인",
@@ -413,7 +417,7 @@ function SignUp(props) {
                 <Input
                     name="location"
                     type="text"
-                    placeholder="이 문구가 나타날 시, 위치확인 버튼을 눌러주세요"
+                    placeholder="위치확인 버튼을 눌러주세요"
                     value={sigudong}
                     disabled
                 /> 

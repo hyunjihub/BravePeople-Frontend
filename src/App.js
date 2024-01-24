@@ -18,7 +18,7 @@ import Authentication from "./page/Authentication";
 
 export default function App(props) {
 
-    localStorage.clear();
+    //localStorage.clear();
 
     return(
         <div id="App">

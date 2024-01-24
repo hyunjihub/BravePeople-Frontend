@@ -73,80 +73,112 @@ const Container = styled.div`
 function FindId(props) {
     const navigate = useNavigate();
 
+    const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
+    const emailCheck = (email) => {
+        return emailRegEx.test(email);
+    }
+
     const idFind = (e) => {
-        // yny3533, rktlrhrl123
-        if (e.target[0].value !== "") {
-            axios.get('http://13.209.77.50:8080/auth/username', {
-                params: {
-                    email: e.target[0].value
-                }
-            })
-            .then(function(response){
+        if(emailCheck(e.target[0].value)) {
+            if (e.target[0].value !== "") {
+                axios.get('http://13.209.77.50:8080/auth/username', {
+                    params: {
+                        email: e.target[0].value
+                    }
+                })
+                .then(function(response){
+                    Swal.fire({
+                        title: "아이디 찾기",
+                        text: "사용자의 아이디는 " + response.data.username + "입니다.",
+                        icon: "success",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                })
+                .catch(function(error){
+                    console.log(error);    
+                });
+                e.preventDefault();
+            } else {
                 Swal.fire({
-                    title: "아이디 찾기",
-                    text: "사용자의 아이디는 " + response.data.username + "입니다.",
-                    icon: "success",
+                    title: "입력 정보 없음",
+                    text: "이메일을 입력해주세요.",
+                    icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
-            })
-            .catch(function(error){
-                console.log(error);    
-            });
-            e.preventDefault();
+            }
         } else {
             Swal.fire({
-                title: "입력 정보 없음",
-                text: "이메일을 입력해주세요.",
+                title: "이메일 형식 오류",
+                text: "올바른 이메일 주소를 입력해주세요.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
         }
+        
         e.preventDefault();
     }
 
     const pwFind = (e) => {
-        
         if(e.target[0].value !== "" && e.target[1].value !== "") {
             if(e.target[0].value.length>6) {
-                axios.get('http://13.209.77.50:8080/auth/pw', {
-                    params: {
-                        username: e.target[0].value,
-                        email: e.target[1].value,
-                    }
-                })
-                .then(function(response){
-                    console.log(response);
+                if(emailCheck(e.target[1].value)) {
+                    axios.get('http://13.209.77.50:8080/auth/pw', {
+                        params: {
+                            username: e.target[0].value,
+                            email: e.target[1].value,
+                        }
+                    })
+                    .then(function(response){
+                        console.log(response);
+                        Swal.fire({
+                            title: "비밀번호 재설정 링크 전송",
+                            text: "입력하신 이메일로 재설정 링크가 전송되었습니다. 메일함을 확인해주세요.",
+                            icon: "success",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                        navigate("/main");
+                    })
+                    .catch(function(error){
+                        console.log(error);
+                        if(error.response.status === 400 && error.response.data.errorMessage === "이메일 전송 오류") {
+                            Swal.fire({
+                                title: "이메일 전송 오류",
+                                text: "이메일 전송 오류가 발생했습니다. 다시 클릭해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else if (error.response.data.errorMessage ==="Invalid request content." && error.response.status === 400) {
+                            Swal.fire({
+                                title: "형식 오류",
+                                html: "입력 항목 일부의 형식이 잘못되었습니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else {
+                            Swal.fire({
+                                title: "계정 정보 없음",
+                                text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        }
+                    });
+                } else {
                     Swal.fire({
-                        title: "비밀번호 재설정 링크 전송",
-                        text: "입력하신 이메일로 재설정 링크가 전송되었습니다. 메일함을 확인해주세요.",
-                        icon: "success",
+                        title: "이메일 형식 오류",
+                        text: "올바른 이메일 주소를 입력해주세요.",
+                        icon: "error",
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                    navigate("/main");
-                })
-                .catch(function(error){
-                    console.log(error);
-                    if(error.response.status === 400 && error.response.data.errorMessage === "이메일 전송 오류") {
-                        Swal.fire({
-                            title: "이메일 전송 오류",
-                            text: "이메일 전송 오류가 발생했습니다. 다시 클릭해주세요.",
-                            icon: "error",
-                            confirmButtonColor: "#d33",
-                            confirmButtonText: "확인",
-                        });
-                    } else {
-                        Swal.fire({
-                            title: "계정 정보 없음",
-                            text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",
-                            icon: "error",
-                            confirmButtonColor: "#d33",
-                            confirmButtonText: "확인",
-                        });
-                    }
-                });
+                } 
             } else {
                 Swal.fire({
                     title: "아이디 형식 오류",

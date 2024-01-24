@@ -70,13 +70,12 @@ const HiddenLocation = styled.div`
 `;
 
 const Location = styled.span`
-    margin-left: 2%;
     color: #000;
     font-weight: bold;
     font-size: 20px;
     font-family: 'SUITE';
     text-align: center;
-    width: 100px;s
+    width: 100px;
 `;
 
 const PostListMenu = styled.div`
@@ -143,11 +142,9 @@ export default function Header(props) {
     const dispatch = useDispatch();
 
     const { isLog, id, loc, profileImg } = useSelector( state => ({
-
         isLog: state.login.isLogin,
         id: state.login.memberId,
         loc: state.login.location,
-        paramid: state.login.paramid,
         profileImg: state.login.profileImg
     }), shallowEqual);
 
@@ -173,7 +170,8 @@ export default function Header(props) {
             loc : {
                 latitude: null,
                 longitude: null
-            }
+            },
+            profileImg: null
         }));
     }
 
@@ -186,6 +184,7 @@ export default function Header(props) {
                     latitude: JSON.parse(localStorage.getItem('savedData')).loc.latitude, 
                     longitude: JSON.parse(localStorage.getItem('savedData')).loc.longitude
                 });
+                setProfile(JSON.parse(localStorage.getItem('savedData')).profileImg);
             }
         }
     },[isLog]);
@@ -224,7 +223,7 @@ export default function Header(props) {
                     latitude: null,
                     longitude: null
                 });
-                setProfile("");
+                setProfile(null);
                 sessionStorage.removeItem('jwt');
                 localStorage.removeItem('savedData');
                 localStorage.removeItem('savedUserInfo');
@@ -241,7 +240,7 @@ export default function Header(props) {
     const MyPageButtonClicked = () => {
         setParam(id);
         localStorage.setItem('savedUserInfo', JSON.stringify({
-            profileImage: null,
+            //profileImage: null,
             nickname: null,
             intro: null,
             score: null,
@@ -345,6 +344,7 @@ export default function Header(props) {
         });
 
         const preLocalStorageId = JSON.parse(localStorage.getItem('savedData')).id;
+        const preLocalStorageImg = JSON.parse(localStorage.getItem('savedData')).profileImg;
 
         localStorage.setItem('savedData', JSON.stringify({
             isLogin: true,
@@ -352,15 +352,20 @@ export default function Header(props) {
             loc : {
                 latitude: 37.0789561558879,
                 longitude: 127.423084873712
-            }
-        }));
+            },
+            profileImg: preLocalStorageImg
+        }
+        ));
     }
 
     const checkFunc = (e) => {
         e.preventDefault();
         SetLoc(e);
+        console.log(JSON.parse(localStorage.getItem('savedData')));
+        console.log(JSON.parse(localStorage.getItem('savedData')).profileImg);
     }
 
+    //헤더 이미지도 스토리지에 저장
     return (
         <Wrapper>
             {isLog?<button onClick={checkFunc}>안성으로 위치 설정하기</button>:<div></div>} {/* 안성에서 위치 설정 버튼 눌렀을 때 가정 */}
@@ -375,7 +380,7 @@ export default function Header(props) {
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 {isLog ? <HeaderButton onClick={MyPageButtonClicked}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
-                {isLog ? <Profile src={(profileImg !== null? profileImg:Nullprofile)}></Profile>: <HiddenProfile />}
+                {isLog ? <Profile src={(profileImg !== undefined? profileImg:Nullprofile)}></Profile>: <HiddenProfile />}
             </RightContainer>
         </Wrapper>
     );

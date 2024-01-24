@@ -319,6 +319,7 @@ function MyPage(props) {
         }
     };
 
+    //닉네임 6글자 over 확인
     const handleModify = (e) => {
         axios.patch("http://13.209.77.50:8080/member/profile", {
             nickname: currentName,
