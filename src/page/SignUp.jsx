@@ -134,7 +134,7 @@ function SignUp(props) {
 
     // 모든 입력 들어갔는지 체크
     const handleSignUp = (e) => {
-        if(e.target[0].value!=="" && e.target[3].value!==""){
+        if(e.target[0].value!=="" && e.target[3].value!=="" && e.target[4].value!=="" && e.target[5].value!==""){
             if(e.target[3].value.length>=6) {
                 if(e.target[4].value === e.target[5].value) {
                     if (isPassword) {

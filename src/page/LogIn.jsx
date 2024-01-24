@@ -107,7 +107,8 @@ export default function LogIn(props) {
                     loc : {
                         latitude: response.data.lat,
                         longitude: response.data.lng
-                    }
+                    },
+                    profileImg: response.data.profileImg
                 }));
                 navigate("/main");
             })
