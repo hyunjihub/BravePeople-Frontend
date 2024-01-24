@@ -9,7 +9,7 @@ import axios from 'axios';
 
 // redux
 import { useDispatch } from "react-redux";
-import { setAccessToken, setLogin, setRefreshToken, setMemberId, setLocation, setProfileImg } from "../redux/modules/login";
+import { setLogin, setMemberId, setLocation, setProfileImg } from "../redux/modules/login";
 
 const Form = styled.form`
     width: 400px;
@@ -75,8 +75,6 @@ export default function LogIn(props) {
 
     const dispatch = useDispatch();
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
-    const setAccess = (access) => dispatch(setAccessToken(access));
-    const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
     const setId = (id) => dispatch(setMemberId(id));
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
@@ -89,16 +87,28 @@ export default function LogIn(props) {
                 pw: e.target[1].value
             })
             .then(function(response){
+                // redux 변수 저장
+                setLog(true);
                 setId(response.data.memberId);
-                setAccess(response.data.tokenDto.accessToken);
-                setRefresh(response.data.tokenDto.refreshToken);
                 setLoc({
                     latitude:response.data.lat, 
                     longitude: response.data.lng
                 });
                 setProfile(response.data.profileImg);
-                setLog(true);
-                console.log(response);
+                // 토큰 저장
+                sessionStorage.setItem('jwt', JSON.stringify({
+                    access: response.data.tokenDto.accessToken,
+                    refresh: response.data.tokenDto.refreshToken
+                }));
+                // 새로고침으로 인한 데이터 삭제 방지용 데이터 저장
+                localStorage.setItem('savedData', JSON.stringify({
+                    isLogin: true,
+                    id: response.data.memberId,
+                    loc : {
+                        latitude: response.data.lat,
+                        longitude: response.data.lng
+                    }
+                }));
                 navigate("/main");
             })
             .catch(function(error){
