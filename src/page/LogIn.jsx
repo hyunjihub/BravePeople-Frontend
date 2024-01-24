@@ -9,7 +9,7 @@ import axios from 'axios';
 
 // redux
 import { useDispatch } from "react-redux";
-import { setAccessToken, setLogin, setRefreshToken, setMemberId, setLocation } from "../redux/modules/login";
+import { setAccessToken, setLogin, setRefreshToken, setMemberId, setLocation, setProfileImg } from "../redux/modules/login";
 
 const Form = styled.form`
     width: 400px;
@@ -79,10 +79,10 @@ export default function LogIn(props) {
     const setRefresh = (refresh) => dispatch(setRefreshToken(refresh));
     const setId = (id) => dispatch(setMemberId(id));
     const setLoc = (loc) => dispatch(setLocation(loc));
+    const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
 
     const handleLogin = (e) => {
         e.preventDefault();
-        // yny3533, rktlrhrl123
         if(e.target[0].value !== "" && e.target[1].value !== ""){
             axios.post('http://13.209.77.50:8080/auth/login', {
                 username: e.target[0].value,
@@ -96,7 +96,9 @@ export default function LogIn(props) {
                     latitude:response.data.lat, 
                     longitude: response.data.lng
                 });
+                setProfile(response.data.profileImg);
                 setLog(true);
+                console.log(response);
                 navigate("/main");
             })
             .catch(function(error){
@@ -107,6 +109,7 @@ export default function LogIn(props) {
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
+                console.log(error);
             });
         }else{
             Swal.fire({

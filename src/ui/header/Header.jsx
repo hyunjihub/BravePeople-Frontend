@@ -5,13 +5,14 @@ import logo from "./logo.png";
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
+import Nullprofile from "../dummy/profile.png"
 
 import axios from 'axios';
 
 // redux
 import HeaderButton from "./HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setAccessToken, setRefreshToken, setMemberId, setParamId, setLocation } from "../../redux/modules/login";
+import { setAccessToken, setLogin, setRefreshToken, setMemberId, setLocation, setParamId, setProfileImg } from "../../redux/modules/login";
 
 const Wrapper = styled.div`
     width : 100vw;
@@ -25,11 +26,11 @@ const Wrapper = styled.div`
 `;
 
 const RightContainer = styled.div`
-    width: 27%;
+    width: 25%;
     height: 50%;
     float: right;
     background-color: #fff;
-    margin-right: 4%;
+    margin-right: 3%;
     margin-top: 1.1%;
     display: flex;
 `;
@@ -45,12 +46,12 @@ const Logo = styled.div`
 `;
 
 const LocationBox = styled.button`
-    width : 160px;
+    width : 150px;
     height : 40px;
     background-color: #fff;
     border-radius : 15px;
     border: 1px solid rgba(18, 23, 42, 0.1);
-    margin-right: 5%;
+    margin-right: 3%;
     padding: 0px 0px 0px 10px;
     box-shadow: 0px 4px 15px -5px rgba(18, 23, 42, 0.1);
     box-sizing: border-box;
@@ -61,14 +62,14 @@ const LocationBox = styled.button`
 `;
 
 const HiddenLocation = styled.div`
-    width: 160px;
+    width: 150px;
     height: 30px;
     background-color: #fff;
-    margin-right: 5%;
+    margin-right: 3%;
 `;
 
 const Location = styled.span`
-    margin-left: 5%;
+    margin-left: 2%;
     color: #000;
     font-weight: bold;
     font-size: 20px;
@@ -106,6 +107,23 @@ const Chat = styled.button`
     cursor: pointer;
 `;
 
+const Profile = styled.img`
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-top: -3%;
+    background-color: #000;
+    border: none;
+`;
+
+const HiddenProfile = styled.div`
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-top: -3%;
+`;
+
+
 const HiddenChat = styled.div`
     width: 10%;
     height: 10%;
@@ -123,12 +141,14 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, access, refresh, id, loc } = useSelector( state => ({
+    const { isLog, access, refresh, id, loc, paramid, profileImg } = useSelector( state => ({
         isLog: state.login.isLogin,
         access: state.login.accessToken,
         refresh: state.login.refreshToken,
         id: state.login.memberId,
-        loc: state.login.location
+        loc: state.login.location,
+        paramid: state.login.paramid,
+        profileImg: state.login.profileImg
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
@@ -137,6 +157,7 @@ export default function Header(props) {
     const setId = (memberId) => dispatch(setMemberId(memberId));
     const setParam = (paramid) => dispatch(setParamId(paramid));
     const setLoc = (loc) => dispatch(setLocation(loc)); 
+    const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
 
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
@@ -171,6 +192,7 @@ export default function Header(props) {
                     latitude: "",
                     longitude: ""
                 });
+                setProfile("");
                 navigate("/main");
             })
             .catch(function(error){
@@ -286,6 +308,7 @@ export default function Header(props) {
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 {isLog ? <HeaderButton onClick={MyPageButtonClicked}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
+                {isLog ? <Profile src={(profileImg !== null? profileImg:Nullprofile)}></Profile>: <HiddenProfile />}
             </RightContainer>
         </Wrapper>
     );

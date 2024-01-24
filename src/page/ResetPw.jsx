@@ -99,97 +99,115 @@ function ResetPw(props) {
         });
     }
 
+    //패스워드 검증
+    const isPassword = (str) => {
+        const correctWord = /^(?=.*[a-zA-Z])(?=.*\d).+$/;
+        const Length = str.length>=8;
+
+        return correctWord.test(str) && Length;
+    }
+
     const handleReset = (e) =>{
         
         if(e.target[0].value!=="" && e.target[1].value!=="") {
-            if(e.target[0].value === e.target[1].value) {
-                if(access==="") {
-                    e.preventDefault();
-                    axios.patch('http://13.209.77.50:8080/member/pw', {
-                        newPassword: e.target[0].value,
-                        emailId: parseInt(query.get('emailid'), 10),
-                        authCode: parseInt(query.get('code'), 10),
-                    })
-                    .then(function(response){
-                        Swal.fire({
-                            title: "비밀번호 재설정 완료",
-                            text: "입력하신 비밀번호로 재설정되었습니다.",
-                            icon: "success",
-                            confirmButtonColor: "#d33",
-                            confirmButtonText: "확인",
+            if(isPassword) {
+                if(e.target[0].value === e.target[1].value) {
+                    if(access==="") {
+                        e.preventDefault();
+                        axios.patch('http://13.209.77.50:8080/member/pw', {
+                            newPassword: e.target[0].value,
+                            emailId: parseInt(query.get('emailid'), 10),
+                            authCode: parseInt(query.get('code'), 10),
+                        })
+                        .then(function(response){
+                            Swal.fire({
+                                title: "비밀번호 재설정 완료",
+                                text: "입력하신 비밀번호로 재설정되었습니다.",
+                                icon: "success",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                            navigate("/main");
+                        })
+                        .catch(function(error){
+                            if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
+                                Swal.fire({
+                                    title: "비밀번호 형식 오류",
+                                    text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33",
+                                    confirmButtonText: "확인",
+                                });  
+                            } else if((error.response.status === 400 && error.response.data.errorMessage === "기존 비밀번호와 새 비밀번호가 일치")) {
+                                Swal.fire({
+                                    title: "기존 비밀번호와 일치",
+                                    text: "새 비밀번호는 기존 비밀번호와 같을 수 없습니다.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33",
+                                    confirmButtonText: "확인",
+                                }); 
+                            } else {
+                                console.log(error);
+                            }
                         });
-                        navigate("/main");
-                    })
-                    .catch(function(error){
-                        if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
+                    } else {
+                        e.preventDefault();
+                        axios.patch('http://13.209.77.50:8080/member/pw', {
+                            newPassword: e.target[0].value},
+                            {headers:{
+                                Authorization: `Bearer ${access}`
+                            }})
+                        .then(function(response){
                             Swal.fire({
-                                title: "비밀번호 형식 오류",
-                                text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
-                                icon: "error",
+                                title: "비밀번호 재설정 완료",
+                                text: "입력하신 비밀번호로 재설정되었습니다. 다시 로그인 해주세요.",
+                                icon: "success",
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
-                            });  
-                        } else if((error.response.status === 400 && error.response.data.errorMessage === "기존 비밀번호와 새 비밀번호가 일치")) {
-                            Swal.fire({
-                                title: "기존 비밀번호와 일치",
-                                text: "새 비밀번호는 기존 비밀번호와 같을 수 없습니다.",
-                                icon: "error",
-                                confirmButtonColor: "#d33",
-                                confirmButtonText: "확인",
-                            }); 
-                        } else {
-                            console.log(error);
-                        }
-                    });
+                            });
+                            navigate("/main");
+                        })
+                        .catch(function(error){
+                            if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                                ReissueToken("토큰 기한이 만료로 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
+                            } else if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
+                                Swal.fire({
+                                    title: "비밀번호 형식 오류",
+                                    text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33",
+                                    confirmButtonText: "확인",
+                                });  
+                            } else if((error.response.status === 400 && error.response.data.errorMessage === "기존 비밀번호와 새 비밀번호가 일치")) {
+                                Swal.fire({
+                                    title: "기존 비밀번호와 일치",
+                                    text: "새 비밀번호는 기존 비밀번호와 같을 수 없습니다.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33",
+                                    confirmButtonText: "확인",
+                                }); 
+                            } else {
+                                console.log(error);
+                            }
+                        });
+                    }
                 } else {
-                    e.preventDefault();
-                    axios.patch('http://13.209.77.50:8080/member/pw', {
-                        newPassword: e.target[0].value},
-                        {headers:{
-                            Authorization: `Bearer ${access}`
-                        }})
-                    .then(function(response){
-                        Swal.fire({
-                            title: "비밀번호 재설정 완료",
-                            text: "입력하신 비밀번호로 재설정되었습니다. 다시 로그인 해주세요.",
-                            icon: "success",
-                            confirmButtonColor: "#d33",
-                            confirmButtonText: "확인",
-                        });
-                        navigate("/main");
-                    })
-                    .catch(function(error){
-                        if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                            ReissueToken("토큰 기한이 만료로 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
-                        } else if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
-                            Swal.fire({
-                                title: "비밀번호 형식 오류",
-                                text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
-                                icon: "error",
-                                confirmButtonColor: "#d33",
-                                confirmButtonText: "확인",
-                            });  
-                        } else if((error.response.status === 400 && error.response.data.errorMessage === "기존 비밀번호와 새 비밀번호가 일치")) {
-                            Swal.fire({
-                                title: "기존 비밀번호와 일치",
-                                text: "새 비밀번호는 기존 비밀번호와 같을 수 없습니다.",
-                                icon: "error",
-                                confirmButtonColor: "#d33",
-                                confirmButtonText: "확인",
-                            }); 
-                        } else {
-                            console.log(error);
-                        }
+                    Swal.fire({
+                        title: "비밀번호 불일치",
+                        text: "비밀번호와 비밀번호 확인에 입력하신 두 비밀번호가 다릅니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
                     });
                 }
             } else {
                 Swal.fire({
-                    title: "비밀번호 불일치",
-                    text: "비밀번호와 비밀번호 확인에 입력하신 두 비밀번호가 다릅니다.",
+                    title: "비밀번호 형식 오류",
+                    text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
-                });
+                });  
             }
         } else {
             Swal.fire({
@@ -199,8 +217,7 @@ function ResetPw(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
-        }
-        
+        } 
         e.preventDefault();
     }
 

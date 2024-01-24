@@ -180,18 +180,19 @@ function FindId(props) {
                             confirmButtonText: "확인",
                         });
                     } else {
-                    Swal.fire({
-                        title: "계정 정보 없음",
-                        text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",
-                        icon: "error",
-                        confirmButtonColor: "#d33",
-                        confirmButtonText: "확인",
-                    });
-                }});
+                        Swal.fire({
+                            title: "계정 정보 없음",
+                            text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                    }
+                });
             } else {
                 Swal.fire({
-                    title: "입력 정보 없음",
-                    text: "아이디나 이메일이 입력되지 않았습니다. 다시 한 번 확인해주세요.",
+                    title: "아이디 형식 오류",
+                    text: "아이디는 6글자 이상입니다. 다시 한 번 확인해주세요.",
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
@@ -199,8 +200,8 @@ function FindId(props) {
             }    
         } else {
             Swal.fire({
-                title: "계정 정보 없음",
-                text: "입력하신 이메일과 일치하는 계정 정보가 없습니다.",
+                title: "입력 정보 없음",
+                text: "아이디나 이메일이 입력되지 않았습니다. 다시 한 번 확인해주세요.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",

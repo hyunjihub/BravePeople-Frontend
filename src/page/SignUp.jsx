@@ -120,12 +120,25 @@ function SignUp(props) {
         else setGender("남성");
     }
 
-    // 위도랑 경도 파라미터 추가해야하고, 비밀번호 영문/숫자 포함했는지 확인
+    //패스워드 검증
+    const isPassword = (str) => {
+        const correctWord = /^(?=.*[a-zA-Z])(?=.*\d).+$/;
+        const Length = str.length>=8;
+
+        return correctWord.test(str) && Length;
+    }
+
+    //모든 입력 검증
+    const isAll = (e) => {
+
+    }
+
+    // 위도랑 경도 파라미터 추가
     const handleSignUp = (e) => {
         if(e.target[0].value!=="" && e.target[3].value!==""){
             if(e.target[3].value.length>=6) {
                 if(e.target[4].value === e.target[5].value) {
-                    if (e.target[4].value.length >= 8) {
+                    if (isPassword) {
                         axios.post('http://13.209.77.50:8080/auth/signup', {
                         name: e.target[0].value,
                         gender: gender,
@@ -169,7 +182,7 @@ function SignUp(props) {
                             } else if (error.response.data.errorMessage ==="이미 가입 진행중인 이메일" && error.response.status === 400) {
                                 Swal.fire({
                                     title: "본인인증 대기 중인 이메일",
-                                    html: "입력하신 이메일로 이미 본인인증이 대기 중입니다. 메일함을 확인해주세요.<br>메일함에 없을 경우, 스팸메일을 확인해주세요.",
+                                    html: "입력하신 이메일로 이미 본인인증이 대기 중입니다. 메일함을 확인해주세요.<br>메일함에 없을 경우, 스팸함을 확인해주세요.",
                                     icon: "error",
                                     confirmButtonColor: "#d33",
                                     confirmButtonText: "확인",
@@ -283,7 +296,6 @@ function SignUp(props) {
         }
     }
 
-    // 버튼 클릭시 위치정보 (시,군,구) 위치정보 input의 기본 텍스트로 입력됨, 위도와 경도 값을 받아와서 나중에 회원가입할 때 같이 보낼 수 있게 저장해야 할 듯
     // 위치 정보
     const { geolocation } = navigator;
     const geolocationOptions = {

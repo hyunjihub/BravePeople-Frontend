@@ -4,6 +4,7 @@ const SET_REFRESH_TOKEN = 'login/SET_REFRESH_TOKEN';
 const SET_MEMBER_ID = 'login/SET_MEMBER_ID';
 const SET_PARAM_ID = 'login/SET_PARAM_ID';
 const SET_LOCATION = 'login/SET_LOC';
+const SET_PROFILEIMG = 'log/SET_PROFILEIMG'
 
 export const setLogin = (isLogin) => ({ type:SET_LOGIN, isLogin });
 export const setAccessToken = (access) => ({ type:SET_ACCESS_TOKEN, access });
@@ -11,6 +12,7 @@ export const setRefreshToken = (refresh) => ({ type:SET_REFRESH_TOKEN, refresh }
 export const setMemberId = (id) => ({ type:SET_MEMBER_ID, id });
 export const setParamId = (paramid) => ({ type:SET_PARAM_ID, paramid });
 export const setLocation = (loc) => ({ type:SET_LOCATION, loc });
+export const setProfileImg = (profileImg) => ({ type:SET_PROFILEIMG, profileImg });
 
 const initialState = {
     isLogin: false,
@@ -21,7 +23,8 @@ const initialState = {
     location: {
         longitude: "",
         latitude: ""
-    }
+    },
+    profileImg: ""
 }
 
 export default function login(state=initialState, action){
@@ -49,6 +52,10 @@ export default function login(state=initialState, action){
         case SET_LOCATION:
             return{
                 ...state, location: action.loc
+            };
+        case SET_PROFILEIMG:
+            return{
+                ...state, profileImg: action.profileImg
             };
         default:
             return state;
