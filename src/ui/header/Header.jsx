@@ -136,6 +136,13 @@ export default function Header(props) {
     const setParam = (paramid) => dispatch(setParamId(paramid));
     const setLoc = (loc) => dispatch(setLocation(loc)); 
 
+    // 세션 스토리지에 토큰 생성
+    sessionStorage.setItem('jwt',JSON.stringify({
+        access: "",
+        refresh: ""
+    }))
+
+    // 토큰 재발행 함수
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,

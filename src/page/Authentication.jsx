@@ -6,10 +6,6 @@ import Swal from "sweetalert2";
 // restapi
 import axios from 'axios';
 
-//redux
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken } from "../redux/modules/login";
-
 
 const Title = styled.div`
     font-size: 40px;
@@ -65,25 +61,17 @@ const Form = styled.form`
 function Authentication(props) {
     const navigate = useNavigate();
 
-    // redux로 변수, 함수 가져오기
-    const { access, refresh } = useSelector((state)=>({
-        access: state.login.accessToken,
-        refresh: state.login.refreshToken,
-    }), shallowEqual);
-
-    const dispatch = useDispatch();
-    const setAccess = (acc) => dispatch(setAccessToken(acc));
-    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
-    
     // 토큰 재발행 함수
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: access,
-            refreshToken: refresh,
+            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
         })
         .then(function(response){
-            setAccess(response.data.accessToken);
-            setRefresh(response.data.refreshToken);
+            sessionStorage.setItem('jwt',JSON.stringify({
+                access: response.data.accessToken,
+                refresh: response.data.refreshToken
+            }))
             alert(msg);
             navigate("/main");
         })
@@ -97,7 +85,7 @@ function Authentication(props) {
             axios.post('http://13.209.77.50:8080/member/pw', {
             nowPassword: e.target[0].value,
             }, {headers:{
-                    Authorization: `Bearer ${access}`
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             })
             .then(function(response){

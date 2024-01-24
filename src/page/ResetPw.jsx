@@ -7,10 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 // restapi
 import axios from 'axios';
 
-//redux
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setAccessToken, setRefreshToken } from "../redux/modules/login";
-
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -71,26 +67,17 @@ function ResetPw(props) {
     const [isReset, setIsReset] = useState(true);
     let [query, setQuery] = useSearchParams();
 
-    // redux로 변수, 함수 가져오기
-    const { access, refresh } = useSelector((state)=>({
-        isLog: state.login.isLogin,
-        id: state.login.memberId,
-        access: state.login.accessToken,
-        refresh: state.login.refreshToken,
-    }), shallowEqual);
-
-    const dispatch = useDispatch();
-    const setAccess = (acc) => dispatch(setAccessToken(acc));
-    const setRefresh = (ref) => dispatch(setRefreshToken(ref));
-
+    // 토큰 재발급
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: access,
-            refreshToken: refresh,
+            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
         })
         .then(function(response){
-            setAccess(response.data.accessToken);
-            setRefresh(response.data.refreshToken);
+            sessionStorage.setItem('jwt',JSON.stringify({
+                access: response.data.accessToken,
+                refresh: response.data.refreshToken
+            }))
             alert(msg);
             navigate("/main");
         })
@@ -100,11 +87,10 @@ function ResetPw(props) {
     }
 
     const handleReset = (e) =>{
-        
+        e.preventDefault();
         if(e.target[0].value!=="" && e.target[1].value!=="") {
             if(e.target[0].value === e.target[1].value) {
-                if(access==="") {
-                    e.preventDefault();
+                if(JSON.parse(sessionStorage.getItem('jwt')).access === "") {
                     axios.patch('http://13.209.77.50:8080/member/pw', {
                         newPassword: e.target[0].value,
                         emailId: parseInt(query.get('emailid'), 10),
@@ -142,11 +128,10 @@ function ResetPw(props) {
                         }
                     });
                 } else {
-                    e.preventDefault();
                     axios.patch('http://13.209.77.50:8080/member/pw', {
                         newPassword: e.target[0].value},
                         {headers:{
-                            Authorization: `Bearer ${access}`
+                            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                         }})
                     .then(function(response){
                         Swal.fire({
@@ -200,8 +185,6 @@ function ResetPw(props) {
                 confirmButtonText: "확인",
             });
         }
-        
-        e.preventDefault();
     }
 
     const handleCancel = () => {
