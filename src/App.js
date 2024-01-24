@@ -18,6 +18,8 @@ import Authentication from "./page/Authentication";
 
 export default function App(props) {
 
+    localStorage.clear();
+
     return(
         <div id="App">
            <BrowserRouter>
