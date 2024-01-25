@@ -101,7 +101,7 @@ export default function LogIn(props) {
                     refresh: response.data.tokenDto.refreshToken
                 }));
                 // 새로고침으로 인한 데이터 삭제 방지용 데이터 저장
-                localStorage.setItem('savedData', JSON.stringify({
+                sessionStorage.setItem('savedData', JSON.stringify({
                     isLogin: true,
                     id: response.data.memberId,
                     loc : {

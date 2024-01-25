@@ -2,7 +2,7 @@ const SET_LOGIN = 'login/SET_LOGIN';
 const SET_MEMBER_ID = 'login/SET_MEMBER_ID';
 const SET_PARAM_ID = 'login/SET_PARAM_ID';
 const SET_LOCATION = 'login/SET_LOC';
-const SET_PROFILEIMG = 'log/SET_PROFILEIMG'
+const SET_PROFILEIMG = 'login/SET_PROFILEIMG'
 
 export const setLogin = (isLogin) => ({ type:SET_LOGIN, isLogin });
 export const setMemberId = (id) => ({ type:SET_MEMBER_ID, id });
@@ -18,7 +18,7 @@ const initialState = {
         longitude: null,
         latitude: null
     },
-    profileImg: ""
+    profileImg: null
 }
 
 export default function login(state=initialState, action){

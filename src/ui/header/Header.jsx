@@ -163,8 +163,8 @@ export default function Header(props) {
         }))
     }
     // webStorage - 새로고침 데이터 삭제 방지용(redux data)
-    if(localStorage.getItem('savedData') === null){
-        localStorage.setItem('savedData', JSON.stringify({
+    if(sessionStorage.getItem('savedData') === null){
+        sessionStorage.setItem('savedData', JSON.stringify({
             isLogin: false,
             id: null,
             loc : {
@@ -176,15 +176,15 @@ export default function Header(props) {
     }
 
     useEffect(()=>{
-        if(localStorage.getItem('savedData')!==null){  
-            if(JSON.parse(localStorage.getItem('savedData')).isLogin && !isLog){
-                setLog(JSON.parse(localStorage.getItem('savedData')).isLogin);
-                setId(JSON.parse(localStorage.getItem('savedData')).id);
+        if(sessionStorage.getItem('savedData')!==null){  
+            if(JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
+                setLog(JSON.parse(sessionStorage.getItem('savedData')).isLogin);
+                setId(JSON.parse(sessionStorage.getItem('savedData')).id);
                 setLoc({
-                    latitude: JSON.parse(localStorage.getItem('savedData')).loc.latitude, 
-                    longitude: JSON.parse(localStorage.getItem('savedData')).loc.longitude
+                    latitude: JSON.parse(sessionStorage.getItem('savedData')).loc.latitude, 
+                    longitude: JSON.parse(sessionStorage.getItem('savedData')).loc.longitude
                 });
-                setProfile(JSON.parse(localStorage.getItem('savedData')).profileImg);
+                setProfile(JSON.parse(sessionStorage.getItem('savedData')).profileImg);
             }
         }
     },[isLog]);
@@ -225,8 +225,8 @@ export default function Header(props) {
                 });
                 setProfile(null);
                 sessionStorage.removeItem('jwt');
-                localStorage.removeItem('savedData');
-                localStorage.removeItem('savedUserInfo');
+                sessionStorage.removeItem('savedData');
+                sessionStorage.removeItem('savedUserInfo');
                 navigate("/main");
             })
             .catch(function(error){
@@ -239,7 +239,7 @@ export default function Header(props) {
 
     const MyPageButtonClicked = () => {
         setParam(id);
-        localStorage.setItem('savedUserInfo', JSON.stringify({
+        sessionStorage.setItem('savedUserInfo', JSON.stringify({
             //profileImage: null,
             nickname: null,
             intro: null,
@@ -271,11 +271,11 @@ export default function Header(props) {
                     latitude: response.data.lat,
                     longitude: response.data.lng
                 });
-                const preLocalStorageId = JSON.parse(localStorage.getItem('savedData')).id;
+                const presessionStorageId = JSON.parse(sessionStorage.getItem('savedData')).id;
 
-                localStorage.setItem('savedData', JSON.stringify({
+                sessionStorage.setItem('savedData', JSON.stringify({
                     isLogin: true,
-                    id: preLocalStorageId,
+                    id: presessionStorageId,
                     loc : {
                         latitude: response.data.lat,
                         longitude: response.data.lng
@@ -343,17 +343,17 @@ export default function Header(props) {
             longitude: 127.423084873712
         });
 
-        const preLocalStorageId = JSON.parse(localStorage.getItem('savedData')).id;
-        const preLocalStorageImg = JSON.parse(localStorage.getItem('savedData')).profileImg;
+        const presessionStorageId = JSON.parse(sessionStorage.getItem('savedData')).id;
+        const presessionStorageImg = JSON.parse(sessionStorage.getItem('savedData')).profileImg;
 
-        localStorage.setItem('savedData', JSON.stringify({
+        sessionStorage.setItem('savedData', JSON.stringify({
             isLogin: true,
-            id: preLocalStorageId,
+            id: presessionStorageId,
             loc : {
                 latitude: 37.0789561558879,
                 longitude: 127.423084873712
             },
-            profileImg: preLocalStorageImg
+            profileImg: presessionStorageImg
         }
         ));
     }
@@ -361,8 +361,8 @@ export default function Header(props) {
     const checkFunc = (e) => {
         e.preventDefault();
         SetLoc(e);
-        console.log(JSON.parse(localStorage.getItem('savedData')));
-        console.log(JSON.parse(localStorage.getItem('savedData')).profileImg);
+        console.log(JSON.parse(sessionStorage.getItem('savedData')));
+        console.log(JSON.parse(sessionStorage.getItem('savedData')).profileImg);
     }
 
     //헤더 이미지도 스토리지에 저장

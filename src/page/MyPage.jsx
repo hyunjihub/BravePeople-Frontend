@@ -238,7 +238,7 @@ function MyPage(props) {
     }
 
     useEffect(()=>{
-        if(!JSON.parse(localStorage.getItem('savedData')).isLogin && !isLog){
+        if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
             Swal.fire({
                 title: "비정상적인 접속",
                 text: "비회원은 마이페이지에 접속하실 수 없습니다.",
@@ -251,7 +251,7 @@ function MyPage(props) {
         else{
             //마이페이지에 처음 접근할 때
             (param === id) ? setMySelf(true) : setMySelf(false);
-            if(JSON.parse(localStorage.getItem('savedUserInfo')).nickname === null){
+            if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
                 axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
                     headers:{
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -265,7 +265,7 @@ function MyPage(props) {
                             score: response.data.score,
                             medalCount: response.data.medalCount
                         });
-                        localStorage.setItem('savedUserInfo', JSON.stringify({
+                        sessionStorage.setItem('savedUserInfo', JSON.stringify({
                             profileImage: response.data.profileImage,
                             nickname: response.data.nickname,
                             intro: response.data.introduction,
@@ -285,11 +285,11 @@ function MyPage(props) {
             }else{
                 // 마이페이지에 처음 접근하는 것이 아닐 때
                 setUserInfo({
-                    profileImage: JSON.parse(localStorage.getItem('savedUserInfo')).profileImage,
-                    nickname: JSON.parse(localStorage.getItem('savedUserInfo')).nickname,
-                    intro: JSON.parse(localStorage.getItem('savedUserInfo')).intro,
-                    score: JSON.parse(localStorage.getItem('savedUserInfo')).score,
-                    medalCount: JSON.parse(localStorage.getItem('savedUserInfo')).medalCount,
+                    profileImage: JSON.parse(sessionStorage.getItem('savedUserInfo')).profileImage,
+                    nickname: JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname,
+                    intro: JSON.parse(sessionStorage.getItem('savedUserInfo')).intro,
+                    score: JSON.parse(sessionStorage.getItem('savedUserInfo')).score,
+                    medalCount: JSON.parse(sessionStorage.getItem('savedUserInfo')).medalCount,
                 });
             }
         };
@@ -334,7 +334,7 @@ function MyPage(props) {
                 nickname: response.data.nickname,
                 intro: response.data.introduction,
             });
-            localStorage.setItem('savedUserInfo', JSON.stringify({
+            sessionStorage.setItem('savedUserInfo', JSON.stringify({
                 profileImage: userInfo.profileImage,
                 nickname: response.data.nickname,
                 intro: response.data.introduction,
@@ -394,7 +394,7 @@ function MyPage(props) {
                         ...userInfo,
                         profileImage: response.data.profileImage,
                     });
-                    localStorage.setItem('savedUserInfo', JSON.stringify({
+                    sessionStorage.setItem('savedUserInfo', JSON.stringify({
                         profileImage: response.data.profileImage,
                         nickname: userInfo.nickname,
                         intro: userInfo.introduction,
