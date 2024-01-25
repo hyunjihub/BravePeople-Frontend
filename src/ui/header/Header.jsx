@@ -209,7 +209,7 @@ export default function Header(props) {
 
     const handleLogOut = () => {
         if(isLog) {
-            axios.post("http://13.209.77.50:8080/member/logout", {
+            axios.get("http://13.209.77.50:8080/member/logout", {
                 headers: {
                     'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
