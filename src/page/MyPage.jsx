@@ -295,7 +295,6 @@ function MyPage(props) {
         };
     }, []);
     const [currentName, setCurrentName] = useState(null);
-    const preName = userInfo.nickname;
 
     const handleCurrentName = (e) => {
         setCurrentName(e.target.value);
@@ -303,7 +302,6 @@ function MyPage(props) {
     }
 
     const [currentIntro, setCurrentIntro] = useState(null);
-    const preIntro = userInfo.intro;
 
     const handleCurrentIntro = (e) => {
         setCurrentIntro(e.target.value);
@@ -319,16 +317,17 @@ function MyPage(props) {
         }
     };
 
-    //닉네임 6글자 over 확인
+    // 수정 완료 버튼
     const handleModify = (e) => {
         axios.patch("http://13.209.77.50:8080/member/profile", {
-            nickname: currentName,
-            introduction: currentIntro
+            nickname: (currentName === null) ? userInfo.nickname : currentName,
+            introduction: (currentIntro === null) ? userInfo.intro : currentIntro,
         }, {
             headers:{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }
         }).then(function(response){
+            console.log(response);
             setUserInfo({
                 ...userInfo,
                 nickname: response.data.nickname,
@@ -465,12 +464,12 @@ function MyPage(props) {
                 <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                 <Myself>
                     {isClicked?
-                    <ModifyNickname type="text" defaultValue={preName} onChange={handleCurrentName}></ModifyNickname>
+                    <ModifyNickname type="text" defaultValue={userInfo.nickname} onChange={handleCurrentName}></ModifyNickname>
                     :<Nickname>{userInfo.nickname}</Nickname>}
                     {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
                 </Myself>
                 {isClicked?
-                    <ModifyIntro type="text" defaultValue={preIntro} onChange={handleCurrentIntro}></ModifyIntro>
+                    <ModifyIntro type="text" defaultValue={(userInfo.intro) === null ? "널값임":userInfo.intro} onChange={handleCurrentIntro}></ModifyIntro>
                     :<Introduce>{(userInfo.intro === null || userInfo.intro === "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
