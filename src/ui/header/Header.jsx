@@ -137,7 +137,6 @@ const HiddenMyPage = styled.div`
 `;
 
 export default function Header(props) {
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -250,6 +249,7 @@ export default function Header(props) {
     }
 
     // 위치 정보
+    // 위도 : latitude, 경도 : longitude
     const { geolocation } = navigator;
     const geolocationOptions = {
         enableHighAccuracy: true,
@@ -337,38 +337,56 @@ export default function Header(props) {
         if(loc.latitude !== null && loc.longitude !== null) mapApi(loc.latitude, loc.longitude);
     }, [loc]);
 
-    const SetLoc = () => {
-        setLoc({
-            latitude: 37.0789561558879,
-            longitude: 127.423084873712
-        });
 
-        const presessionStorageId = JSON.parse(sessionStorage.getItem('savedData')).id;
-        const presessionStorageImg = JSON.parse(sessionStorage.getItem('savedData')).profileImg;
-
-        sessionStorage.setItem('savedData', JSON.stringify({
-            isLogin: true,
-            id: presessionStorageId,
-            loc : {
-                latitude: 37.0789561558879,
-                longitude: 127.423084873712
-            },
-            profileImg: presessionStorageImg
-        }
-        ));
+    // -------------------------------------- 테스트용 코드 ------------------------------------
+    const [testloc, setTestloc] = useState({
+        testlat: "",
+        testlng: ""
+    })
+    // 위도
+    const changeLat = (e) => {
+        setTestloc({
+            ...testloc,
+            testlat: e.target.value
+        })
     }
-
+    // 경도
+    const changeLng = (e) => {
+        setTestloc({
+            ...testloc,
+            testlng: e.target.value
+        })
+    }
     const checkFunc = (e) => {
+        axios.get(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${testloc.testlng}&y=${testloc.testlat}&input_coord=WGS84`,
+        {headers:{
+            Authorization: `KakaoAK ae9e0cedf9e82516ded7194a84881362`
+            }    
+        })  
+        .then(function(response){
+            if(response.data.documents.length !== 0){
+                console.log(response.data.documents);
+                alert(response.data.documents[0].address.region_2depth_name);
+            }else{
+                alert("위도 경도를 확인해주세요");
+            }
+        })
+        .catch(function(error){
+            console.log(error);
+        })
         e.preventDefault();
-        SetLoc(e);
-        console.log(JSON.parse(sessionStorage.getItem('savedData')));
-        console.log(JSON.parse(sessionStorage.getItem('savedData')).profileImg);
     }
+    // ----------------------------------------------------------------------------------------
+
 
     //헤더 이미지도 스토리지에 저장
     return (
         <Wrapper>
-            {isLog?<button onClick={checkFunc}>안성으로 위치 설정하기</button>:<div></div>} {/* 안성에서 위치 설정 버튼 눌렀을 때 가정 */}
+            <div>
+            <input type="text" placeholder={"위도"} onChange={changeLat}></input>
+            <input type="text" placeholder={"경도"} onChange={changeLng}></input>
+            <button onClick={checkFunc}>테스트</button>
+            </div>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
