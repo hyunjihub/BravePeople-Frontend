@@ -383,8 +383,8 @@ export default function Header(props) {
     return (
         <Wrapper>
             <div>
-            <input type="text" placeholder={"위도"} onChange={changeLat}></input>
-            <input type="text" placeholder={"경도"} onChange={changeLng}></input>
+            <input type="text" placeholder={"위도(latitude)"} onChange={changeLat}></input>
+            <input type="text" placeholder={"경도(longitude)"} onChange={changeLng}></input>
             <button onClick={checkFunc}>테스트</button>
             </div>
             <Logo onClick={()=>{navigate("/main");}}>
