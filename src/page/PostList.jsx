@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import PostItem from "../components/PostItem";
+import { BiMenuAltRight } from "react-icons/bi";
+import { useNavigate } from "react-router";
 
 const data = {
     title: "파이팅!",
@@ -37,7 +39,36 @@ const PostListBox = styled.div`
     }
 `;
 
+const WriteButton = styled.button`
+    width: 9%;
+    height: 75%;
+    background-color: #f8332f;
+    font-family: 'SUITE';
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 100%;
+    margin-right: 6%;
+`;
+
+const ButtonContainer = styled.div`
+    width: 100%;
+    height: 6%;
+    display: flex;
+    justify-content: flex-end;
+`;
+
+const DonerMenu = styled.button`
+    height: 90%;
+    border: none;
+    background-color: #fff;
+    margin-top: -1%;
+`;
+
 function PostList(props) {
+
+    const navigate = useNavigate();
     const [ postItems, setPostItems ] = useState([]);
     const [ num, setNum ] = useState(0);
     const { ishelped } = useParams();
@@ -48,12 +79,22 @@ function PostList(props) {
         setNum(0);
     }, [type]);
 
+    const handleWrite = (e) => {
+        navigate("./writepost");
+        e.preventDefault();
+    }
+
     return(
         <Wrapper>
-            <Title>{type}</Title>
             <button onClick={()=>{setPostItems([...postItems, num]); setNum(num + 1);}}>데이터 추가</button>
+            <Title>{type}</Title>
+            <ButtonContainer>
+                <DonerMenu ><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu>
+                <WriteButton onClick={handleWrite}>글쓰기</WriteButton>
+            </ButtonContainer>
+            
             <PostListBox>
-                {(postItems.length === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", fontSize:"25px"}}>등록된 게시물이 없습니다!</div> : 
+                {(postItems.length === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", fontSize:"25px", marginTop:"200px", fontSize:"35px"}}>등록된 게시물이 없습니다!</div> : 
                 postItems.map((item, index)=>{
                     return <PostItem key={index} value={item} />
                 })}  

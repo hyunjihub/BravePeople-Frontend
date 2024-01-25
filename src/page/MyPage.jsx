@@ -314,13 +314,19 @@ function MyPage(props) {
         setCurrentImg(img);
     }
 
+    // 수정 비/활성화
     const handleIsClicked = () => {
         if(isClicked) {
             setIsClicked(false);
         }
         else {
             setIsClicked(true);
+            console.log(userInfo.intro);
+            console.log(userInfo.nickname);
+            console.log(userInfo.profileImage);
             handleCurrentImg(userInfo.profileImage);
+            setCurrentName(userInfo.nickname);
+            setCurrentIntro(userInfo.intro);
         }
     };
 
@@ -336,65 +342,52 @@ function MyPage(props) {
             });
         } else {
             axios.patch("http://13.209.77.50:8080/member/profile", {
-            nickname: (currentName === null) ? userInfo.nickname : currentName,
-            introduction: (currentIntro === null) ? userInfo.intro : currentIntro,
+            nickname: currentName,
+            introduction: currentIntro,
+            profileImg: currentImg
         }, {
             headers:{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }
         }).then(function(response){
-            let tmpName = response.data.nickname;
-            let tmpIntro = response.data.introduction;
-            axios.patch("http://13.209.77.50:8080/member/profile/image", frm, {
-                headers: {'Content-Type' : 'Multipart/form-data',
-                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }
-            }).then(function(response){
+            console.log(response);
                 setUserInfo({
-                        ...userInfo,
-                        profileImage: response.data.profileImage,
-                        nickname: tmpName,
-                        intro: tmpIntro,
-                    });
-                    sessionStorage.setItem('savedUserInfo', JSON.stringify({
-                        profileImage: response.data.profileImage,
-                        nickname: tmpName,
-                        intro: tmpName,
-                        score: userInfo.score,
-                        medalCount: userInfo.medalCount
-                    }));
-                }
-            )
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                } else {
-                alert("에러 발생");
-                console.log(error);
-                }
-            });
-            setCurrentName(null);
-            setCurrentIntro(null);
-            setCurrentImg(userInfo.profileImage);
-        })
-        .catch(function(err){
-            if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
-                ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-            } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '닉네임 중복 오류')) {
-                Swal.fire({
-                    title: "닉네임 중복",
-                    text: "현재 사용중인 닉네임입니다.",
-                    icon: "error",
-                    confirmButtonColor: "#d33",
-                    confirmButtonText: "확인",
+                    ...userInfo,
+                    nickname: response.data.nickname,
+                    intro: response.data.introduction,
+                    profileImage: response.data.profileImg,
                 });
-                setIsClicked(true);
-            } else {
-                console.log(err);
-            }
-        });
+                sessionStorage.setItem('savedUserInfo', JSON.stringify({
+                    profileImage: response.data.profileImg,
+                    nickname: response.data.nickname,
+                    intro: response.data.introduction,
+                    score: userInfo.score,
+                    medalCount: userInfo.medalCount
+                }));
+                setCurrentImg(response.data.profile);
+                setCurrentIntro(response.data.introduction);
+                setCurrentName(response.data.nickname);
+                console.log(response.data.profileImg);
+                console.log(response.data.nickname);
+                console.log(response.data.introduction);
+                setIsClicked(false);
+            }).catch(function(err) {
+                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '닉네임 중복 오류')) {
+                    Swal.fire({
+                        title: "닉네임 중복",
+                        text: "현재 사용중인 닉네임입니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                    setIsClicked(true);
+                } else {
+                    console.log(err);
+                }
+            })
         }
-        setIsClicked(false);
     }
 
     const fileInput = React.createRef();
@@ -403,6 +396,7 @@ function MyPage(props) {
     }
     const frm = new FormData();
 
+    //프로필 이미지 불러오기
     const handleChange = (e) => {
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
@@ -418,7 +412,26 @@ function MyPage(props) {
         }
         else if (files && files.length > 0) {
             frm.append('file', files[0]);
-            handleCurrentImg(files[0]);
+            axios.post("http://13.209.77.50:8080/image", frm, {
+                headers: {'Content-Type' : 'Multipart/form-data',
+                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }}).then(function(response){
+                handleCurrentImg(response.data.imgUrl);
+            }).catch(function(err){
+                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '파일 업로드 실패')) {
+                    Swal.fire({
+                        title: "파일 업로드 오류",
+                        text: "파일 업로드 오류가 발생했습니다. 다시 시도해주세요.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                } else {
+                    console.log(err);
+                }
+            })
         }
     }
     // 위치 정보
