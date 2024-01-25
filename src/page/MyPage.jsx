@@ -334,6 +334,13 @@ function MyPage(props) {
                 nickname: response.data.nickname,
                 intro: response.data.introduction,
             });
+            localStorage.setItem('savedUserInfo', JSON.stringify({
+                profileImage: userInfo.profileImage,
+                nickname: response.data.nickname,
+                intro: response.data.introduction,
+                score: userInfo.score,
+                medalCount: userInfo.medalCount
+            }));
             setCurrentName(null);
             setCurrentIntro(null);
         })
@@ -387,6 +394,13 @@ function MyPage(props) {
                         ...userInfo,
                         profileImage: response.data.profileImage,
                     });
+                    localStorage.setItem('savedUserInfo', JSON.stringify({
+                        profileImage: response.data.profileImage,
+                        nickname: userInfo.nickname,
+                        intro: userInfo.introduction,
+                        score: userInfo.score,
+                        medalCount: userInfo.medalCount
+                    }));
                 }
             )
             .catch(function(error){
