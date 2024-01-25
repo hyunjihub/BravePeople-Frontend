@@ -308,18 +308,34 @@ function MyPage(props) {
         e.preventDefault();
     }
 
+    const [currentImg, setCurrentImg] = useState(null);
+
+    const handleCurrentImg = (img) => {
+        setCurrentImg(img);
+    }
+
     const handleIsClicked = () => {
         if(isClicked) {
             setIsClicked(false);
         }
         else {
             setIsClicked(true);
+            handleCurrentImg(userInfo.profileImage);
         }
     };
 
     // 수정 완료 버튼
     const handleModify = (e) => {
-        axios.patch("http://13.209.77.50:8080/member/profile", {
+        if(currentName.length<=1 && currentName.length>6) {
+            Swal.fire({
+                title: "닉네임 형식 오류",
+                text: "닉네임은 2글자 이상 6글자 이하로 작성해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        } else {
+            axios.patch("http://13.209.77.50:8080/member/profile", {
             nickname: (currentName === null) ? userInfo.nickname : currentName,
             introduction: (currentIntro === null) ? userInfo.intro : currentIntro,
         }, {
@@ -327,21 +343,39 @@ function MyPage(props) {
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }
         }).then(function(response){
-            console.log(response);
-            setUserInfo({
-                ...userInfo,
-                nickname: response.data.nickname,
-                intro: response.data.introduction,
+            let tmpName = response.data.nickname;
+            let tmpIntro = response.data.introduction;
+            axios.patch("http://13.209.77.50:8080/member/profile/image", frm, {
+                headers: {'Content-Type' : 'Multipart/form-data',
+                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+            }).then(function(response){
+                setUserInfo({
+                        ...userInfo,
+                        profileImage: response.data.profileImage,
+                        nickname: tmpName,
+                        intro: tmpIntro,
+                    });
+                    sessionStorage.setItem('savedUserInfo', JSON.stringify({
+                        profileImage: response.data.profileImage,
+                        nickname: tmpName,
+                        intro: tmpName,
+                        score: userInfo.score,
+                        medalCount: userInfo.medalCount
+                    }));
+                }
+            )
+            .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                } else {
+                alert("에러 발생");
+                console.log(error);
+                }
             });
-            sessionStorage.setItem('savedUserInfo', JSON.stringify({
-                profileImage: userInfo.profileImage,
-                nickname: response.data.nickname,
-                intro: response.data.introduction,
-                score: userInfo.score,
-                medalCount: userInfo.medalCount
-            }));
             setCurrentName(null);
             setCurrentIntro(null);
+            setCurrentImg(userInfo.profileImage);
         })
         .catch(function(err){
             if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
@@ -359,6 +393,7 @@ function MyPage(props) {
                 console.log(err);
             }
         });
+        }
         setIsClicked(false);
     }
 
@@ -366,6 +401,7 @@ function MyPage(props) {
     const handleProfile = (e) => {
         fileInput.current.click();
     }
+    const frm = new FormData();
 
     const handleChange = (e) => {
         const files = e.target.files;
@@ -381,35 +417,8 @@ function MyPage(props) {
             });
         }
         else if (files && files.length > 0) {
-            const frm = new FormData();
             frm.append('file', files[0]);
-
-            axios.patch("http://13.209.77.50:8080/member/profile/image", frm, {
-                headers: {'Content-Type' : 'Multipart/form-data',
-                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }
-            }).then(function(response){
-                setUserInfo({
-                        ...userInfo,
-                        profileImage: response.data.profileImage,
-                    });
-                    sessionStorage.setItem('savedUserInfo', JSON.stringify({
-                        profileImage: response.data.profileImage,
-                        nickname: userInfo.nickname,
-                        intro: userInfo.introduction,
-                        score: userInfo.score,
-                        medalCount: userInfo.medalCount
-                    }));
-                }
-            )
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                } else {
-                alert("에러 발생");
-                console.log(error);
-                }
-            });
+            handleCurrentImg(files[0]);
         }
     }
     // 위치 정보
@@ -459,7 +468,7 @@ function MyPage(props) {
     return(
         <Container>
             <Profile>
-                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${userInfo.profileImage ? userInfo.profileImage : profile})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
+                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${currentImg ? currentImg : profile})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
                 <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage ? userInfo.profileImage : profile})`}}/>}
                 <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                 <Myself>

@@ -123,13 +123,7 @@ function SignUp(props) {
     const isPassword = (str) => {
         const correctWord = /^(?=.*[a-zA-Z])(?=.*\d).+$/;
         const Length = str.length>=8;
-
         return correctWord.test(str) && Length;
-    }
-
-    //모든 입력 검증
-    const isAll = (e) => {
-
     }
 
     // 모든 입력 들어갔는지 체크
@@ -137,65 +131,75 @@ function SignUp(props) {
         if(e.target[0].value!=="" && e.target[3].value!=="" && e.target[4].value!=="" && e.target[5].value!==""){
             if(e.target[3].value.length>=6) {
                 if(e.target[4].value === e.target[5].value) {
-                    if (isPassword) {
-                        axios.post('http://13.209.77.50:8080/auth/signup', {
-                        name: e.target[0].value,
-                        gender: gender,
-                        username: e.target[3].value,
-                        pw: e.target[4].value,
-                        email: email,
-                        nickname: e.target[8].value,
-                        lat: loc.lat,
-                        lng: loc.lng,
-                        emailId: emailId
-                        })
-                        .then(function(response){
-                            navigate("/main");
-                        })
-                        .catch(function(error){
-                            console.log(error);
-                            if(error.response.data.errorMessage ==="이메일 미인증" && error.response.status === 400) {
-                                Swal.fire({
-                                    title: "이메일 미인증",
-                                    text: "입력하신 이메일로 본인인증을 진행해주세요. 전송된 이메일이 없을 시 스팸함을 확인해주세요.",
-                                    icon: "error",
-                                    confirmButtonColor: "#d33",
-                                    confirmButtonText: "확인",
+                    if (isPassword(e.target[4].value)) {
+                        if (e.target[8].value>=2 && e.target[8].value<7) {
+                            axios.post('http://13.209.77.50:8080/auth/signup', {
+                                name: e.target[0].value,
+                                gender: gender,
+                                username: e.target[3].value,
+                                pw: e.target[4].value,
+                                email: email,
+                                nickname: e.target[8].value,
+                                lat: loc.lat,
+                                lng: loc.lng,
+                                emailId: emailId
+                                })
+                                .then(function(response){
+                                    navigate("/main");
+                                })
+                                .catch(function(error){
+                                    console.log(error);
+                                    if(error.response.data.errorMessage ==="이메일 미인증" && error.response.status === 400) {
+                                        Swal.fire({
+                                            title: "이메일 미인증",
+                                            text: "입력하신 이메일로 본인인증을 진행해주세요. 전송된 이메일이 없을 시 스팸함을 확인해주세요.",
+                                            icon: "error",
+                                            confirmButtonColor: "#d33",
+                                            confirmButtonText: "확인",
+                                        });
+                                    } else if (error.response.data.errorMessage ==="아이디 중복" && error.response.status === 400) {
+                                        Swal.fire({
+                                            title: "아이디 중복",
+                                            text: "입력하신 아이디는 현재 가입되어 있습니다.",
+                                            icon: "error",
+                                            confirmButtonColor: "#d33",
+                                            confirmButtonText: "확인",
+                                        });
+                                    } else if (error.response.data.errorMessage ==="닉네임 중복" && error.response.status === 400) {
+                                        Swal.fire({
+                                            title: "닉네임 중복",
+                                            text: "현재 입력하신 닉네임을 사용하는 회원이 존재합니다.",
+                                            icon: "error",
+                                            confirmButtonColor: "#d33",
+                                            confirmButtonText: "확인",
+                                        });
+                                    } else if (error.response.data.errorMessage ==="이미 가입 진행중인 이메일" && error.response.status === 400) {
+                                        Swal.fire({
+                                            title: "본인인증 대기 중인 이메일",
+                                            html: "입력하신 이메일로 이미 본인인증이 대기 중입니다. 메일함을 확인해주세요.<br>메일함에 없을 경우, 스팸함을 확인해주세요.",
+                                            icon: "error",
+                                            confirmButtonColor: "#d33",
+                                            confirmButtonText: "확인",
+                                        });
+                                    } else if (error.response.data.errorMessage ==="Invalid request content." && error.response.status === 400) {
+                                        Swal.fire({
+                                            title: "형식 오류",
+                                            html: "입력 항목 일부의 형식이 잘못되었습니다.",
+                                            icon: "error",
+                                            confirmButtonColor: "#d33",
+                                            confirmButtonText: "확인",
+                                        });
+                                    }
                                 });
-                            } else if (error.response.data.errorMessage ==="아이디 중복" && error.response.status === 400) {
-                                Swal.fire({
-                                    title: "아이디 중복",
-                                    text: "입력하신 아이디는 현재 가입되어 있습니다.",
-                                    icon: "error",
-                                    confirmButtonColor: "#d33",
-                                    confirmButtonText: "확인",
-                                });
-                            } else if (error.response.data.errorMessage ==="닉네임 중복" && error.response.status === 400) {
-                                Swal.fire({
-                                    title: "닉네임 중복",
-                                    text: "현재 입력하신 닉네임을 사용하는 회원이 존재합니다.",
-                                    icon: "error",
-                                    confirmButtonColor: "#d33",
-                                    confirmButtonText: "확인",
-                                });
-                            } else if (error.response.data.errorMessage ==="이미 가입 진행중인 이메일" && error.response.status === 400) {
-                                Swal.fire({
-                                    title: "본인인증 대기 중인 이메일",
-                                    html: "입력하신 이메일로 이미 본인인증이 대기 중입니다. 메일함을 확인해주세요.<br>메일함에 없을 경우, 스팸함을 확인해주세요.",
-                                    icon: "error",
-                                    confirmButtonColor: "#d33",
-                                    confirmButtonText: "확인",
-                                });
-                            } else if (error.response.data.errorMessage ==="Invalid request content." && error.response.status === 400) {
-                                Swal.fire({
-                                    title: "형식 오류",
-                                    html: "입력 항목 일부의 형식이 잘못되었습니다.",
-                                    icon: "error",
-                                    confirmButtonColor: "#d33",
-                                    confirmButtonText: "확인",
-                                });
-                            }
-                        });
+                        } else {
+                            Swal.fire({
+                                title: "닉네임 형식 오류",
+                                text: "닉네임은 2글자 이상 6글자 이하이어야 합니다.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        }   
                     } else {
                         Swal.fire({
                             title: "비밀번호 형식 오류",
