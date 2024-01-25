@@ -207,7 +207,7 @@ function FindId(props) {
                 <Label>아이디</Label>
                 <Input
                     name="useremail"
-                    type="email"
+                    type="text"
                     placeholder="이메일 (ex brave@naver.com)" 
                 />
                 <Button>아이디 찾기</Button>
@@ -222,7 +222,7 @@ function FindId(props) {
                 />
                 <Input
                     name="useremail"
-                    type="email"
+                    type="text"
                     placeholder="이메일 (ex brave@naver.com)" 
                 />
                 <Button>비밀번호 찾기</Button>

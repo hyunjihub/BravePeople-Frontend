@@ -399,7 +399,7 @@ function SignUp(props) {
             <ForInset>            
                 <Input
                     name="useremail"
-                    type="email"
+                    type="text"
                     placeholder="이메일 주소 (ex : brave@naver.com)"
                     disabled={isDisabled}
                     onChange={(e)=>setEmail(e.target.value)}
