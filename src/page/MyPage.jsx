@@ -199,9 +199,9 @@ function MyPage(props) {
     const [isClicked, setIsClicked] = useState(false);
 
     const [userInfo, setUserInfo] = useState({
-        profileImage: "",
-        nickname: "",
-        intro: "",
+        profileImage: null,
+        nickname: null,
+        intro: null,
         score: 0,
         medalCount: 0
     });
