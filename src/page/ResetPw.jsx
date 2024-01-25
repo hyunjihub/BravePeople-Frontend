@@ -7,6 +7,10 @@ import { useSearchParams } from 'react-router-dom';
 // restapi
 import axios from 'axios';
 
+// redux
+import { setLogin, setMemberId, setLocation, setParamId, setProfileImg } from "../redux/modules/login";
+import { useDispatch } from "react-redux";
+
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -67,7 +71,15 @@ function ResetPw(props) {
     const [isReset, setIsReset] = useState(true);
     let [query, setQuery] = useSearchParams();
 
-    // 토큰 재발급
+    // redux 함수 dispatch
+    const dispatch = useDispatch();
+    const setLog = (isLogin) => dispatch(setLogin(isLogin));
+    const setId = (memberId) => dispatch(setMemberId(memberId));
+    const setParam = (paramid) => dispatch(setParamId(paramid)); 
+    const setLoc = (loc) => dispatch(setLocation(loc)); 
+    const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
+
+    // 토큰 재발급 함수
     const ReissueToken = (msg) => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
@@ -99,6 +111,7 @@ function ResetPw(props) {
         if(e.target[0].value!=="" && e.target[1].value!=="") {
             if(isPassword(e.target[0].value)) {
                 if(e.target[0].value === e.target[1].value) {
+                    // 비회원일 때 비밀번호 재설정
                     if(JSON.parse(sessionStorage.getItem('jwt')).access === null) {
                         axios.patch('http://13.209.77.50:8080/member/pw', {
                             newPassword: e.target[0].value,
@@ -136,13 +149,24 @@ function ResetPw(props) {
                                 console.log(error);
                             }
                         });
-                    } else {
+                    }
+                    // 회원일 때 비밀번호 재설정 
+                    else {
                         axios.patch('http://13.209.77.50:8080/member/pw', {
                             newPassword: e.target[0].value},
                             {headers:{
                                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                             }})
                         .then(function(response){
+                            sessionStorage.clear();
+                            setLog(false);
+                            setId(null);
+                            setParam(null);
+                            setLoc({
+                                latitude: null,
+                                longitude: null
+                            });
+                            setProfile(null);
                             Swal.fire({
                                 title: "비밀번호 재설정 완료",
                                 text: "입력하신 비밀번호로 재설정되었습니다. 다시 로그인 해주세요.",

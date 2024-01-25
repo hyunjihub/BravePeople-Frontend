@@ -176,8 +176,9 @@ export default function Header(props) {
     }
 
     useEffect(()=>{
-        if(sessionStorage.getItem('savedData')!==null){  
+        if(sessionStorage.getItem('savedData')!==null && JSON.parse(sessionStorage.getItem('savedData')).id !== null){  
             if(JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
+                console.log("데이터 저장했다");
                 setLog(JSON.parse(sessionStorage.getItem('savedData')).isLogin);
                 setId(JSON.parse(sessionStorage.getItem('savedData')).id);
                 setLoc({
