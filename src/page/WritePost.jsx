@@ -87,16 +87,24 @@ const Input = styled.input`
     }
     font-family: 'SUITE';
 
-    &.content {
-        height: 40%;
-        margin-top: 7%;
-    }
     &.price {
         display: inline;
         width: 40%;
         margin-top: 5%;
-        margin-bottom: 10%;
     }
+`;
+
+const Content = styled.textarea`
+    height: 40%;
+    margin-top: 5%;
+    display: block;
+    border: 1px solid #d1d1d1;
+    width: 100%;
+    hegiht: 10%;
+    box-sizing: border-box;
+    padding: 16px 24px;
+    margin-top: 7%;
+    font-family: 'SUITE';
 `;
 
 const FileInput = styled.button`
@@ -224,9 +232,9 @@ function WritePost(props) {
                         <CheckBox name="discussion" type="checkbox" value="-1" checked={isChecked} onChange={handleCheck}/>
                         <Discussion>가격 협의</Discussion>
                     </PriceContainer>
-                    <Input className="content"
-                    name="title"
-                    type="text"
+                    <Content
+                    name="content"
+                    cols="30" rows="5"
                     placeholder="내용을 입력해주세요. 최대 2,000자"/>
                     <FileInput><FaCamera className="icon" size="45" color="ccc"/></FileInput>
                 </Form>
