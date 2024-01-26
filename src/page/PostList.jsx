@@ -41,7 +41,7 @@ const PostListBox = styled.div`
 
 const WriteButton = styled.button`
     width: 9%;
-    height: 75%;
+    height: 70%;
     background-color: #f8332f;
     font-family: 'SUITE';
     border: none;
@@ -50,6 +50,7 @@ const WriteButton = styled.button`
     font-weight: 600;
     font-size: 100%;
     margin-right: 6%;
+    cursor: pointer;
 `;
 
 const ButtonContainer = styled.div`
@@ -64,7 +65,9 @@ const DonerMenu = styled.button`
     border: none;
     background-color: #fff;
     margin-top: -1%;
+    cursor: pointer;
 `;
+
 
 function PostList(props) {
 

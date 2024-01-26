@@ -26,6 +26,7 @@ const Title = styled.button`
     padding: 0px;
     font-family: 'SUITE';
     margin-left: 1%;
+    cursor: pointer;
 `;
 
 const UploadTime = styled.div`
