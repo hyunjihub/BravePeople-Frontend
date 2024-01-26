@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
-import logo from "./logo.png";
+import logo from "../resources/img/logo.png";
 import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
-import Nullprofile from "../dummy/profile.png"
+import Nullprofile from "../../common/resources/img/profile.png"
 
 import axios from 'axios';
 
 // redux
-import HeaderButton from "./HeaderButton";
+import HeaderButton from "../components/HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setMemberId, setLocation, setParamId, setProfileImg } from "../../redux/modules/login";
+import { setLogin, setMemberId, setLocation, setParamId, setProfileImg } from "../../member/redux/modules/login"
 
 
 const Wrapper = styled.div`

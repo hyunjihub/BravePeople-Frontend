@@ -5,13 +5,6 @@ import PostItem from "../components/PostItem";
 import { BiMenuAltRight } from "react-icons/bi";
 import { useNavigate } from "react-router";
 
-const data = {
-    title: "파이팅!",
-    price: "10000",
-    gender: "woman",
-    time: "2024-01-11 18:05:54"
-}
-
 const Wrapper = styled.div`
     width: 40%;
     height: 100vh;

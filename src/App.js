@@ -1,20 +1,20 @@
 import React from "react";
-import Header from "./ui/header/Header";
+import Header from "./header/page/Header";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
 //Page
-import Chat from "./page/Chat";
-import FindId from "./page/FindId";
-import LogIn from "./page/LogIn";
-import Main from "./page/Main";
-import PostList from "./page/PostList";
-import ResetPw from "./page/ResetPw";
-import SignUp from "./page/SignUp";
-import ViewPost from "./page/ViewPost";
-import WritePost from "./page/WritePost";
-import MyPage from "./page/MyPage";
-import Error from "./page/Error";
-import Authentication from "./page/Authentication";
+import Chat from "./chat/page/Chat";
+import FindId from "./member/page/FindId";
+import LogIn from "./member/page/LogIn";
+import Main from "./common/page/Main";
+import PostList from "./post/page/PostList";
+import ResetPw from "./member/page/ResetPw";
+import SignUp from "./member/page/SignUp";
+import ViewPost from "./post/page/ViewPost";
+import WritePost from "./post/page/WritePost";
+import MyPage from "./member/page/MyPage";
+import Error from "./common/page/Error";
+import Authentication from "./member/page/Authentication";
 
 export default function App(props) {
 

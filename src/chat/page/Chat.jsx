@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import profile from "../ui/dummy/profile.png";
+import profile from "../../common/resources/img/profile.png";
 
 const Chatting = styled.div`
     width: 400px;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import profile from '../ui/dummy/profile.png';
+import profile from '../../common/resources/img/profile.png';
 import { useNavigate } from "react-router";
 import { FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
