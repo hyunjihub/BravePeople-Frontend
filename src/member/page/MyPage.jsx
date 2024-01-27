@@ -253,7 +253,7 @@ function MyPage(props) {
             //마이페이지에 처음 접근할 때
             (param === id) ? setMySelf(true) : setMySelf(false);
             if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
-                axios.get(`http://13.209.77.50:8080/member/profile?memberid=${param}`,{
+                axios.get(`http://13.209.77.50:8080/member/profile/${param}`,{
                     headers:{
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                     }
