@@ -140,18 +140,18 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, id, loc, profileImg } = useSelector( state => ({
+    const { isLog, id, loc, profile } = useSelector( state => ({
         isLog: state.login.isLogin,
         id: state.login.memberId,
         loc: state.login.location,
-        profileImg: state.login.profileImg
+        profile: state.login.profileImg
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
     const setParam = (paramid) => dispatch(setParamId(paramid)); 
     const setLoc = (loc) => dispatch(setLocation(loc)); 
-    const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
+    const setProfile = (profile) => dispatch(setProfileImg(profile));
 
     // 웹 스토리지에 데이터 생성 및 초기값 설정
     // sessionStorage - JWT
@@ -174,6 +174,8 @@ export default function Header(props) {
         }));
     }
 
+
+    // 새로고침 시 데이터 유지
     useEffect(()=>{
         if(sessionStorage.getItem('savedData')!==null && JSON.parse(sessionStorage.getItem('savedData')).id !== null){  
             if(JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
@@ -207,6 +209,7 @@ export default function Header(props) {
         });
     }    
 
+    // 로그아웃
     const handleLogOut = () => {
         if(isLog) {
             axios.post("http://13.209.77.50:8080/member/logout", {
@@ -239,7 +242,7 @@ export default function Header(props) {
     const MyPageButtonClicked = () => {
         setParam(id);
         sessionStorage.setItem('savedUserInfo', JSON.stringify({
-            //profileImage: null,
+            profileImage: null,
             nickname: null,
             intro: null,
             score: null,
@@ -398,7 +401,7 @@ export default function Header(props) {
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 {isLog ? <HeaderButton onClick={MyPageButtonClicked}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
-                {isLog ? <Profile src={(profileImg !== undefined? profileImg:Nullprofile)}></Profile>: <HiddenProfile />}
+                {isLog ? <Profile src={((profile === null || profile === undefined)? Nullprofile : profile)}></Profile>: <HiddenProfile />}
             </RightContainer>
         </Wrapper>
     );

@@ -132,7 +132,7 @@ function SignUp(props) {
             if(e.target[3].value.length>=6) {
                 if(e.target[4].value === e.target[5].value) {
                     if (isPassword(e.target[4].value)) {
-                        if (e.target[8].value>=2 && e.target[8].value<7) {
+                        if (e.target[8].value.length>=2 && e.target[8].value.length<7) {
                             axios.post('http://13.209.77.50:8080/auth/signup', {
                                 name: e.target[0].value,
                                 gender: gender,

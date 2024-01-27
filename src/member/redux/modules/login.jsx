@@ -8,7 +8,7 @@ export const setLogin = (isLogin) => ({ type:SET_LOGIN, isLogin });
 export const setMemberId = (id) => ({ type:SET_MEMBER_ID, id });
 export const setParamId = (paramid) => ({ type:SET_PARAM_ID, paramid });
 export const setLocation = (loc) => ({ type:SET_LOCATION, loc });
-export const setProfileImg = (profileImg) => ({ type:SET_PROFILEIMG, profileImg });
+export const setProfileImg = (profile) => ({ type:SET_PROFILEIMG, profile });
 
 const initialState = {
     isLogin: false,
@@ -41,7 +41,7 @@ export default function login(state=initialState, action){
             };
         case SET_PROFILEIMG:
             return{
-                ...state, profileImg: action.profileImg
+                ...state, profileImg: action.profile
             };
         default:
             return state;

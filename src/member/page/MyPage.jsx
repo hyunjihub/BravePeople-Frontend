@@ -13,7 +13,7 @@ import axios from "axios";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setLocation } from "../redux/modules/login";
+import { setLocation, setProfileImg } from "../redux/modules/login";
 
 const Container = styled.div`
     width: 1200px;
@@ -207,16 +207,17 @@ function MyPage(props) {
     });
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, param } = useSelector((state)=>({
+    const { isLog, id, param, loc, proImg } = useSelector((state)=>({
         isLog: state.login.isLogin,
         id: state.login.memberId,
-        access: state.login.accessToken,
-        refresh: state.login.refreshToken,
-        param : state.login.paramId
+        param : state.login.paramId,
+        loc: state.login.location,
+        proImg: state.login.profileImg
     }), shallowEqual);
 
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
+    const setProfile = (pro) => dispatch(setProfileImg(pro));
 
     // 토큰 재발급
     const ReissueToken = (msg) => {
@@ -259,14 +260,14 @@ function MyPage(props) {
                 })
                 .then(function(response){
                         setUserInfo({
-                            profileImage: response.data.profileImage,
+                            profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
                             nickname: response.data.nickname,
                             intro: response.data.introduction,
                             score: response.data.score,
                             medalCount: response.data.medalCount
                         });
                         sessionStorage.setItem('savedUserInfo', JSON.stringify({
-                            profileImage: response.data.profileImage,
+                            profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
                             nickname: response.data.nickname,
                             intro: response.data.introduction,
                             score: response.data.score,
@@ -317,76 +318,83 @@ function MyPage(props) {
     // 수정 비/활성화
     const handleIsClicked = () => {
         if(isClicked) {
+            setCurrentImg(null);
+            setCurrentIntro(null);
+            setCurrentName(null);
             setIsClicked(false);
         }
         else {
             setIsClicked(true);
-            console.log(userInfo.intro);
-            console.log(userInfo.nickname);
-            console.log(userInfo.profileImage);
-            handleCurrentImg(userInfo.profileImage);
-            setCurrentName(userInfo.nickname);
-            setCurrentIntro(userInfo.intro);
         }
     };
 
     // 수정 완료 버튼
-    const handleModify = (e) => {
-        if(currentName.length<=1 && currentName.length>6) {
-            Swal.fire({
-                title: "닉네임 형식 오류",
-                text: "닉네임은 2글자 이상 6글자 이하로 작성해주세요.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-                confirmButtonText: "확인",
-            });
-        } else {
-            axios.patch("http://13.209.77.50:8080/member/profile", {
-            nickname: currentName,
-            introduction: currentIntro,
-            profileImg: currentImg
-        }, {
-            headers:{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }
-        }).then(function(response){
-            console.log(response);
-                setUserInfo({
-                    ...userInfo,
-                    nickname: response.data.nickname,
-                    intro: response.data.introduction,
-                    profileImage: response.data.profileImg,
+    const handleModify = (e) => {        
+        if((currentName === null || currentName === "") && (currentIntro === null || currentIntro === "") && (currentImg === null)){
+            alert("수정사항이 없습니다.");
+        }else{
+            if(currentName.length<=1 && currentName.length>6) {
+                Swal.fire({
+                    title: "닉네임 형식 오류",
+                    text: "닉네임은 2글자 이상 6글자 이하로 작성해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
                 });
-                sessionStorage.setItem('savedUserInfo', JSON.stringify({
-                    profileImage: response.data.profileImg,
-                    nickname: response.data.nickname,
-                    intro: response.data.introduction,
-                    score: userInfo.score,
-                    medalCount: userInfo.medalCount
-                }));
-                setCurrentImg(response.data.profile);
-                setCurrentIntro(response.data.introduction);
-                setCurrentName(response.data.nickname);
-                console.log(response.data.profileImg);
-                console.log(response.data.nickname);
-                console.log(response.data.introduction);
-                setIsClicked(false);
-            }).catch(function(err) {
-                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '닉네임 중복 오류')) {
-                    Swal.fire({
-                        title: "닉네임 중복",
-                        text: "현재 사용중인 닉네임입니다.",
-                        icon: "error",
-                        confirmButtonColor: "#d33",
-                        confirmButtonText: "확인",
+            }else{
+                axios.patch("http://13.209.77.50:8080/member/profile", {
+                    nickname: (currentName === null || currentName === "") ? userInfo.nickname : currentName,
+                    introduction: (currentIntro === null || currentIntro === "") ? userInfo.intro : currentIntro,
+                    profileImg: (currentImg === null) ? userInfo.profileImage : currentImg
+                }, {
+                    headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }
+                }).then(function(response){
+                    setUserInfo({
+                        ...userInfo,
+                        nickname: response.data.nickname,
+                        intro: response.data.introduction,
+                        profileImage: response.data.profileImg,
                     });
-                    setIsClicked(true);
-                } else {
-                    console.log(err);
-                }
-            })
+                    sessionStorage.setItem('savedUserInfo', JSON.stringify({
+                        profileImage: response.data.profileImg,
+                        nickname: response.data.nickname,
+                        intro: response.data.introduction,
+                        score: userInfo.score,
+                        medalCount: userInfo.medalCount
+                    }));
+                    sessionStorage.setItem('savedData', JSON.stringify({
+                        isLogin: isLog,
+                        id: id,
+                        loc : {
+                            latitude: loc.latitude,
+                            longitude: loc.longitude
+                        },
+                        profileImg: response.data.profileImg
+                    }));
+                    setProfile(response.data.profileImg);
+                    setCurrentImg(null);
+                    setCurrentIntro(null);
+                    setCurrentName(null);
+                    setIsClicked(false);
+                }).catch(function(err) {
+                    if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                    } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '닉네임 중복 오류')) {
+                        Swal.fire({
+                            title: "닉네임 중복",
+                            text: "현재 사용중인 닉네임입니다.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                        setIsClicked(true);
+                    } else {
+                        console.log(err);
+                    }
+                })
+            }
         }
     }
 
@@ -481,17 +489,17 @@ function MyPage(props) {
     return(
         <Container>
             <Profile>
-                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${currentImg ? currentImg : profile})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
-                <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage ? userInfo.profileImage : profile})`}}/>}
+                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${(currentImg === null) ? userInfo.profileImage : currentImg})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
+                <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage})`}}/>}
                 <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                 <Myself>
                     {isClicked?
-                    <ModifyNickname type="text" defaultValue={userInfo.nickname} onChange={handleCurrentName}></ModifyNickname>
+                    <ModifyNickname type="text" placeholder={userInfo.nickname} onChange={handleCurrentName}></ModifyNickname>
                     :<Nickname>{userInfo.nickname}</Nickname>}
                     {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
                 </Myself>
                 {isClicked?
-                    <ModifyIntro type="text" defaultValue={(userInfo.intro) === null ? "널값임":userInfo.intro} onChange={handleCurrentIntro}></ModifyIntro>
+                    <ModifyIntro type="text" placeholder={(userInfo.intro) === null ? "자기소개 문구가 작성되지 않았습니다.":userInfo.intro} onChange={handleCurrentIntro}></ModifyIntro>
                     :<Introduce>{(userInfo.intro === null || userInfo.intro === "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
                 <Rating>
                     <StarRating value={userInfo.score}></StarRating>
