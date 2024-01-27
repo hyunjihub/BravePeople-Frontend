@@ -340,54 +340,8 @@ export default function Header(props) {
         if(loc.latitude !== null && loc.longitude !== null) mapApi(loc.latitude, loc.longitude);
     }, [loc]);
 
-
-    // -------------------------------------- 테스트용 코드 ------------------------------------
-    const [testloc, setTestloc] = useState({
-        testlat: "",
-        testlng: ""
-    })
-    // 위도
-    const changeLat = (e) => {
-        setTestloc({
-            ...testloc,
-            testlat: e.target.value
-        })
-    }
-    // 경도
-    const changeLng = (e) => {
-        setTestloc({
-            ...testloc,
-            testlng: e.target.value
-        })
-    }
-    const checkFunc = (e) => {
-        axios.get(`https://dapi.kakao.com/v2/local/geo/coord2address.json?x=${testloc.testlng}&y=${testloc.testlat}&input_coord=WGS84`,
-        {headers:{
-            Authorization: `KakaoAK ae9e0cedf9e82516ded7194a84881362`
-            }    
-        })  
-        .then(function(response){
-            if(response.data.documents.length !== 0){
-                console.log(response.data.documents);
-                alert(response.data.documents[0].address.region_2depth_name);
-            }else{
-                alert("위도 경도를 확인해주세요");
-            }
-        })
-        .catch(function(error){
-            console.log(error);
-        })
-        e.preventDefault();
-    }
-    // ----------------------------------------------------------------------------------------
-
     return (
         <Wrapper>
-            <div>
-            <input type="text" placeholder={"위도(latitude)"} onChange={changeLat}></input>
-            <input type="text" placeholder={"경도(longitude)"} onChange={changeLng}></input>
-            <button onClick={checkFunc}>테스트</button>
-            </div>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>

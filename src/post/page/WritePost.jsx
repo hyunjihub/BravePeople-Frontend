@@ -228,7 +228,7 @@ function WritePost(props) {
 
     //라디오버튼
     const handleRadio = (e) => {
-      setSelectedCategory(e.target.value);
+        setSelectedCategory(e.target.value);
     };
 
     //체크박스
@@ -278,7 +278,7 @@ function WritePost(props) {
                         placeholder="제목을 입력해주세요. 최대 40자"/>
                     <PriceContainer>
                         <Input className="price"
-                        name="title"
+                        name="price"
                         type="text"
                         value={number}
                         onChange={handleInputChange}
