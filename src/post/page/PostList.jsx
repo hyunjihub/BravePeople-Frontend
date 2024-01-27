@@ -72,16 +72,16 @@ const DropdownMenu = styled.ul`
     z-index: 99;
     border: 1px solid #d1d1d1;
     border-radius: 10px;
-    font-weight: 600;
+    font-weight: 500;
     background-color: #fff;
-    padding: 0.5% 1%;
+    padding: 0.5% 1% 0.5% 0.8%;
     box-sizing: border-box;
     box-shadow: 0px 0px 3px 1px rgba(190, 190, 190, 0.3);
 `;
 
 const DropdownOption = styled.li`
-    margin : 0% 5% 17%;
-    font-size: 18px;
+    margin : 0% 5% 17% 0%;
+    font-size: 17px;
 `;
 
 
@@ -96,7 +96,7 @@ function PostList(props) {
     //드롭다운 메뉴 구현
     const options = ['2km', '5km', '10km', '전역'];
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedOption, setSelectedOption] = useState('2km');
 
     const handleOptionClick = (option) => {
         setSelectedOption(option);

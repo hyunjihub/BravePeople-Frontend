@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import { FaCamera } from "react-icons/fa";
+import { MdCancel } from "react-icons/md";
+import { text } from "@fortawesome/fontawesome-svg-core";
 
 const Wrapper = styled.div`
     width: 40%;
@@ -47,7 +49,7 @@ const CategoryTxt = styled.div`
 
 const Form = styled.div`
     width: 85%;
-    hegiht: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
 `;
@@ -78,34 +80,39 @@ const Input = styled.input`
     display: block;
     border: 1px solid #d1d1d1;
     width: 100%;
-    hegiht: 10%;
+    height: 6%;
     box-sizing: border-box;
-    padding: 16px 24px;
+    padding: 10px 15px;
     margin: 10px 0;
     &::placeholder {
         color: #ababab;
     }
     font-family: 'SUITE';
+    font-size: 15px;
 
     &.price {
-        display: inline;
-        width: 40%;
-        margin-top: 5%;
+        width: 25%;
+        height: 50%;
+        margin-top: 4.5%;
+    }
+
+    &:disabled {
+        background-color: #ddd;
     }
 `;
 
 const Content = styled.textarea`
     height: 40%;
-    margin-top: 5%;
     display: block;
     border: 1px solid #d1d1d1;
     width: 100%;
     hegiht: 10%;
     box-sizing: border-box;
     padding: 16px 24px;
-    margin-top: 7%;
+    margin-top: 3%;
     font-family: 'SUITE';
     resize: none;
+    font-size: 15px;
 
     &::placeholder {
         color: #ababab;
@@ -115,7 +122,7 @@ const Content = styled.textarea`
 const FileInput = styled.button`
     border: 1px solid #d1d1d1;
     width: 25%;
-    height: 20%;
+    height: 67%;
     margin-top: 3%;
     background-color: #fff;
 `;
@@ -135,7 +142,7 @@ const PriceContainer = styled.div`
     width: 100%;
     height: 9%;
     display: flex;
-    flex-directiom: row;
+    flex-direction: row;
 `;
 
 const Discussion = styled.div`
@@ -143,6 +150,13 @@ const Discussion = styled.div`
     color: #ababab;
     margin-top: 7.5%;
     margin-left: -1%;
+
+    &.unit {
+        margin-left: 1%;
+        color: #000;
+        font-weight: 600;
+        font-size: 16px;
+    }
 `;
 
 const RadioBox = styled.div`
@@ -168,6 +182,26 @@ const RadioLabel = styled.label`
     margin-right: 10px;
 `;
 
+const ImageContainer = styled.div`
+    width: 100%;
+    height: 30%;
+    display: flex;
+    flex-directiom: row;
+`;
+
+const CancelBox = styled.div`
+    width: 70%;
+    height: 8%;
+    margin: 23% 0 0 0.5%;
+`;
+
+const CancelLabel = styled.label`
+    color: #d1180b;
+    font-size: 13px;
+    margin-left: 0.5%;
+    margin-top: -20%;
+`;
+
 function WritePost(props) {
 
     const navigate = useNavigate();
@@ -176,6 +210,20 @@ function WritePost(props) {
 
     const [selectedCategory, setSelectedCategory] = useState("벌레");
     const [isChecked, setIsChecked] = useState(false);
+
+
+    //세자리마다 콤마(,) 찍어주기 -> 백으로 전달할 때 intPrice를 넘겨줘야 함
+    const [number, setNumber] = useState("");
+    let intPrice = 0;
+
+    const handleInputChange = (e) => {
+        const value = e.target.value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        setNumber(value);
+    };
+
+    const handleNumberChange = (e) => {
+        intPrice = parseInt(e.target.value.replace(/,/g, ""), 10);
+    };
 
 
     //라디오버튼
@@ -201,7 +249,7 @@ function WritePost(props) {
 
     
 
-    //가격은 숫자로만 입력받아야 하지만, 세자리마다 콤마(,)를 넣기 위해서는 text로 받아야 한다해서 현재 text type입니다.
+    //가격은 숫자로만 입력받아야 하지만, 세자리마다 콤마(,)를 넣기 위해서는 text로 받아야 함 -> 백으로 전달할 때 intPrice를 넘겨줘야 함
     return (
         <Wrapper>
             <Title>{type}</Title>
@@ -232,8 +280,12 @@ function WritePost(props) {
                         <Input className="price"
                         name="title"
                         type="text"
-                        placeholder="가격을 입력해주세요. 최대 999,999원"
+                        value={number}
+                        onChange={handleInputChange}
+                        onBlur={handleNumberChange}
+                        placeholder="가격을 입력해주세요."
                         disabled={isChecked}/>
+                        <Discussion className="unit">원</Discussion>
                         <CheckBox name="discussion" type="checkbox" value="-1" checked={isChecked} onChange={handleCheck}/>
                         <Discussion>가격 협의</Discussion>
                     </PriceContainer>
@@ -241,7 +293,14 @@ function WritePost(props) {
                     name="content"
                     cols="30" rows="5"
                     placeholder="내용을 입력해주세요. 최대 2,000자"/>
-                    <FileInput><FaCamera className="icon" size="45" color="ccc"/></FileInput>
+                    <ImageContainer>
+                        <FileInput><FaCamera className="icon" size="45" color="ccc"/></FileInput>
+                        <CancelBox>
+                            <MdCancel size="25" color="d1180b"/>
+                            <CancelLabel>이미지는 최대 1장까지 업로드 가능하며, X를 통해 이미지 등록을 취소할 수 있습니다.</CancelLabel>
+                        </CancelBox>
+                    </ImageContainer>
+                    
                 </Form>
             </Container>
             <ButtonContainer>
