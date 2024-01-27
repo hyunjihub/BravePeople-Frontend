@@ -105,6 +105,11 @@ const Content = styled.textarea`
     padding: 16px 24px;
     margin-top: 7%;
     font-family: 'SUITE';
+    resize: none;
+
+    &::placeholder {
+        color: #ababab;
+    }
 `;
 
 const FileInput = styled.button`

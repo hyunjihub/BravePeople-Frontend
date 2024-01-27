@@ -1,5 +1,6 @@
-import React from "react";
 import styled from "styled-components";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router";
 import { PiGenderMaleBold } from "react-icons/pi";
 import { PiGenderFemaleBold } from "react-icons/pi";
@@ -73,13 +74,21 @@ function PostItem(props) {
 
     const navigate = useNavigate();
     const gender = false;
+
+    const { ishelped } = useParams();
+
+    const handleView = (e) => {
+        const url = `/viewpost/${ishelped}`;
+        navigate(url);
+        e.preventDefault();
+    }
     
     return(
         <Wrapper>
             <FirstLine>
                 <Category>벌레</Category>
                 {gender?<PiGenderMaleBold size="30" color="#254995"/>:<PiGenderMaleBold size="30" color="#a93957"/>}
-                <Title onClick={()=>{navigate("/viewPost");}}>벌레 잡아주실 분 찾습니다</Title>
+                <Title onClick={handleView}>벌레 잡아주실 분 찾습니다</Title>
                 <UploadTime>{props.value}시간 전</UploadTime>
                 <Price>999,999원</Price>
             </FirstLine>

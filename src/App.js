@@ -18,8 +18,6 @@ import Authentication from "./member/page/Authentication";
 
 export default function App(props) {
 
-    //localStorage.clear();
-
     return(
         <div id="App">
            <BrowserRouter>
@@ -35,7 +33,7 @@ export default function App(props) {
                     <Route path="/resetpw" element={<ResetPw />}/>
                     <Route path="/authentication" element={<Authentication />} />
                     <Route path="/signup" element={<SignUp />}/>
-                    <Route path="/viewpost" element={<ViewPost />}/>
+                    <Route path="/viewpost/:ishelped" element={<ViewPost />}/>
                     <Route path="/postlist/:ishelped/writepost" element={<WritePost />}/>
                     <Route path="/error" element={<Error />} />
                 </Routes>
