@@ -333,7 +333,7 @@ function MyPage(props) {
         if((currentName === null || currentName === "") && (currentIntro === null || currentIntro === "") && (currentImg === null)){
             alert("수정사항이 없습니다.");
         }else{
-            if(currentName.length<=1 && currentName.length>6) {
+            if(currentName !== null && (currentName.length <= -1 || currentName.length > 6)) {
                 Swal.fire({
                     title: "닉네임 형식 오류",
                     text: "닉네임은 2글자 이상 6글자 이하로 작성해주세요.",
