@@ -190,7 +190,7 @@ function WritePost(props) {
 
     //게시글 업로드
     const handleUpload = (e) => {
-
+        console.log("업로드");
     }
 
     //취소
@@ -245,8 +245,8 @@ function WritePost(props) {
                 </Form>
             </Container>
             <ButtonContainer>
-                <Button onClick={handleUpload}>등록</Button>
-                <Button onClick={handleCancel}>취소</Button>
+                <Button onClick={handleUpload} type="submit">등록</Button>
+                <Button onClick={handleCancel} type="button">취소</Button>
             </ButtonContainer>
         </Wrapper>
     )
