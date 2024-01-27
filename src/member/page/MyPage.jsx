@@ -329,11 +329,7 @@ function MyPage(props) {
     };
 
     // 수정 완료 버튼
-    const handleModify = (e) => {
-        console.log(currentName);
-        console.log(currentIntro);
-        console.log(currentImg);
-        
+    const handleModify = (e) => {        
         if((currentName === null || currentName === "") && (currentIntro === null || currentIntro === "") && (currentImg === null)){
             alert("수정사항이 없습니다.");
         }else{
