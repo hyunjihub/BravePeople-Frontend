@@ -194,7 +194,7 @@ function ViewPost(props) {
                 {gender?<PiGenderMaleBold size="40" color="#254995"/>:<PiGenderMaleBold size="40" color="#a93957"/>}
             </TitleBox>
             <ProfileBox>
-                <Profile src={(profile)}/>
+                <Profile src={(profile)} alt="프로필"/>
                 <NicknameBox>
                     <Nickname>닉네임</Nickname>
                     <Time>1시간 전</Time>
