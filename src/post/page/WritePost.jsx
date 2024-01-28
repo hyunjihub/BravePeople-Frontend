@@ -4,7 +4,10 @@ import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 import { FaCamera } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
+import Swal from "sweetalert2";
 import { text } from "@fortawesome/fontawesome-svg-core";
+
+import axios from "axios";
 
 const Wrapper = styled.div`
     width: 40%;
@@ -208,37 +211,139 @@ function WritePost(props) {
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
-    const [selectedCategory, setSelectedCategory] = useState("벌레");
-    const [isChecked, setIsChecked] = useState(false);
+    // 토큰 재발급
+    const ReissueToken = (msg) => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+        })
+        .then(function(response){
+            sessionStorage.setItem('jwt',JSON.stringify({
+                access: response.data.accessToken,
+                refresh: response.data.refreshToken
+            }))
+            alert(msg);
+            navigate("/main");
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
 
-
+    //가격
     //세자리마다 콤마(,) 찍어주기 -> 백으로 전달할 때 intPrice를 넘겨줘야 함
-    const [number, setNumber] = useState("");
-    let intPrice = 0;
+    const [number, setNumber] = useState();
+    const [price, setPrice] = useState();
 
     const handleInputChange = (e) => {
         const value = e.target.value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        setNumber(value);
+        setPrice(parseInt(e.target.value.replace(/,/g, ""), 10));
+        setNumber(value);      
     };
 
-    const handleNumberChange = (e) => {
-        intPrice = parseInt(e.target.value.replace(/,/g, ""), 10);
-    };
-
-
-    //라디오버튼
+    //라디오버튼(category)
+    const [selectedCategory, setSelectedCategory] = useState("벌레");
     const handleRadio = (e) => {
         setSelectedCategory(e.target.value);
     };
 
-    //체크박스
+    //체크박스(가격 협의)
+    const [isChecked, setIsChecked] = useState(false);
     const handleCheck = (e) => {
         setIsChecked(e.target.checked);
     };
 
+    //제목
+    const [title, setTitle] = useState("");
+    const handleTitle = (e) => {
+        setTitle(e.target.value);
+        console.log(title);
+    };
+
+    //내용
+    const [content, setContent] = useState("")
+    const handleContent = (e) => {
+        setContent(e.target.value);
+    };
+
+    //이미지 업로드
+    const [currentImg, setCurrentImg] = useState("");
+
+    const handleCurrentImg = (img) => {
+        setCurrentImg(img);
+    }
+
+    const fileInput = React.createRef();
+    const handleImg = (e) => {
+        fileInput.current.click();
+    }
+    const frm = new FormData();
+    const handleChange = (e) => {
+        const files = e.target.files;
+        var reg = /(.*?)\.(jpg|jpeg|png)$/;
+        if (!files[0].name.match(reg)) {
+            Swal.fire({
+                title: "불가능한 파일 확장자",
+                text: "프로필 이미지는 jpg, jpeg, png만 사용가능합니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        }
+        else if (files && files.length > 0) {
+            frm.append('file', files[0]);
+            axios.post("http://13.209.77.50:8080/image", frm, {
+                headers: {'Content-Type' : 'Multipart/form-data',
+                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }}).then(function(response){
+                handleCurrentImg(response.data.imgUrl);
+            }).catch(function(err){
+                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '파일 업로드 실패')) {
+                    Swal.fire({
+                        title: "파일 업로드 오류",
+                        text: "파일 업로드 오류가 발생했습니다. 다시 시도해주세요.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                } else {
+                    console.log(err);
+                }
+            })
+        }
+    }
+
     //게시글 업로드
     const handleUpload = (e) => {
-        console.log("업로드");
+        if((title !== "") && (price !== undefined) && (content !== "")){
+            axios.post('http://13.209.77.50:8080/posts',{
+            type: type,
+            category: selectedCategory,
+            title: title,
+            price: (isChecked)?-1:price,
+            contents: content,
+            img: currentImg
+            }, {headers:{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }})
+            .then(function(response){
+                alert("게시글 작성이 완료되었습니다.");
+                navigate(-1);
+            })
+            .catch(function(err){
+                console.log(err);
+                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                }else if(err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === "Invalid request content."){
+                    alert("비어있는 입력이 있는지 확인해주세요!");
+                }
+            })
+        }else{
+            alert("비어있는 입력이 있는지 확인해주세요!");
+        }
+        
     }
 
     //취소
@@ -246,8 +351,6 @@ function WritePost(props) {
         navigate(-1);
         e.preventDefault();
     }
-
-    
 
     //가격은 숫자로만 입력받아야 하지만, 세자리마다 콤마(,)를 넣기 위해서는 text로 받아야 함 -> 백으로 전달할 때 intPrice를 넘겨줘야 함
     return (
@@ -275,32 +378,36 @@ function WritePost(props) {
                     <Input 
                         name="title"
                         type="text"
-                        placeholder="제목을 입력해주세요. 최대 40자"/>
+                        onChange={handleTitle}
+                        placeholder="제목을 입력해주세요. 최대 20자"/>
                     <PriceContainer>
                         <Input className="price"
-                        name="price"
+                        name="title"
                         type="text"
                         value={number}
                         onChange={handleInputChange}
-                        onBlur={handleNumberChange}
-                        placeholder="가격을 입력해주세요."
+                        placeholder="가격"
                         disabled={isChecked}/>
                         <Discussion className="unit">원</Discussion>
-                        <CheckBox name="discussion" type="checkbox" value="-1" checked={isChecked} onChange={handleCheck}/>
+                        <CheckBox name="discussion" type="checkbox" checked={isChecked} onChange={handleCheck}/>
                         <Discussion>가격 협의</Discussion>
                     </PriceContainer>
                     <Content
                     name="content"
                     cols="30" rows="5"
+                    onChange={handleContent}
                     placeholder="내용을 입력해주세요. 최대 2,000자"/>
                     <ImageContainer>
-                        <FileInput><FaCamera className="icon" size="45" color="ccc"/></FileInput>
+                        <FileInput onClick={handleImg}>
+                            {(currentImg === "") ? <FaCamera className="icon" size="45" color="ccc"/> : 
+                            <img src={currentImg} style={{width:"100%", height:"80%"}}/>}
+                        </FileInput>
+                        <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                         <CancelBox>
                             <MdCancel size="25" color="d1180b"/>
                             <CancelLabel>이미지는 최대 1장까지 업로드 가능하며, X를 통해 이미지 등록을 취소할 수 있습니다.</CancelLabel>
                         </CancelBox>
-                    </ImageContainer>
-                    
+                    </ImageContainer>                 
                 </Form>
             </Container>
             <ButtonContainer>

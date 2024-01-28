@@ -473,7 +473,7 @@ function MyPage(props) {
             });
         }
         const handleError = (err) => {
-                console.log(err);
+            console.log(err);
         }
         if(!geolocation){
             console.log('Geolocation is not supported');
