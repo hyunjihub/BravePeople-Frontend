@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { FaCamera } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import Swal from "sweetalert2";
 import { text } from "@fortawesome/fontawesome-svg-core";
 
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 
 const Wrapper = styled.div`
     width: 40%;
@@ -211,8 +213,14 @@ function WritePost(props) {
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
-    // 토큰 재발급
-    const ReissueToken = (msg) => {
+    const dispatch = useDispatch();
+    const setLoc = (loc) => dispatch(setLocation(loc));
+    const setId = (id) => dispatch(setMemberId(id));
+    const setProfile = (pro) => dispatch(setProfileImg(pro));
+    const setLog = (bool) => dispatch(setLogin(bool));
+
+    // 토큰 재발급 요청 api
+    const ReissueToken = () => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
             refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
@@ -221,12 +229,27 @@ function WritePost(props) {
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
                 refresh: response.data.refreshToken
-            }))
-            alert(msg);
+            }));
+            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
             navigate("/main");
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                sessionStorage.removeItem('jwt');
+                sessionStorage.removeItem('savedData');
+                sessionStorage.removeItem('savedUserInfo');
+                setLog(false);
+                setId(null);
+                setProfile(null);
+                setLoc({
+                    latitude: null,
+                    longitude: null
+                });
+                alert("로그인 유지 시간이 종료되었습니다.");
+                navigate("/main");
+            }else{
+                console.log(error);
+            }
         });
     }
 
@@ -297,9 +320,9 @@ function WritePost(props) {
             }}).then(function(response){
                 handleCurrentImg(response.data.imgUrl);
             }).catch(function(err){
-                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
+                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '파일 업로드 실패')) {
+                } else if((err.response.status === 400 && err.response.data.errorMessage === '파일 업로드 실패')) {
                     Swal.fire({
                         title: "파일 업로드 오류",
                         text: "파일 업로드 오류가 발생했습니다. 다시 시도해주세요.",
@@ -335,9 +358,9 @@ function WritePost(props) {
             })
             .catch(function(err){
                 console.log(err);
-                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                }else if(err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === "Invalid request content."){
+                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();
+                }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
                     alert("비어있는 입력이 있는지 확인해주세요!");
                 }
             })
@@ -350,7 +373,6 @@ function WritePost(props) {
     //취소
     const handleCancel = (e) => {
         navigate(-1);
-        e.preventDefault();
     }
 
     //가격은 숫자로만 입력받아야 하지만, 세자리마다 콤마(,)를 넣기 위해서는 text로 받아야 함 -> 백으로 전달할 때 intPrice를 넘겨줘야 함

@@ -13,7 +13,7 @@ import axios from "axios";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setLocation, setProfileImg } from "../redux/modules/login";
+import { setLocation, setProfileImg, setLogin, setMemberId } from "../redux/modules/login";
 
 const Container = styled.div`
     width: 1200px;
@@ -207,20 +207,21 @@ function MyPage(props) {
     });
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, param, loc, proImg } = useSelector((state)=>({
+    const { isLog, id, param, loc } = useSelector((state)=>({
         isLog: state.login.isLogin,
         id: state.login.memberId,
         param : state.login.paramId,
         loc: state.login.location,
-        proImg: state.login.profileImg
     }), shallowEqual);
 
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
+    const setId = (id) => dispatch(setMemberId(id));
     const setProfile = (pro) => dispatch(setProfileImg(pro));
+    const setLog = (bool) => dispatch(setLogin(bool));
 
-    // 토큰 재발급
-    const ReissueToken = (msg) => {
+    // 토큰 재발급 요청 api
+    const ReissueToken = () => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
             refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
@@ -229,15 +230,31 @@ function MyPage(props) {
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
                 refresh: response.data.refreshToken
-            }))
-            alert(msg);
+            }));
+            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
             navigate("/main");
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                sessionStorage.removeItem('jwt');
+                sessionStorage.removeItem('savedData');
+                sessionStorage.removeItem('savedUserInfo');
+                setLog(false);
+                setId(null);
+                setProfile(null);
+                setLoc({
+                    latitude: null,
+                    longitude: null
+                });
+                alert("로그인 유지 시간이 종료되었습니다.");
+                navigate("/main");
+            }else{
+                console.log(error);
+            }
         });
     }
-
+    
+    // 마이페이지 실행 시 
     useEffect(()=>{
         if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
             Swal.fire({
@@ -277,7 +294,7 @@ function MyPage(props) {
                 )
                 .catch(function(error){
                     if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
+                        ReissueToken();   
                     }
                     else {
                         console.log(error);
@@ -379,9 +396,9 @@ function MyPage(props) {
                     setCurrentName(null);
                     setIsClicked(false);
                 }).catch(function(err) {
-                    if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                    } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '닉네임 중복 오류')) {
+                    if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken();
+                    } else if((err.response.status === 400 && err.response.data.errorMessage === '닉네임 중복 오류')) {
                         Swal.fire({
                             title: "닉네임 중복",
                             text: "현재 사용중인 닉네임입니다.",
@@ -426,9 +443,9 @@ function MyPage(props) {
             }}).then(function(response){
                 handleCurrentImg(response.data.imgUrl);
             }).catch(function(err){
-                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
-                } else if((err.response.data.status === '400 BAD_REQUEST' && err.response.data.errorMessage === '파일 업로드 실패')) {
+                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();
+                } else if((err.response.status === 400 && err.response.data.errorMessage === '파일 업로드 실패')) {
                     Swal.fire({
                         title: "파일 업로드 오류",
                         text: "파일 업로드 오류가 발생했습니다. 다시 시도해주세요.",
@@ -466,7 +483,7 @@ function MyPage(props) {
                     })
             }).catch(function(error){
                 if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                    ReissueToken();
                 }else{
                 console.log(error);
                 }

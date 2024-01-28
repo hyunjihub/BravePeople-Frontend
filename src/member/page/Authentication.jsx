@@ -6,6 +6,9 @@ import Swal from "sweetalert2";
 // restapi
 import axios from 'axios';
 
+// redux
+import { setLocation, setProfileImg, setLogin, setMemberId } from "../redux/modules/login";
+import { useDispatch } from "react-redux";
 
 const Title = styled.div`
     font-size: 40px;
@@ -61,8 +64,14 @@ const Form = styled.form`
 function Authentication(props) {
     const navigate = useNavigate();
 
-    // 토큰 재발행 함수
-    const ReissueToken = (msg) => {
+    const dispatch = useDispatch();
+    const setLoc = (loc) => dispatch(setLocation(loc));
+    const setId = (id) => dispatch(setMemberId(id));
+    const setProfile = (pro) => dispatch(setProfileImg(pro));
+    const setLog = (bool) => dispatch(setLogin(bool));
+
+    // 토큰 재발급 요청 api
+    const ReissueToken = () => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
             refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
@@ -71,12 +80,27 @@ function Authentication(props) {
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
                 refresh: response.data.refreshToken
-            }))
-            alert(msg);
+            }));
+            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
             navigate("/main");
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                sessionStorage.removeItem('jwt');
+                sessionStorage.removeItem('savedData');
+                sessionStorage.removeItem('savedUserInfo');
+                setLog(false);
+                setId(null);
+                setProfile(null);
+                setLoc({
+                    latitude: null,
+                    longitude: null
+                });
+                alert("로그인 유지 시간이 종료되었습니다.");
+                navigate("/main");
+            }else{
+                console.log(error);
+            }
         });
     }
 
@@ -101,7 +125,7 @@ function Authentication(props) {
                         confirmButtonText: "확인",
                     });
                 } else if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken("토큰 기한이 만료로 요청이 취소되었습니다. 메인페이지로 이동합니다.");   
+                        ReissueToken();   
                     }
                 else {
                     console.log(error);
