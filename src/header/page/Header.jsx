@@ -190,8 +190,8 @@ export default function Header(props) {
         }
     },[isLog]);
 
-    // 토큰 재발행 함수
-    const ReissueToken = (msg) => {
+    // 토큰 재발급 요청 api
+    const ReissueToken = () => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
             refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
@@ -200,14 +200,29 @@ export default function Header(props) {
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
                 refresh: response.data.refreshToken
-            }))
-            alert(msg);
+            }));
+            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
             navigate("/main");
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                sessionStorage.removeItem('jwt');
+                sessionStorage.removeItem('savedData');
+                sessionStorage.removeItem('savedUserInfo');
+                setLog(false);
+                setId(null);
+                setProfile(null);
+                setLoc({
+                    latitude: null,
+                    longitude: null
+                });
+                alert("로그인 유지 시간이 종료되었습니다.");
+                navigate("/main");
+            }else{
+                console.log(error);
+            }
         });
-    }    
+    }
 
     // 로그아웃
     const handleLogOut = () => {
@@ -285,8 +300,8 @@ export default function Header(props) {
                     }
                 }));
             }).catch(function(err){
-                if(err.response.data.status === '401 UNAUTHORIZED' && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();
                 }
             });
         }
