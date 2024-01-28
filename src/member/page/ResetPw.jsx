@@ -210,6 +210,14 @@ function ResetPw(props) {
                                     confirmButtonColor: "#d33",
                                     confirmButtonText: "확인",
                                 }); 
+                            } else if((error.response.status === 400 && error.response.data.errorMessage === "존재하지 않는 이메일ID")) {
+                                Swal.fire({
+                                    title: "재설정 완료된 링크",
+                                    text: "재설정이 완료된 링크입니다. 추가 재설정을 원하실 경우, 새로 재설정 링크를 받아주세요.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33",
+                                    confirmButtonText: "확인",
+                                }); 
                             } else {
                                 console.log(error);
                             }

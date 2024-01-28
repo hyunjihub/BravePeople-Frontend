@@ -85,7 +85,7 @@ const NicknameBox = styled.div`
 const Nickname = styled.div`
     font-size: 20px;
     font-weight: 600;
-    margin-right: 2%;
+    margin-right: 1%;
 `;
 
 const Time = styled.div`
@@ -206,7 +206,7 @@ function ViewPost(props) {
                 <NicknameBox>
                     <Rating>
                         <Nickname>닉네임</Nickname>
-                        <StarRating value='4.5'/>
+                        <StarRating value="3.8" size="20"/>
                     </Rating>
                     <Time>1시간 전</Time>
                 </NicknameBox>

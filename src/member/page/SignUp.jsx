@@ -145,6 +145,13 @@ function SignUp(props) {
                                 emailId: emailId
                                 })
                                 .then(function(response){
+                                    Swal.fire({
+                                        title: "회원가입 완료",
+                                        text: "정상적으로 회원가입이 완료되었습니다. 로그인해주세요.",
+                                        icon: "success",
+                                        confirmButtonColor: "#d33",
+                                        confirmButtonText: "확인",
+                                    });
                                     navigate("/main");
                                 })
                                 .catch(function(error){
@@ -169,14 +176,6 @@ function SignUp(props) {
                                         Swal.fire({
                                             title: "닉네임 중복",
                                             text: "현재 입력하신 닉네임을 사용하는 회원이 존재합니다.",
-                                            icon: "error",
-                                            confirmButtonColor: "#d33",
-                                            confirmButtonText: "확인",
-                                        });
-                                    } else if (error.response.data.errorMessage ==="이미 가입 진행중인 이메일" && error.response.status === 400) {
-                                        Swal.fire({
-                                            title: "본인인증 대기 중인 이메일",
-                                            html: "입력하신 이메일로 이미 본인인증이 대기 중입니다. 메일함을 확인해주세요.<br>메일함에 없을 경우, 스팸함을 확인해주세요.",
                                             icon: "error",
                                             confirmButtonColor: "#d33",
                                             confirmButtonText: "확인",
@@ -296,6 +295,14 @@ function SignUp(props) {
                                 confirmButtonText: "확인",
                             });
                             setIsDisabled(false);
+                        } else if (error.response.data.errorMessage ==="이미 가입 진행중인 이메일" && error.response.status === 400) {
+                            Swal.fire({
+                                title: "본인인증 대기 중인 이메일",
+                                html: "입력하신 이메일로 이미 본인인증이 대기 중입니다. 메일함을 확인해주세요.<br>메일함에 없을 경우, 스팸함을 확인해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
                         } else {
                             console.error(error);
                             setIsDisabled(false);

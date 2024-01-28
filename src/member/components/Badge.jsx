@@ -10,14 +10,12 @@ const Medal = styled.img`
 
 function Badge(props) {
 
-    const {value} = props;
-
     const renderBadge = () => {
 
-        if(value<10) {
+        if(props.value<10) {
             return dong;
         }
-        else if (10<=value && value<20) {
+        else if (props.value<20) {
             return eun;
         }
         else {

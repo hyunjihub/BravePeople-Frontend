@@ -200,6 +200,13 @@ const CancelBox = styled.div`
     margin: 23% 0 0 0.5%;
 `;
 
+const CancelButton = styled.button`
+    width: 7%;
+    background-color: #fff;
+    border: none;
+    padding: 0px;
+`;
+
 const CancelLabel = styled.label`
     color: #d1180b;
     font-size: 13px;
@@ -260,8 +267,19 @@ function WritePost(props) {
 
     const handleInputChange = (e) => {
         const value = e.target.value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        setPrice(parseInt(e.target.value.replace(/,/g, ""), 10));
-        setNumber(value);      
+        if(value.length>7) {
+            Swal.fire({
+                title: "가격 최대 자리수",
+                text: "최대 가격은 999,999원 입니다. 가격을 다시 확인해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        } else {
+            setPrice(parseInt(e.target.value.replace(/,/g, ""), 10));
+            setNumber(value);
+        }
+        
     };
 
     //라디오버튼(category)
@@ -279,13 +297,31 @@ function WritePost(props) {
     //제목
     const [title, setTitle] = useState("");
     const handleTitle = (e) => {
-        setTitle(e.target.value);
+        if(e.target.value.length>40) {
+            Swal.fire({
+                title: "제목 최대 글자수",
+                text: "제목의 최대 글자수는 40자 입니다. 제목 글자수를 확인해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        }
+        else setTitle(e.target.value);
     };
 
     //내용
     const [content, setContent] = useState("")
     const handleContent = (e) => {
-        setContent(e.target.value);
+        if(e.target.value.length>40) {
+            Swal.fire({
+                title: "내용 최대 글자수",
+                text: "내용의 최대 글자수는 2,000자 입니다. 내용 글자수를 확인해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        }
+        else setContent(e.target.value);
     };
 
     //이미지 업로드
@@ -337,6 +373,11 @@ function WritePost(props) {
         }
     }
 
+    const handleUploadCancel = (e) => {
+        setCurrentImg("");
+        e.preventDefault();
+    }
+
     //게시글 업로드
     const handleUpload = (e) => {
         if((title !== "") && (price !== undefined) && (content !== "")){
@@ -361,11 +402,23 @@ function WritePost(props) {
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();
                 }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
-                    alert("비어있는 입력이 있는지 확인해주세요!");
+                    Swal.fire({
+                        title: "게시글 양식 오류",
+                        text: "작성하지 않은 항목이 있는지, 최대 글자수를 넘어가지 않았는지 확인해주세요.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
                 }
             })
         }else{
-            alert("비어있는 입력이 있는지 확인해주세요!");
+            Swal.fire({
+                title: "작성 미기재 항목 존재",
+                text: "작성하지 않은 항목이 있습니다. 다시 한 번 확인해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
         
     }
@@ -427,7 +480,7 @@ function WritePost(props) {
                         </FileInput>
                         <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                         <CancelBox>
-                            <MdCancel size="25" color="d1180b"/>
+                            <CancelButton onClick={handleUploadCancel}><MdCancel size="25" color="d1180b"/></CancelButton>
                             <CancelLabel>이미지는 최대 1장까지 업로드 가능하며, X를 통해 이미지 등록을 취소할 수 있습니다.</CancelLabel>
                         </CancelBox>
                     </ImageContainer>                 
