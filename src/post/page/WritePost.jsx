@@ -257,7 +257,6 @@ function WritePost(props) {
     const [title, setTitle] = useState("");
     const handleTitle = (e) => {
         setTitle(e.target.value);
-        console.log(title);
     };
 
     //내용
@@ -330,6 +329,8 @@ function WritePost(props) {
             }})
             .then(function(response){
                 alert("게시글 작성이 완료되었습니다.");
+                console.log(response);
+                console.log(response.data.img);
                 navigate(-1);
             })
             .catch(function(err){
@@ -384,9 +385,9 @@ function WritePost(props) {
                         <Input className="price"
                         name="title"
                         type="text"
-                        value={number}
+                        value={number || ""}
                         onChange={handleInputChange}
-                        placeholder="가격"
+                        placeholder="최대 999,999"
                         disabled={isChecked}/>
                         <Discussion className="unit">원</Discussion>
                         <CheckBox name="discussion" type="checkbox" checked={isChecked} onChange={handleCheck}/>

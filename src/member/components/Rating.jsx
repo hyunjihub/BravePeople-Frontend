@@ -4,12 +4,10 @@ import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 function Rating(props) {
 
-    const {value} = props;
-
     const renderRating = () => {
         const stars = [];
-        const round = Math.floor(value); // 정수
-        const hasHalf = value % 1 !== 0; // 0.5의 경우
+        const round = Math.floor(props); // 정수
+        const hasHalf = props % 1 !== 0; // 0.5의 경우
     
         for (let i = 0; i < 5; i++) {
           if (i < round) {
