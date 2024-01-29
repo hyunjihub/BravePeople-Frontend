@@ -93,6 +93,7 @@ const DropdownOption = styled.li`
 function PostList(props) {
 
     const navigate = useNavigate();
+
     const [ postItems, setPostItems ] = useState([]);
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
@@ -117,13 +118,14 @@ function PostList(props) {
         e.preventDefault();
     }
 
-    // 토큰 재발급 요청 api
+    
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setId = (id) => dispatch(setMemberId(id));
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
 
+    // 토큰 재발급 요청 api
     const ReissueToken = () => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
@@ -216,6 +218,7 @@ function PostList(props) {
         console.log(selectedOption);
     }
 
+
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
         <Wrapper>
@@ -236,7 +239,7 @@ function PostList(props) {
             </ButtonContainer>
             
             <PostListBox>
-                {(postLength === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", fontSize:"25px", marginTop:"200px", fontSize:"35px"}}>
+                {(postLength === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", marginTop:"200px", fontSize:"35px"}}>
                     등록된 게시물이 없습니다!</div> : 
                 postItems.map((item)=>{
                     return <PostItem key={item.postId} value={item} />

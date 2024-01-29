@@ -88,7 +88,7 @@ const Input = styled.input`
     height: 6%;
     box-sizing: border-box;
     padding: 10px 15px;
-    margin: 10px 0;
+    margin: 5px 0;
     &::placeholder {
         color: #ababab;
     }
@@ -96,7 +96,7 @@ const Input = styled.input`
     font-size: 15px;
 
     &.price {
-        width: 25%;
+        width: 28%;
         height: 50%;
         margin-top: 4.5%;
     }
@@ -115,6 +115,7 @@ const Content = styled.textarea`
     box-sizing: border-box;
     padding: 16px 24px;
     margin-top: 3%;
+    margin-bottom: 1%;
     font-family: 'SUITE';
     resize: none;
     font-size: 15px;
@@ -214,6 +215,16 @@ const CancelLabel = styled.label`
     margin-top: -20%;
 `;
 
+const Length = styled.label`
+    font-size: 15px;
+    width: 10%;
+    margin-left: 90%;
+
+    &.title {
+        margin-left: 92%;
+    }
+`;
+
 function WritePost(props) {
 
     const navigate = useNavigate();
@@ -222,9 +233,9 @@ function WritePost(props) {
 
     const { postid } = useParams();
     if(postid === "-1"){
-        alert("게시글 작성");
+        
     }else{
-        alert("게시글 수정");
+        
     }
 
     const dispatch = useDispatch();
@@ -299,6 +310,7 @@ function WritePost(props) {
     const [isChecked, setIsChecked] = useState(false);
     const handleCheck = (e) => {
         setIsChecked(e.target.checked);
+        setPrice(-1);
     };
 
     //제목
@@ -319,7 +331,7 @@ function WritePost(props) {
     //내용
     const [content, setContent] = useState("")
     const handleContent = (e) => {
-        if(e.target.value.length>40) {
+        if(e.target.value.length>2000) {
             Swal.fire({
                 title: "내용 최대 글자수",
                 text: "내용의 최대 글자수는 2,000자 입니다. 내용 글자수를 확인해주세요.",
@@ -392,7 +404,7 @@ function WritePost(props) {
             type: type,
             category: selectedCategory,
             title: title,
-            price: (isChecked)?-1:price,
+            price: price,
             contents: content,
             img: currentImg
             }, {headers:{
@@ -419,6 +431,9 @@ function WritePost(props) {
                 }
             })
         }else{
+            console.log(title);
+            console.log(price);
+            console.log(content);
             Swal.fire({
                 title: "작성 미기재 항목 존재",
                 text: "작성하지 않은 항목이 있습니다. 다시 한 번 확인해주세요.",
@@ -461,8 +476,10 @@ function WritePost(props) {
                     <Input 
                         name="title"
                         type="text"
+                        value={title || ""}
                         onChange={handleTitle}
-                        placeholder="제목을 입력해주세요. 최대 20자"/>
+                        placeholder="제목을 입력해주세요. 최대 40자"/>
+                    <Length className="title">{title.length}/40</Length>
                     <PriceContainer>
                         <Input className="price"
                         name="title"
@@ -478,8 +495,10 @@ function WritePost(props) {
                     <Content
                     name="content"
                     cols="30" rows="5"
+                    value={content || ""}
                     onChange={handleContent}
                     placeholder="내용을 입력해주세요. 최대 2,000자"/>
+                    <Length>{content.length}/2000</Length>
                     <ImageContainer>
                         <FileInput onClick={handleImg}>
                             {(currentImg === "") ? <FaCamera className="icon" size="45" color="ccc"/> : 

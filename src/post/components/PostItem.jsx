@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React from "react";
 import { useNavigate } from "react-router";
 import { PiGenderMaleBold } from "react-icons/pi";
 import { PiGenderFemaleBold } from "react-icons/pi";
@@ -74,15 +73,20 @@ function PostItem(props) {
     const handleView = (e) => {
         navigate(`/viewpost/${props.value.postId}`);
     }
+
+    //글자수 over시 ...처리
+    const truncate = (str, n) => {
+        return str?.length > n ? str.substr(0, n - 1) + "..." : str;
+    };
     
     return(
         <Wrapper>
             <FirstLine>
                 <Category>{props.value.category}</Category>
                 {(props.value.gender === "남성")?<PiGenderMaleBold size="30" color="#254995"/>:<PiGenderFemaleBold size="30" color="#a93957"/>}
-                <Title onClick={handleView}>{props.value.title}</Title>
+                <Title onClick={handleView}>{truncate(props.value.title, 20)}</Title>
                 <UploadTime>{props.value.createdAt}</UploadTime>
-                <Price>{props.value.price}￦</Price>
+                <Price>{(props.value.price!==-1)? props.value.price+"원":"가격협의"}</Price>
             </FirstLine>
             
             
