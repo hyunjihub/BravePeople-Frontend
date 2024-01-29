@@ -256,6 +256,7 @@ function MyPage(props) {
     
     // 마이페이지 실행 시 
     useEffect(()=>{
+        // 비회원일 때 
         if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
             Swal.fire({
                 title: "비정상적인 접속",
@@ -276,6 +277,7 @@ function MyPage(props) {
                     }
                 })
                 .then(function(response){
+                        console.log(response);
                         setUserInfo({
                             profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
                             nickname: response.data.nickname,

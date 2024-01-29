@@ -176,14 +176,24 @@ const Rating = styled.div`
 function ViewPost(props) {
 
     const navigate = useNavigate();
-    const gender = false;
 
     const { postid } = useParams();
-    const [postData, setPostData] = useState();
+    const [postData, setPostData] = useState({
+        type: "",
+        category: "",
+        title: "",
+        gender: "",
+        img: "",
+        nickname: "",
+        createdAt: "",
+        contents: "",
+        price: ""
+    });
 
     useEffect(()=>{
         axios.get(`http://13.209.77.50:8080/posts/${postid}`)
         .then(function(response){
+            console.log(response);
             setPostData(response.data);
         })
         .catch(function(error){
