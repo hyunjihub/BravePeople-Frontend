@@ -123,7 +123,7 @@ function PostList(props) {
     const setId = (id) => dispatch(setMemberId(id));
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
-    
+
     const ReissueToken = () => {
         axios.post("http://13.209.77.50:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
@@ -192,6 +192,25 @@ function PostList(props) {
         })
         }   
     }, [ishelped]);
+
+    // 거리 바꿀 시 데이터 불러오기
+    useEffect(()=>{
+        axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                setPostLength(response.data.data.length);
+                setPostItems(response.data.data);
+            })
+            .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();   
+                } 
+            })
+    }, [selectedOption])
 
     const testFunc = () => {
         console.log(selectedOption);
