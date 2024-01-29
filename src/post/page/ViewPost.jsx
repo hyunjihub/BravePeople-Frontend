@@ -176,7 +176,10 @@ function ViewPost(props) {
     const gender = false;
 
     const { ishelped } = useParams();
+    
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
+
+    
     
     //수정 버튼 클릭시 이동
     const handleModify = (e) => {

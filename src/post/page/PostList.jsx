@@ -4,6 +4,7 @@ import styled from "styled-components";
 import PostItem from "../components/PostItem";
 import { BiMenuAltRight } from "react-icons/bi";
 import { useNavigate } from "react-router";
+import axios from "axios";
 
 const Wrapper = styled.div`
     width: 40%;
@@ -89,7 +90,6 @@ function PostList(props) {
 
     const navigate = useNavigate();
     const [ postItems, setPostItems ] = useState([]);
-    const [ num, setNum ] = useState(0);
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
@@ -103,9 +103,9 @@ function PostList(props) {
         setIsOpen(false);
     };
     
+
     useEffect(()=>{
         setPostItems([]);
-        setNum(0);
     }, [type]);
 
     const handleWrite = (e) => {
@@ -113,9 +113,30 @@ function PostList(props) {
         e.preventDefault();
     }
 
+    // 게시글 데이터 불러오기 api
+
+    // 포스트 개수
+    const [postLength, setPostLength] = useState(0);
+
+    useEffect(()=>{
+        axios.get("http://13.209.77.50:8080/posts?type=원정대&page=0&amount=2")
+        .then(function(response){
+            setPostLength(response.data.data.length);
+            setPostItems(response.data.data);
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+    }, [])
+
+    const testFunc = () => {
+        console.log(postItems);
+    }
+
+    // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
         <Wrapper>
-            <button onClick={()=>{setPostItems([...postItems, num]); setNum(num + 1);}}>데이터 추가</button>
+            <div><button onClick={testFunc}>testButton</button></div>
             <Title>{type}</Title>
             <ButtonContainer>
                 <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu>
@@ -133,9 +154,10 @@ function PostList(props) {
             </ButtonContainer>
             
             <PostListBox>
-                {(postItems.length === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", fontSize:"25px", marginTop:"200px", fontSize:"35px"}}>등록된 게시물이 없습니다!</div> : 
-                postItems.map((item, index)=>{
-                    return <PostItem key={index} value={item} />
+                {(postLength === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", fontSize:"25px", marginTop:"200px", fontSize:"35px"}}>
+                    등록된 게시물이 없습니다!</div> : 
+                postItems.map((item)=>{
+                    return <PostItem key={item.postId} value={item} />
                 })}  
             </PostListBox>
         </Wrapper>

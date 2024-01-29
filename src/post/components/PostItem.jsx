@@ -67,30 +67,22 @@ const FirstLine = styled.div`
     width: 95%;
 `;
 
-/* 성별, 카테고리 추가 */
-// 받은 POSTID로 백엔드와 RESTAPI통신하여 해당 ID의 게시글 정보를 불러온다.(작성자성별, 제목, 글작성시간, 가격, 카테고리)
-// AXIOS.머시기ㅣ머시기({props.value}) => 여기서 받은 데이터를 PostItem 리턴에 담아서 PostList component로
 function PostItem(props) {
 
     const navigate = useNavigate();
-    const gender = false;
-
-    const { ishelped } = useParams();
 
     const handleView = (e) => {
-        const url = `/viewpost/${ishelped}`;
-        navigate(url);
-        e.preventDefault();
+        navigate(`/viewpost/${(props.value.type === "원정대")?"helping":"helped"}/${props.value.postId}`);
     }
     
     return(
         <Wrapper>
             <FirstLine>
-                <Category>벌레</Category>
-                {gender?<PiGenderMaleBold size="30" color="#254995"/>:<PiGenderMaleBold size="30" color="#a93957"/>}
-                <Title onClick={handleView}>벌레 잡아주실 분 찾습니다</Title>
-                <UploadTime>{props.value}시간 전</UploadTime>
-                <Price>999,999원</Price>
+                <Category>{props.value.category}</Category>
+                {(props.value.gender === "남성")?<PiGenderMaleBold size="30" color="#254995"/>:<PiGenderFemaleBold size="30" color="#a93957"/>}
+                <Title onClick={handleView}>{props.value.title}</Title>
+                <UploadTime>{props.value.createdAt}</UploadTime>
+                <Price>{props.value.price}￦</Price>
             </FirstLine>
             
             

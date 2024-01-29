@@ -357,17 +357,8 @@ export default function Header(props) {
         if(loc.latitude !== null && loc.longitude !== null) mapApi(loc.latitude, loc.longitude);
     }, [loc]);
 
-    const testButton = () => {
-        console.log(JSON.parse(sessionStorage.getItem('jwt')).access);
-        console.log(isLog);
-        console.log(id);
-        console.log(loc);
-        console.log(profile);
-    }
-
     return (
         <Wrapper>
-            <div><button onClick={testButton}>테스트</button></div>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
