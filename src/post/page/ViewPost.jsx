@@ -350,7 +350,8 @@ function ViewPost(props) {
                 {postData.contents}
             </Content>
             <StickyBox>
-                <ChatButton>{(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
+                <ChatButton disabled={!isActivate} onClick={()=>{alert(`${(postData.type==="원정대")? "의뢰하기" : "원정가기"}버튼 눌림`)}}>
+                    {(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
                 <Price>{postData.price!=="-1"?postData.price+"원":"가격협의"}</Price>
             </StickyBox>
         </Wrapper>
