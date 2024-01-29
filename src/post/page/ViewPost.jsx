@@ -324,7 +324,7 @@ function ViewPost(props) {
                 <NicknameBox>
                     <Rating>
                         <Nickname>{postData.nickname}</Nickname>
-                        <StarRating value="3.8" size="20"/>
+                        <StarRating value={"3.8"} size="20"/>
                     </Rating>
                     <Time>{postData.createdAt}</Time>
                 </NicknameBox>
@@ -341,7 +341,7 @@ function ViewPost(props) {
             </Content>
             <StickyBox>
                 <ChatButton>{(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
-                <Price>{postData.price!==-1?postData.price+"원":"가격협의"}</Price>
+                <Price>{postData.price!=="-1"?postData.price+"원":"가격협의"}</Price>
             </StickyBox>
         </Wrapper>
     );
