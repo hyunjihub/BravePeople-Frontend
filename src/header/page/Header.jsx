@@ -201,7 +201,7 @@ export default function Header(props) {
                 access: response.data.accessToken,
                 refresh: response.data.refreshToken
             }));
-            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
+            alert("토큰 기한 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
             navigate("/main");
         })
         .catch(function(error){
@@ -225,29 +225,31 @@ export default function Header(props) {
     }
 
     // 로그아웃
-    const handleLogOut = () => {
+    const handleLogOut = (e) => {
         if(isLog) {
-            axios.post("http://13.209.77.50:8080/member/logout", {
+            axios.post("http://13.209.77.50:8080/member/logout", {},{
                 headers: {
                     'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             })
             .then(function(response){
-                setLog(false);
-                setId(null);
-                setParam(null);
-                setLocation({
-                    latitude: null,
-                    longitude: null
-                });
-                setProfile(null);
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
                 sessionStorage.removeItem('savedUserInfo');
+                setLog(false);
+                setId(null);
+                setProfile(null);
+                setLoc({
+                    latitude: null,
+                    longitude: null
+                });
                 navigate("/main");
             })
-            .catch(function(error){
-                console.log(error);
+            .catch(function(err){
+                console.log(err);
+                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();
+                }
             });
         }else{
             navigate("/login")
@@ -355,8 +357,17 @@ export default function Header(props) {
         if(loc.latitude !== null && loc.longitude !== null) mapApi(loc.latitude, loc.longitude);
     }, [loc]);
 
+    const testButton = () => {
+        console.log(JSON.parse(sessionStorage.getItem('jwt')).access);
+        console.log(isLog);
+        console.log(id);
+        console.log(loc);
+        console.log(profile);
+    }
+
     return (
         <Wrapper>
+            <div><button onClick={testButton}>테스트</button></div>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
