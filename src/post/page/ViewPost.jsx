@@ -320,7 +320,7 @@ function ViewPost(props) {
                 {(postData.gender === "남성")?<PiGenderMaleBold size="40" color="#254995"/>:<PiGenderFemaleBold size="40" color="#a93957"/>}
             </TitleBox>
             <ProfileBox>
-                <Profile src={profile} alt="프로필"/>
+                <Profile src={postData.profileImg?postData.profileImg:profile} alt="프로필"/>
                 <NicknameBox>
                     <Rating>
                         <Nickname>{postData.nickname}</Nickname>
@@ -336,7 +336,7 @@ function ViewPost(props) {
             </ProfileBox>
             <Line />
             <Content>
-                <Image src={postData.img?postData.img:null}/>
+                <Image src={postData.postImg?postData.postImg:null}/>
                 {postData.contents}
             </Content>
             <StickyBox>

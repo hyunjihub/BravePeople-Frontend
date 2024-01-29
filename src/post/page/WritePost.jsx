@@ -279,9 +279,7 @@ function WritePost(props) {
     }
 
     //가격
-    //세자리마다 콤마(,) 찍어주기 -> 백으로 전달할 때 intPrice를 넘겨줘야 함
     const [number, setNumber] = useState();
-    const [price, setPrice] = useState();
 
     const handleInputChange = (e) => {
         const value = e.target.value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -294,7 +292,6 @@ function WritePost(props) {
                 confirmButtonText: "확인",
             });
         } else {
-            setPrice(parseInt(e.target.value.replace(/,/g, ""), 10));
             setNumber(value);
         }
         
@@ -310,7 +307,7 @@ function WritePost(props) {
     const [isChecked, setIsChecked] = useState(false);
     const handleCheck = (e) => {
         setIsChecked(e.target.checked);
-        setPrice(-1);
+        setNumber("-1");
     };
 
     //제목
@@ -399,14 +396,14 @@ function WritePost(props) {
 
     //게시글 업로드
     const handleUpload = (e) => {
-        if((title !== "") && (price !== undefined) && (content !== "")){
+        if((title !== "") && (number !== "") && (content !== "")){
             axios.post('http://13.209.77.50:8080/posts',{
             type: type,
             category: selectedCategory,
             title: title,
-            price: price,
+            price: number,
             contents: content,
-            img: currentImg
+            postImg: currentImg
             }, {headers:{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
@@ -432,7 +429,7 @@ function WritePost(props) {
             })
         }else{
             console.log(title);
-            console.log(price);
+            console.log(number);
             console.log(content);
             Swal.fire({
                 title: "작성 미기재 항목 존재",
@@ -450,7 +447,6 @@ function WritePost(props) {
         navigate(-1);
     }
 
-    //가격은 숫자로만 입력받아야 하지만, 세자리마다 콤마(,)를 넣기 위해서는 text로 받아야 함 -> 백으로 전달할 때 intPrice를 넘겨줘야 함
     return (
         <Wrapper>
             <Title>{type}</Title>
