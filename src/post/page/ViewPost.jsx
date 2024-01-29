@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { PiGenderMaleBold } from "react-icons/pi";
 import { PiGenderFemaleBold } from "react-icons/pi";
 import profile from '../../common/resources/img/profile.png';
+import StarRating from '../../member/components/Rating';
 
 const Wrapper = styled.div`
     width: 40%;
@@ -84,6 +85,7 @@ const NicknameBox = styled.div`
 const Nickname = styled.div`
     font-size: 20px;
     font-weight: 600;
+    margin-right: 1%;
 `;
 
 const Time = styled.div`
@@ -162,6 +164,12 @@ const Image = styled.div`
     margin: 2% auto 3%;
 `;
 
+const Rating = styled.div`
+    display: flex;
+    flex-direction: row;
+    height: 50%;
+`;
+
 function ViewPost(props) {
 
     const navigate = useNavigate();
@@ -194,9 +202,12 @@ function ViewPost(props) {
                 {gender?<PiGenderMaleBold size="40" color="#254995"/>:<PiGenderMaleBold size="40" color="#a93957"/>}
             </TitleBox>
             <ProfileBox>
-                <Profile src={(profile)}/>
+                <Profile src={(profile)} alt="프로필"/>
                 <NicknameBox>
-                    <Nickname>닉네임</Nickname>
+                    <Rating>
+                        <Nickname>닉네임</Nickname>
+                        <StarRating value="3.8" size="20"/>
+                    </Rating>
                     <Time>1시간 전</Time>
                 </NicknameBox>
                 <ButtonContainer>

@@ -295,6 +295,14 @@ function MyPage(props) {
                 .catch(function(error){
                     if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                         ReissueToken();   
+                    } else if (error.response.data.errorMessage ==="존재하지 않는 멤버ID" && error.response.status === 400) {
+                        Swal.fire({
+                            title: "존재하지 않는 회원",
+                            html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
                     }
                     else {
                         console.log(error);
@@ -398,7 +406,7 @@ function MyPage(props) {
                 }).catch(function(err) {
                     if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                         ReissueToken();
-                    } else if((err.response.status === 400 && err.response.data.errorMessage === '닉네임 중복 오류')) {
+                    } else if((err.response.status === 400 && err.response.data.errorMessage === '닉네임 중복')) {
                         Swal.fire({
                             title: "닉네임 중복",
                             text: "현재 사용중인 닉네임입니다.",
@@ -519,9 +527,9 @@ function MyPage(props) {
                     <ModifyIntro type="text" placeholder={(userInfo.intro) === null ? "자기소개 문구가 작성되지 않았습니다.":userInfo.intro} onChange={handleCurrentIntro}></ModifyIntro>
                     :<Introduce>{(userInfo.intro === null || userInfo.intro === "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
                 <Rating>
-                    <StarRating value={userInfo.score}></StarRating>
+                    <StarRating value={userInfo.score} size="40"></StarRating>
                 </Rating>
-                <Badge><BadgeCount value={userInfo.medalCount} /></Badge>
+                <Badge><BadgeCount value={userInfo.medalCount}/></Badge>
                 <ButtonContainer>
                     {isClicked?<ModifyButton onClick={handleModify}>수정완료</ModifyButton>:null}
                     {isClicked?<ModifyButton onClick={handleIsClicked}>취소</ModifyButton>:null}

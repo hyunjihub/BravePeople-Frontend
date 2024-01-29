@@ -96,7 +96,15 @@ function FindId(props) {
                     });
                 })
                 .catch(function(error){
-                    console.log(error);    
+                    if(error.response.status === 400 && error.response.data.errorMessage === "존재하지 않는 이메일") {
+                        Swal.fire({
+                            title: "존재하지 않는 이메일",
+                            text: "가입되지 않은 이메일입니다. 이메일을 다시 확인해주십시오.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                    }  
                 });
                 e.preventDefault();
             } else {
@@ -160,7 +168,23 @@ function FindId(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
-                        } else {
+                        } else if(error.response.status === 400 && error.response.data.errorMessage === "존재하지 않는 아이디") {
+                            Swal.fire({
+                                title: "존재하지 않는 아이디",
+                                text: "가입되지 않은 아이디입니다. 아이디를 다시 확인해주십시오.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else if(error.response.status === 400 && error.response.data.errorMessage === "존재하지 않는 이메일") {
+                            Swal.fire({
+                                title: "존재하지 않는 이메일",
+                                text: "가입되지 않은 이메일입니다. 이메일을 다시 확인해주십시오.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        }  else {
                             Swal.fire({
                                 title: "계정 정보 없음",
                                 text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",
