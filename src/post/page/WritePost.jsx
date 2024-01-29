@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 import { Link, useParams } from "react-router-dom";
@@ -231,12 +231,15 @@ function WritePost(props) {
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
+    // 게시글 작성 OR 수정 여부 판단
+    const [isWrite, setIsWrite] = useState(true);
     const { postid } = useParams();
-    if(postid === "-1"){
-        
-    }else{
-        
-    }
+    useEffect(()=>{
+        if(postid === "-1"){ setIsWrite(true); }
+        else{ setIsWrite(false) }
+    }, []);
+    
+
 
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
@@ -277,6 +280,17 @@ function WritePost(props) {
             }
         });
     }
+
+    // 게시글 수정일 때 데이터 불러오기
+    useEffect(()=>{
+        axios.get(`http://13.209.77.50:8080/posts/${postid}`)
+        .then(function(response){
+            console.log(response);
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }, [])
 
     //가격
     const [number, setNumber] = useState();

@@ -222,6 +222,7 @@ function ViewPost(props) {
     // 버튼들(수정, 삭제, 달려가기, 부탁하기) 활성화 여부
     const [isActivate, setIsActivate] = useState(false);
 
+    // 데이터 불러오기
     useEffect(()=>{
         axios.get(`http://13.209.77.50:8080/posts/${postid}`)
         .then(function(response){
@@ -340,7 +341,7 @@ function ViewPost(props) {
                 </NicknameBox>
                 {(isActivate)?
                 <ButtonContainer>
-                    <Button>수정</Button>
+                    <Button onClick={()=>{navigate(`/postlist/${(postData.type==="원정대")? "helping" : "helped"}/writepost/${postid}`)}}>수정</Button>
                     <Button onClick={handleDelete}>삭제</Button>
                 </ButtonContainer>:null}
             </ProfileBox>
