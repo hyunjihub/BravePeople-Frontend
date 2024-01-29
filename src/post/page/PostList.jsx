@@ -5,7 +5,10 @@ import PostItem from "../components/PostItem";
 import { BiMenuAltRight } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import axios from "axios";
-import { useSelector } from "react-redux";
+
+// redux
+import { useDispatch, useSelector } from "react-redux";
+import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/redux/modules/login";
 
 const Wrapper = styled.div`
     width: 40%;
@@ -95,7 +98,6 @@ function PostList(props) {
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
     // redux
-
     const { isLog } = useSelector((state)=>({
         isLog: state.login.isLogin
     }));
@@ -113,6 +115,46 @@ function PostList(props) {
     const handleWrite = (e) => {
         navigate("./writepost/-1");
         e.preventDefault();
+    }
+
+    // 토큰 재발급 요청 api
+    const dispatch = useDispatch();
+    const setLoc = (loc) => dispatch(setLocation(loc));
+    const setId = (id) => dispatch(setMemberId(id));
+    const setProfile = (pro) => dispatch(setProfileImg(pro));
+    const setLog = (bool) => dispatch(setLogin(bool));
+    
+    const ReissueToken = () => {
+        axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+        })
+        .then(function(response){
+            sessionStorage.setItem('jwt',JSON.stringify({
+                access: response.data.accessToken,
+                refresh: response.data.refreshToken
+            }));
+            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
+            navigate("/main");
+        })
+        .catch(function(error){
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                sessionStorage.removeItem('jwt');
+                sessionStorage.removeItem('savedData');
+                sessionStorage.removeItem('savedUserInfo');
+                setLog(false);
+                setId(null);
+                setProfile(null);
+                setLoc({
+                    latitude: null,
+                    longitude: null
+                });
+                alert("로그인 유지 시간이 종료되었습니다.");
+                navigate("/main");
+            }else{
+                console.log(error);
+            }
+        });
     }
 
     // 게시글 데이터 불러오기 api
@@ -161,7 +203,7 @@ function PostList(props) {
             <div><button onClick={testFunc}>testButton</button></div>
             <Title>{type}</Title>
             <ButtonContainer>
-                <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu>
+                {(isLog) ? <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu> : <div></div>}
                 {isOpen&& (<DropdownMenu>
                     {options.map((option) => (
                     <DropdownOption
