@@ -338,10 +338,10 @@ function ViewPost(props) {
                     </Rating>
                     <Time>{postData.createdAt}</Time>
                 </NicknameBox>
-                {(id===postData.memberId)?
+                {(isActivate)?
                 <ButtonContainer>
-                    {(isActivate)?<Button>수정</Button>:<HiddenButton />}
-                    {(isActivate)?<Button onClick={handleDelete}>삭제</Button>:<HiddenButton />}
+                    <Button>수정</Button>
+                    <Button onClick={handleDelete}>삭제</Button>
                 </ButtonContainer>:null}
             </ProfileBox>
             <Line />
