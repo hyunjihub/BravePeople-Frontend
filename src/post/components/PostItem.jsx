@@ -72,7 +72,7 @@ function PostItem(props) {
     const navigate = useNavigate();
 
     const handleView = (e) => {
-        navigate(`/viewpost/${(props.value.type === "원정대")?"helping":"helped"}/${props.value.postId}`);
+        navigate(`/viewpost/${props.value.postId}`);
     }
     
     return(

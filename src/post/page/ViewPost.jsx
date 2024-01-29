@@ -7,6 +7,9 @@ import { PiGenderFemaleBold } from "react-icons/pi";
 import profile from '../../common/resources/img/profile.png';
 import StarRating from '../../member/components/Rating';
 
+// axios
+import axios from "axios";
+
 const Wrapper = styled.div`
     width: 40%;
     height: 100vh;
@@ -175,12 +178,19 @@ function ViewPost(props) {
     const navigate = useNavigate();
     const gender = false;
 
-    const { ishelped } = useParams();
-    
-    let type = ishelped === "helping" ? "원정대" : "의뢰인";
+    const { postid } = useParams();
+    const [postData, setPostData] = useState();
 
-    
-    
+    useEffect(()=>{
+        axios.get(`http://13.209.77.50:8080/posts/${postid}`)
+        .then(function(response){
+            setPostData(response.data);
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }, []);
+
     //수정 버튼 클릭시 이동
     const handleModify = (e) => {
         e.preventDefault();
@@ -197,21 +207,21 @@ function ViewPost(props) {
 
     return(
         <Wrapper>
-            <Title>{type}</Title>
+            <Title>{postData.type}</Title>
             <Line />
             <TitleBox>
-                <Category>벌레</Category>
-                <ContentTitle>벌레 잡아주실 분 찾습니다.</ContentTitle>
-                {gender?<PiGenderMaleBold size="40" color="#254995"/>:<PiGenderMaleBold size="40" color="#a93957"/>}
+                <Category>{postData.category}</Category>
+                <ContentTitle>{postData.title}</ContentTitle>
+                {(postData.gender === "남성")?<PiGenderMaleBold size="40" color="#254995"/>:<PiGenderFemaleBold size="40" color="#a93957"/>}
             </TitleBox>
             <ProfileBox>
-                <Profile src={(profile)} alt="프로필"/>
+                <Profile src={postData.img} alt="프로필"/>
                 <NicknameBox>
                     <Rating>
-                        <Nickname>닉네임</Nickname>
+                        <Nickname>{postData.nickname}</Nickname>
                         <StarRating value="3.8" size="20"/>
                     </Rating>
-                    <Time>1시간 전</Time>
+                    <Time>{postData.createdAt}</Time>
                 </NicknameBox>
                 <ButtonContainer>
                     <Button>수정</Button>
@@ -221,11 +231,11 @@ function ViewPost(props) {
             <Line />
             <Content>
                 <Image>이미지 있을 시 입력되는 부분 height 고정값X</Image>
-                내용 입력 부분 내용은 왼쪽 정렬 고정
+                {postData.contents}
             </Content>
             <StickyBox>
-                <ChatButton>{(type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
-                <Price>999,999원</Price>
+                <ChatButton>{(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
+                <Price>{postData.price}￦</Price>
             </StickyBox>
         </Wrapper>
     );
