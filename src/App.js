@@ -34,7 +34,7 @@ export default function App(props) {
                     <Route path="/authentication" element={<Authentication />} />
                     <Route path="/signup" element={<SignUp />}/>
                     <Route path="/viewpost/:postid" element={<ViewPost />}/>
-                    <Route path="/postlist/:ishelped/writepost" element={<WritePost />}/>
+                    <Route path="/postlist/:ishelped/writepost/:postid" element={<WritePost />}/>
                     <Route path="/error" element={<Error />} />
                 </Routes>
             </BrowserRouter>

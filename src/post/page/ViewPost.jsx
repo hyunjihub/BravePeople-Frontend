@@ -193,7 +193,6 @@ function ViewPost(props) {
     useEffect(()=>{
         axios.get(`http://13.209.77.50:8080/posts/${postid}`)
         .then(function(response){
-            console.log(response);
             setPostData(response.data);
         })
         .catch(function(error){

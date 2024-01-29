@@ -220,6 +220,13 @@ function WritePost(props) {
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
+    const { postid } = useParams();
+    if(postid === "-1"){
+        alert("게시글 작성");
+    }else{
+        alert("게시글 수정");
+    }
+
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setId = (id) => dispatch(setMemberId(id));

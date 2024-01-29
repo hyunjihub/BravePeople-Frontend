@@ -5,6 +5,7 @@ import PostItem from "../components/PostItem";
 import { BiMenuAltRight } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     width: 40%;
@@ -93,33 +94,53 @@ function PostList(props) {
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
+    // redux
+
+    const { isLog } = useSelector((state)=>({
+        isLog: state.login.isLogin
+    }));
+
     //드롭다운 메뉴 구현
-    const options = ['2km', '5km', '10km', '전역'];
+    const options = ['2', '5', '10', '0'];
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState('2km');
+    const [selectedOption, setSelectedOption] = useState('2');
 
     const handleOptionClick = (option) => {
         setSelectedOption(option);
         setIsOpen(false);
     };
-    
-
-    useEffect(()=>{
-        setPostItems([]);
-    }, [type]);
 
     const handleWrite = (e) => {
-        navigate("./writepost");
+        navigate("./writepost/-1");
         e.preventDefault();
     }
 
     // 게시글 데이터 불러오기 api
-
     // 포스트 개수
     const [postLength, setPostLength] = useState(0);
 
     useEffect(()=>{
-        axios.get("http://13.209.77.50:8080/posts?type=원정대&page=0&amount=2")
+        // 로그인 상태일 때 게시글 조회
+        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog){
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                setPostLength(response.data.data.length);
+                setPostItems(response.data.data);
+            })
+            .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();   
+                } 
+            })
+        }
+        // 비로그인 상태일 때 게시글 조회
+        else if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=0&amount=2`)
         .then(function(response){
             setPostLength(response.data.data.length);
             setPostItems(response.data.data);
@@ -127,10 +148,11 @@ function PostList(props) {
         .catch(function(error){
             console.log(error);
         })
-    }, [])
+        }   
+    }, [ishelped]);
 
     const testFunc = () => {
-        console.log(postItems);
+        console.log(selectedOption);
     }
 
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
@@ -144,9 +166,8 @@ function PostList(props) {
                     {options.map((option) => (
                     <DropdownOption
                         key={option}
-                        onClick={() => handleOptionClick(option)}
-                        onMouseOver={() => setSelectedOption(option)}>
-                        {option}
+                        onClick={() => handleOptionClick(option)}>
+                        {(option === '0') ? "전역" : `${option}km`}
                     </DropdownOption>
                     ))}
                 </DropdownMenu>)}
