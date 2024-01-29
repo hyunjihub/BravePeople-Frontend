@@ -219,10 +219,15 @@ function ViewPost(props) {
         price: ""
     });
 
+    // 버튼들(수정, 삭제, 달려가기, 부탁하기) 활성화 여부
+    const [isActivate, setIsActivate] = useState(false);
+
     useEffect(()=>{
         axios.get(`http://13.209.77.50:8080/posts/${postid}`)
         .then(function(response){
             setPostData(response.data);
+            if((id !== null)&&(id === response.data.memberId.toString())&&(!response.data.disabled)){ setIsActivate(true); }
+            else { setIsActivate(false); }
         })
         .catch(function(error){
             console.log(error);
@@ -310,8 +315,13 @@ function ViewPost(props) {
     const handlePage = (e) => {
     }
 
+    const checkFunc = () => {
+        console.log(isActivate);
+    }
+
     return(
         <Wrapper>
+            <div><button onClick={checkFunc}>TEST</button></div>
             <Title>{postData.type}</Title>
             <Line />
             <TitleBox>
@@ -328,10 +338,10 @@ function ViewPost(props) {
                     </Rating>
                     <Time>{postData.createdAt}</Time>
                 </NicknameBox>
-                {(id==postData.memberId)?
+                {(id===postData.memberId)?
                 <ButtonContainer>
-                    {(!postData.isDisabled)?<Button>수정</Button>:<HiddenButton />}
-                    <Button onClick={handleDelete}>삭제</Button>
+                    {(isActivate)?<Button>수정</Button>:<HiddenButton />}
+                    {(isActivate)?<Button onClick={handleDelete}>삭제</Button>:<HiddenButton />}
                 </ButtonContainer>:null}
             </ProfileBox>
             <Line />
