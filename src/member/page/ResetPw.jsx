@@ -146,8 +146,8 @@ function ResetPw(props) {
                         .catch(function(error){
                             if(error.response.data.errorMessage ==="Invalid request content." && error.response.status === 400) {
                                 Swal.fire({
-                                    title: "형식 오류",
-                                    html: "입력 항목 일부의 형식이 잘못되었습니다.",
+                                    title: "비밀번호 형식 오류",
+                                    text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",
                                     icon: "error",
                                     confirmButtonColor: "#d33",
                                     confirmButtonText: "확인",
@@ -194,7 +194,7 @@ function ResetPw(props) {
                         .catch(function(error){
                             if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                                 ReissueToken();   
-                            } else if(error.response.status === 400 && error.response.data.errorMessage === "비밀번호 형식 오류"){
+                            } else if(error.response.status === 400 && error.response.data.errorMessage === "Invalid request content."){
                                 Swal.fire({
                                     title: "비밀번호 형식 오류",
                                     text: "비밀번호는 영문과 숫자를 섞어 8글자 이상이어야 합니다.",

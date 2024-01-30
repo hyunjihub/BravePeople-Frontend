@@ -84,7 +84,7 @@ const ModifyProfile = styled.button`
 const Nickname = styled.div`
     width: 60%;
     margin-left: 20%;
-    font-weight: 700;
+    font-weight: 800;
     color: #000;
     text-align: center;
     font-size: 38px;
@@ -94,7 +94,7 @@ const Nickname = styled.div`
 const ModifyNickname = styled.input`
     width: 60%;
     margin-left: 20%;
-    font-weight: 700;
+    font-weight: 800;
     color: #000;
     text-align: center;
     font-size: 38px;
@@ -119,7 +119,7 @@ const Introduce = styled.div`
 `;
 
 const Modify = styled.button`
-    font-weight: 300;
+    font-weight: 500;
     color: #333;
     font-size: 15px;
     text-align: center;
@@ -433,6 +433,15 @@ function MyPage(props) {
                             confirmButtonText: "확인",
                         });
                         setIsClicked(true);
+                    } else if((err.response.status === 400 && err.response.data.errorMessage === 'Invalid request content.')) {
+                        Swal.fire({
+                            title: "형식 오류",
+                            text: "닉네임과 자기소개 중 형식에 맞지않게 작성된 항목이 있습니다.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                        setIsClicked(true);
                     } else {
                         console.log(err);
                     }
@@ -510,6 +519,14 @@ function MyPage(props) {
             }).catch(function(error){
                 if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();
+                } else if(error.response.status === 401 && error.response.data.errorMessage === "존재하지 않는 멤버ID"){
+                    Swal.fire({
+                        title: "존재하지 않는 회원",
+                        html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
                 }else{
                 console.log(error);
                 }

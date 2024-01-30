@@ -39,7 +39,7 @@ const Line = styled.hr`
 
 const TitleBox = styled.div`
     width: 90%;
-    height: 3%;
+    height: 5%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -49,12 +49,12 @@ const TitleBox = styled.div`
 const ContentTitle = styled.div`
     width: 95%;
     font-size: 28px;
-    font-weight: 600;
+    font-weight: 800;
 `;
 
 const Category = styled.div`
     width: 9%;
-    height: 100%;
+    height: 63%;
     background-color: #f8332f;
     border-radius: 15px;
     color: #fff;
@@ -71,7 +71,7 @@ const ProfileBox = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 2% 6% ;
+    margin: 3% 6% ;
 `;
 
 const Profile = styled.img`
@@ -164,7 +164,7 @@ const ChatButton = styled.button`
     border: none;
     background-color: #f8332f;
     font-family: 'SUITE';
-    font-weight: 600;
+    font-weight: 800;
     font-size: 30px;
     color: #fff;
     margin: auto;
@@ -174,7 +174,7 @@ const Price = styled.div`
     border: none;
     background-color: #f8332f;
     font-family: 'SUITE';
-    font-weight: 600;
+    font-weight: 800;
     font-size: 30px;
     color: #fff;
     margin: auto;
@@ -269,11 +269,6 @@ function ViewPost(props) {
                 console.log(error);
             }
         });
-    }
-
-    //수정 버튼 클릭시 이동
-    const handleModify = (e) => {
-        e.preventDefault();
     }
 
     //삭제 버튼 클릭시 삭제 API

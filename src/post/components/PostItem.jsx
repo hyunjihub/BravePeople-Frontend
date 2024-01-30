@@ -18,7 +18,7 @@ const Wrapper = styled.div`
 
 const Title = styled.button`
     width: 65%;
-    font-weight: bold;
+    font-weight: 800;
     font-size: 25px;
     text-align: left;
     border: none;
@@ -84,7 +84,7 @@ function PostItem(props) {
             <FirstLine>
                 <Category>{props.value.category}</Category>
                 {(props.value.gender === "남성")?<PiGenderMaleBold size="30" color="#254995"/>:<PiGenderFemaleBold size="30" color="#a93957"/>}
-                <Title onClick={handleView}>{truncate(props.value.title, 20)}</Title>
+                <Title onClick={handleView}>{truncate(props.value.title, 18)}</Title>
                 <UploadTime>{props.value.createdAt}</UploadTime>
                 <Price>{(props.value.price!=="-1")? props.value.price+"원":"가격협의"}</Price>
             </FirstLine>

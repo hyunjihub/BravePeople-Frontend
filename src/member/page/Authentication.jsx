@@ -116,7 +116,7 @@ function Authentication(props) {
                 navigate("/resetpw");
             })
             .catch(function(error){
-                if(error.response.status === 400) {
+                if(error.response.status === 400 && error.response.data.errorMessage === "잘못된 비밀번호") {
                     Swal.fire({
                         title: "비밀번호 오류",
                         text: "비밀번호가 틀립니다.",
@@ -129,7 +129,6 @@ function Authentication(props) {
                     }
                 else {
                     console.log(error);
-                    alert("에러 발생");
                 }
             });
         } else {
