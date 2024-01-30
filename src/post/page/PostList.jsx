@@ -118,7 +118,6 @@ function PostList(props) {
         e.preventDefault();
     }
 
-    
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setId = (id) => dispatch(setMemberId(id));

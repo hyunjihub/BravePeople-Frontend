@@ -324,7 +324,7 @@ function ViewPost(props) {
                 <NicknameBox>
                     <Rating>
                         <Nickname>{postData.nickname}</Nickname>
-                        <StarRating value={"3.8"} size="20"/>
+                        <StarRating value={postData.score} size="20"/>
                     </Rating>
                     <Time>{postData.createdAt}</Time>
                 </NicknameBox>
