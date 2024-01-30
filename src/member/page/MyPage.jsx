@@ -366,10 +366,6 @@ function MyPage(props) {
 
     // 수정 완료 버튼
     const handleModify = (e) => {        
-<<<<<<< Updated upstream
-        if((currentName === null || currentName === "") && (currentIntro === null || currentIntro === "") && (currentImg === null)){
-            alert("수정사항이 없습니다.");
-=======
         if((currentName === userInfo.nickname) && (currentIntro === userInfo.intro) && (currentImg === userInfo.profileImage)){
             Swal.fire({
                 title: "수정사항 없음",
@@ -378,7 +374,6 @@ function MyPage(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
->>>>>>> Stashed changes
             setIsClicked(false);
         }else{
             if(currentName !== null && (currentName.length <= -1 || currentName.length > 6)) {

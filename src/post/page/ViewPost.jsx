@@ -229,7 +229,7 @@ function ViewPost(props) {
         axios.get(`http://13.209.77.50:8080/posts/${postid}`)
         .then(function(response){
             setPostData(response.data);
-            if((id !== null)&&(id === response.data.memberId.toString())&&(!response.data.disabled)){ setIsActivate(true); }
+            if((id !== null)&&(id === response.data.memberId.toString())){ setIsActivate(true); }
             else { setIsActivate(false); }
         })
         .catch(function(error){
@@ -320,7 +320,7 @@ function ViewPost(props) {
     }
 
     const checkFunc = () => {
-        console.log(isActivate);
+        console.log(postData);
     }
 
     return(
@@ -344,7 +344,8 @@ function ViewPost(props) {
                 </NicknameBox>
                 {(isActivate)?
                 <ButtonContainer>
-                    <Button onClick={()=>{navigate(`/postlist/${(postData.type==="원정대")? "helping" : "helped"}/writepost/${postid}`)}}>수정</Button>
+                    {(!postData.disabled)?<Button onClick={()=>{navigate(`/postlist/${(postData.type==="원정대")? "helping" : "helped"}/writepost/${postid}`)}}>수정</Button>
+                    :null}
                     <Button onClick={handleDelete}>삭제</Button>
                 </ButtonContainer>:null}
             </ProfileBox>
