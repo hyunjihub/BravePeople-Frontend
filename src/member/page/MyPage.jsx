@@ -364,6 +364,7 @@ function MyPage(props) {
     const handleModify = (e) => {        
         if((currentName === null || currentName === "") && (currentIntro === null || currentIntro === "") && (currentImg === null)){
             alert("수정사항이 없습니다.");
+            setIsClicked(false);
         }else{
             if(currentName !== null && (currentName.length <= -1 || currentName.length > 6)) {
                 Swal.fire({
