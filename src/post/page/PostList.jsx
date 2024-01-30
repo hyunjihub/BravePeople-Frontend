@@ -98,11 +98,6 @@ function PostList(props) {
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
-    // redux
-    const { isLog } = useSelector((state)=>({
-        isLog: state.login.isLogin
-    }));
-
     //드롭다운 메뉴 구현
     const options = ['2', '5', '10', '0'];
     const [isOpen, setIsOpen] = useState(false);
@@ -164,7 +159,7 @@ function PostList(props) {
 
     useEffect(()=>{
         // 로그인 상태일 때 게시글 조회
-        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog){
+        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
             axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
             {
                 headers:{
@@ -180,15 +175,15 @@ function PostList(props) {
                     ReissueToken();   
                 } 
             })
-        }
-        // 비로그인 상태일 때 게시글 조회
-        else if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
+            // 비로그인 상태일 때 게시글 조회
+        }else if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin){
             axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=0&amount=2`)
         .then(function(response){
             setPostLength(response.data.data.length);
             setPostItems(response.data.data);
         })
         .catch(function(error){
+            console.log("비로그인 에러");
             console.log(error);
         })
         }   
@@ -196,7 +191,8 @@ function PostList(props) {
 
     // 거리 바꿀 시 데이터 불러오기
     useEffect(()=>{
-        axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
+        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
+                axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
             {
                 headers:{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -211,10 +207,11 @@ function PostList(props) {
                     ReissueToken();   
                 } 
             })
+        }
     }, [selectedOption])
 
     const testFunc = () => {
-        console.log(selectedOption);
+        console.log(JSON.parse(sessionStorage.getItem('jwt')).access);
     }
 
 
@@ -224,7 +221,8 @@ function PostList(props) {
             <div><button onClick={testFunc}>testButton</button></div>
             <Title>{type}</Title>
             <ButtonContainer>
-                {(isLog) ? <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu> : <div></div>}
+                {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ? 
+                <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu> : <div></div>}
                 {isOpen&& (<DropdownMenu>
                     {options.map((option) => (
                     <DropdownOption

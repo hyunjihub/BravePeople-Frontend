@@ -277,7 +277,6 @@ function MyPage(props) {
                     }
                 })
                 .then(function(response){
-                        console.log(response);
                         setUserInfo({
                             profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
                             nickname: response.data.nickname,

@@ -219,10 +219,16 @@ function ViewPost(props) {
         price: ""
     });
 
+    // 버튼들(수정, 삭제, 달려가기, 부탁하기) 활성화 여부
+    const [isActivate, setIsActivate] = useState(false);
+
+    // 데이터 불러오기
     useEffect(()=>{
         axios.get(`http://13.209.77.50:8080/posts/${postid}`)
         .then(function(response){
             setPostData(response.data);
+            if((id !== null)&&(id === response.data.memberId.toString())&&(!response.data.disabled)){ setIsActivate(true); }
+            else { setIsActivate(false); }
         })
         .catch(function(error){
             console.log(error);
@@ -310,8 +316,13 @@ function ViewPost(props) {
     const handlePage = (e) => {
     }
 
+    const checkFunc = () => {
+        console.log(isActivate);
+    }
+
     return(
         <Wrapper>
+            <div><button onClick={checkFunc}>TEST</button></div>
             <Title>{postData.type}</Title>
             <Line />
             <TitleBox>
@@ -328,9 +339,9 @@ function ViewPost(props) {
                     </Rating>
                     <Time>{postData.createdAt}</Time>
                 </NicknameBox>
-                {(id==postData.memberId)?
+                {(isActivate)?
                 <ButtonContainer>
-                    {(!postData.isDisabled)?<Button>수정</Button>:<HiddenButton />}
+                    <Button onClick={()=>{navigate(`/postlist/${(postData.type==="원정대")? "helping" : "helped"}/writepost/${postid}`)}}>수정</Button>
                     <Button onClick={handleDelete}>삭제</Button>
                 </ButtonContainer>:null}
             </ProfileBox>
@@ -340,7 +351,8 @@ function ViewPost(props) {
                 {postData.contents}
             </Content>
             <StickyBox>
-                <ChatButton>{(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
+                <ChatButton disabled={!isActivate} onClick={()=>{alert(`${(postData.type==="원정대")? "의뢰하기" : "원정가기"}버튼 눌림`)}}>
+                    {(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
                 <Price>{postData.price!=="-1"?postData.price+"원":"가격협의"}</Price>
             </StickyBox>
         </Wrapper>
