@@ -50,6 +50,9 @@ const ProfileButton = styled.button`
     margin: 10% 20% 3%;
     border: none;
     cursor: pointer;
+    background-repeat: no-repeat;
+    object-fit: cover;
+    background-position: center;
 `;
 
 const ModifyProfile = styled.button`
@@ -62,6 +65,9 @@ const ModifyProfile = styled.button`
     margin: 10% 20% 3%;
     border: none;
     cursor: pointer;
+    background-repeat: no-repeat;
+    object-fit: cover;
+    background-position: center;
     &:hover {
         filter: brightness(80%);
         .icon {

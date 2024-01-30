@@ -31,7 +31,7 @@ const RightContainer = styled.div`
     height: 50%;
     float: right;
     background-color: #fff;
-    margin-right: 3%;
+    margin-right: 0.7%;
     margin-top: 1.1%;
     display: flex;
 `;
@@ -114,6 +114,8 @@ const Profile = styled.img`
     margin-top: -3%;
     background-color: #000;
     border: none;
+    background-repeat: no-repeat;
+    object-fit: cover;
 `;
 
 const HiddenProfile = styled.div`
@@ -127,12 +129,6 @@ const HiddenProfile = styled.div`
 const HiddenChat = styled.div`
     width: 10%;
     height: 10%;
-    background-color: #fff;
-`;
-
-const HiddenMyPage = styled.div`
-    width: 100px;
-    height: 30px;
     background-color: #fff;
 `;
 
@@ -368,9 +364,8 @@ export default function Header(props) {
             <RightContainer>
                 {isLog ? <LocationBox onClick={SetLocation}><IoLocationSharp size="30" color="#f8332f"/> <Location>{sigudong}</Location></LocationBox>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
-                {isLog ? <HeaderButton onClick={MyPageButtonClicked}>마이페이지</HeaderButton>: <HiddenMyPage />}   
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
-                {isLog ? <Profile src={((profile === null || profile === undefined)? Nullprofile : profile)}></Profile>: <HiddenProfile />}
+                {isLog ? <Profile onClick={MyPageButtonClicked} src={((profile === null || profile === undefined)? Nullprofile : profile)}></Profile>: <HiddenProfile />}
             </RightContainer>
         </Wrapper>
     );

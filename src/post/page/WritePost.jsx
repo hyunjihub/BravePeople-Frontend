@@ -5,14 +5,14 @@ import { Link, useParams } from "react-router-dom";
 import { FaCamera } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import Swal from "sweetalert2";
-import { text } from "@fortawesome/fontawesome-svg-core";
 
 import axios from "axios";
-import { useDispatch } from "react-redux";
+//redux
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 
 const Wrapper = styled.div`
-    width: 40%;
+    width: 42%;
     height: 100vh;
     margin: 15px auto;
 `;
@@ -88,7 +88,8 @@ const Input = styled.input`
     height: 6%;
     box-sizing: border-box;
     padding: 10px 15px;
-    margin: 5px 0;
+    margin-top: 5%;
+    margin-bottom: 1%;
     &::placeholder {
         color: #ababab;
     }
@@ -98,7 +99,7 @@ const Input = styled.input`
     &.price {
         width: 28%;
         height: 50%;
-        margin-top: 4.5%;
+        margin-top: 3%;
     }
 
     &:disabled {
@@ -128,15 +129,15 @@ const Content = styled.textarea`
 const FileInput = styled.button`
     border: 1px solid #d1d1d1;
     width: 25%;
-    height: 67%;
+    height: 75%;
     margin-top: 3%;
     background-color: #fff;
 `;
 
 const CheckBox = styled.input`
     width: 5%;
-    height: 23%;
-    margin-top: 7.7%;
+    height: 27%;
+    margin-top: 5.2%;
     cursor: pointer;
 
     &:checked {
@@ -154,7 +155,7 @@ const PriceContainer = styled.div`
 const Discussion = styled.div`
     font-size: 15px;
     color: #ababab;
-    margin-top: 7.5%;
+    margin-top: 5%;
     margin-left: -1%;
 
     &.unit {
@@ -167,7 +168,7 @@ const Discussion = styled.div`
 
 const RadioBox = styled.div`
     width: 100%;
-    height: 7.5%;
+    height: 6%;
     display: flex;
     flex-directiom: row;
     margin-top: 2%;
@@ -221,7 +222,7 @@ const Length = styled.label`
     margin-left: 90%;
 
     &.title {
-        margin-left: 92%;
+        margin-left: 93%;
     }
 `;
 
@@ -239,7 +240,10 @@ function WritePost(props) {
         else{ setIsWrite(false) }
     }, []);
     
-
+    // redux로 변수, 함수 가져오기
+    const { isLog } = useSelector((state)=>({
+        isLog: state.login.isLog
+    }), shallowEqual);
 
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
@@ -258,8 +262,7 @@ function WritePost(props) {
                 access: response.data.accessToken,
                 refresh: response.data.refreshToken
             }));
-            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
-            navigate("/main");
+            navigate(0);
         })
         .catch(function(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
@@ -283,13 +286,33 @@ function WritePost(props) {
 
     // 게시글 수정일 때 데이터 불러오기
     useEffect(()=>{
-        axios.get(`http://13.209.77.50:8080/posts/${postid}`)
-        .then(function(response){
-            console.log(response);
-        })
-        .catch(function(error){
-            console.log(error);
-        });
+
+        if(!isLog){
+            Swal.fire({
+                title: "비정상적인 접속",
+                text: "비회원은 마이페이지에 접속하실 수 없습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+            navigate("/main");
+        } else if(postid!=='-1') {
+            axios.get(`http://13.209.77.50:8080/posts/${postid}`)
+            .then(function(response){
+                setContent(response.data.contents);
+                setCurrentImg(response.data.postImg);
+                setTitle(response.data.title);
+                setNumber(response.data.price);
+                if(response.data.price==="-1") setIsChecked(true);
+                setSelectedCategory(response.data.category);
+                type=response.data.type;
+            })
+            .catch(function(error){
+                if((error.response.status === 404 && error.response.data.errorMessage === '존재하지 않는 게시글')) {
+                    navigate("/error");
+                }
+            });
+        }
     }, [])
 
     //가격
@@ -321,7 +344,8 @@ function WritePost(props) {
     const [isChecked, setIsChecked] = useState(false);
     const handleCheck = (e) => {
         setIsChecked(e.target.checked);
-        setNumber("-1");
+        if(isChecked===true) setNumber("-1");
+        else setNumber("");
     };
 
     //제목
@@ -411,40 +435,63 @@ function WritePost(props) {
     //게시글 업로드
     const handleUpload = (e) => {
         if((title !== "") && (number !== "") && (content !== "")){
-            axios.post('http://13.209.77.50:8080/posts',{
-            type: type,
-            category: selectedCategory,
-            title: title,
-            price: number,
-            contents: content,
-            postImg: currentImg
-            }, {headers:{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }})
-            .then(function(response){
-                alert("게시글 작성이 완료되었습니다.");
-                console.log(response);
-                console.log(response.data.img);
-                navigate(-1);
-            })
-            .catch(function(err){
-                console.log(err);
-                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();
-                }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
-                    Swal.fire({
-                        title: "게시글 양식 오류",
-                        text: "작성하지 않은 항목이 있는지, 최대 글자수를 넘어가지 않았는지 확인해주세요.",
-                        icon: "error",
-                        confirmButtonColor: "#d33",
-                        confirmButtonText: "확인",
-                    });
-                }
-            })
+            if(postid==='-1') {
+                axios.post('http://13.209.77.50:8080/posts',{
+                    type: type,
+                    category: selectedCategory,
+                    title: title,
+                    price: number,
+                    contents: content,
+                    postImg: currentImg
+                    }, {headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }})
+                    .then(function(response){
+                        alert("게시글 작성이 완료되었습니다.");
+                        navigate(-1);
+                    })
+                    .catch(function(err){
+                        if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                            ReissueToken();
+                        }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
+                            Swal.fire({
+                                title: "게시글 양식 오류",
+                                text: "작성하지 않은 항목이 있는지, 최대 글자수를 넘어가지 않았는지 확인해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else console.log(err);
+                    })
+            } else {
+                axios.patch(`http://13.209.77.50:8080/posts/${postid}`, {
+                    type: type,
+                    title: title,
+                    contents: content,
+                    price: number,
+                    category: selectedCategory,
+                    postImg: currentImg
+                }, {headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }}).then(function(response){
+                    alert("게시글 수정이 완료되었습니다.");
+                    navigate(-1);
+                })
+                .catch(function(err){
+                    if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken();
+                    }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
+                        Swal.fire({
+                            title: "게시글 양식 오류",
+                            text: "작성하지 않은 항목이 있는지, 최대 글자수를 넘어가지 않았는지 확인해주세요.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                    } else console.log(err);
+                })
+            }
         }else{
-            console.log(title);
-            console.log(number);
-            console.log(content);
             Swal.fire({
                 title: "작성 미기재 항목 존재",
                 text: "작성하지 않은 항목이 있습니다. 다시 한 번 확인해주세요.",
@@ -494,7 +541,7 @@ function WritePost(props) {
                         <Input className="price"
                         name="title"
                         type="text"
-                        value={number || ""}
+                        value={(number === "-1" || number == null) ? "" : number}
                         onChange={handleInputChange}
                         placeholder="최대 999,999"
                         disabled={isChecked}/>
@@ -512,7 +559,7 @@ function WritePost(props) {
                     <ImageContainer>
                         <FileInput onClick={handleImg}>
                             {(currentImg === "") ? <FaCamera className="icon" size="45" color="ccc"/> : 
-                            <img src={currentImg} style={{width:"100%", height:"80%"}}/>}
+                            <img src={currentImg} alt="업로드이미지" style={{width:"100%", height:"80%"}}/>}
                         </FileInput>
                         <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                         <CancelBox>

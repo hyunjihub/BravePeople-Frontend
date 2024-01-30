@@ -15,7 +15,7 @@ import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/redux/modules/login";
 
 const Wrapper = styled.div`
-    width: 40%;
+    width: 42%;
     height: 100vh;
     margin: 15px auto;
 `;
@@ -75,10 +75,12 @@ const ProfileBox = styled.div`
 `;
 
 const Profile = styled.img`
-    width: 7%;
+    width: 6.5%;
     height: 100%;
     border-radius: 50%;
     border: none;
+    background-repeat: no-repeat;
+    object-fit: cover;
 `;
 
 const NicknameBox = styled.div`
@@ -314,6 +316,7 @@ function ViewPost(props) {
 
     //클릭시 프로필 페이지 이동
     const handlePage = (e) => {
+        e.preventDefault();
     }
 
     const checkFunc = () => {
@@ -331,7 +334,7 @@ function ViewPost(props) {
                 {(postData.gender === "남성")?<PiGenderMaleBold size="40" color="#254995"/>:<PiGenderFemaleBold size="40" color="#a93957"/>}
             </TitleBox>
             <ProfileBox>
-                <Profile src={postData.profileImg?postData.profileImg:profile} alt="프로필"/>
+                <Profile onClick={handlePage} src={postData.profileImg?postData.profileImg:profile} alt="프로필"/>
                 <NicknameBox>
                     <Rating>
                         <Nickname>{postData.nickname}</Nickname>

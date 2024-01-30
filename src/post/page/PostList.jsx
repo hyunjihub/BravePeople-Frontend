@@ -6,12 +6,12 @@ import { BiMenuAltRight } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import axios from "axios";
 
-// redux
-import { useDispatch, useSelector } from "react-redux";
-import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/redux/modules/login";
+//redux
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 
 const Wrapper = styled.div`
-    width: 40%;
+    width: 42%;
     height: 100vh;
     margin: 15px auto;
 `;
@@ -108,16 +108,19 @@ function PostList(props) {
         setIsOpen(false);
     };
 
-    const handleWrite = (e) => {
-        navigate("./writepost/-1");
-        e.preventDefault();
-    }
-
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setId = (id) => dispatch(setMemberId(id));
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
+
+    // redux로 변수, 함수 가져오기
+    const { isLog, id, param, loc } = useSelector((state)=>({
+        isLog: state.login.isLogin,
+        id: state.login.memberId,
+        param : state.login.paramId,
+        loc: state.login.location,
+    }), shallowEqual);
 
     // 토큰 재발급 요청 api
     const ReissueToken = () => {
@@ -153,6 +156,14 @@ function PostList(props) {
         });
     }
 
+    const handleWrite = (e) => {
+        if(!isLog) {
+            navigate("/login");
+        }
+        else navigate("./writepost/-1");
+        e.preventDefault();
+    }
+
     // 게시글 데이터 불러오기 api
     // 포스트 개수
     const [postLength, setPostLength] = useState(0);
@@ -177,7 +188,7 @@ function PostList(props) {
             })
             // 비로그인 상태일 때 게시글 조회
         }else if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=0&amount=2`)
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=0&amount=5`)
         .then(function(response){
             setPostLength(response.data.data.length);
             setPostItems(response.data.data);
@@ -210,15 +221,9 @@ function PostList(props) {
         }
     }, [selectedOption])
 
-    const testFunc = () => {
-        console.log(JSON.parse(sessionStorage.getItem('jwt')).access);
-    }
-
-
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
         <Wrapper>
-            <div><button onClick={testFunc}>testButton</button></div>
             <Title>{type}</Title>
             <ButtonContainer>
                 {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ? 

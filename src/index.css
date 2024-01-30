@@ -16,7 +16,19 @@
 @font-face {
 	font-family: 'SUITE';
 	font-weight: 800;
-	src: url('./common/resources/fonts/Pretendard-ExtraBold.woff') format('woff2');
+	src: url('./common/resources/fonts/SUITE-ExtraBold.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'SUITE';
+	font-weight: 500;
+	src: url('./common/resources/fonts/SUITE-Medium.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'SUITE';
+	font-weight: 300;
+	src: url('./common/resources/fonts/SUITE-Light.woff2') format('woff2');
 }
 
 html{
