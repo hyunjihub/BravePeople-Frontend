@@ -21,7 +21,7 @@ const Title = styled.div`
     height: 5%;
     line-height: 1.5;
     font-size: 40px;
-    font-weight: 700;
+    font-weight: 800;
     text-align: center;
     font-family: 'SUITE';
     margin: 50px 0 50px;
@@ -72,14 +72,14 @@ const DropdownMenu = styled.ul`
     height: 15%;
     list-style: none;
     position: absolute;
-    top: 32%;
+    top: 28%;
     left: 62%;
     z-index: 99;
     border: 1px solid #d1d1d1;
     border-radius: 10px;
     font-weight: 500;
     background-color: #fff;
-    padding: 0.5% 1% 0.5% 0.8%;
+    padding: 0.5% 0.5% 0.5% 0.7%;
     box-sizing: border-box;
     box-shadow: 0px 0px 3px 1px rgba(190, 190, 190, 0.3);
 `;
@@ -87,6 +87,12 @@ const DropdownMenu = styled.ul`
 const DropdownOption = styled.li`
     margin : 0% 5% 17% 0%;
     font-size: 17px;
+    cursor: pointer;
+
+    &:hover {
+        background-color: #ced4da;
+        font-weight: 800;
+    }
 `;
 
 

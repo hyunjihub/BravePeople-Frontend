@@ -25,7 +25,7 @@ const Title = styled.div`
     height: 5%;
     line-height: 1.5;
     font-size: 40px;
-    font-weight: 700;
+    font-weight: 800;
     text-align: center;
     font-family: 'SUITE';
     margin: 50px 0 50px;

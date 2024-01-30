@@ -22,7 +22,7 @@ const Title = styled.div`
     height: 5%;
     line-height: 1.5;
     font-size: 40px;
-    font-weight: 700;
+    font-weight: 800;
     text-align: center;
     font-family: 'SUITE';
     margin: 50px 0 50px;
@@ -382,6 +382,7 @@ function WritePost(props) {
 
     //이미지 업로드
     const [currentImg, setCurrentImg] = useState("");
+    const [uploading, setUploading] = useState(false);
 
     const handleCurrentImg = (img) => {
         setCurrentImg(img);
@@ -389,9 +390,11 @@ function WritePost(props) {
 
     const fileInput = React.createRef();
     const handleImg = (e) => {
-        fileInput.current.click();
+        if (!uploading) {
+            fileInput.current.click();
+        }
     }
-    const frm = new FormData();
+
     const handleChange = (e) => {
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
@@ -405,12 +408,14 @@ function WritePost(props) {
             });
         }
         else if (files && files.length > 0) {
+            const frm = new FormData();
             frm.append('file', files[0]);
             axios.post("http://13.209.77.50:8080/image", frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
                 handleCurrentImg(response.data.imgUrl);
+                setUploading(true);
             }).catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
@@ -431,9 +436,10 @@ function WritePost(props) {
 
     const handleUploadCancel = (e) => {
         setCurrentImg("");
+        fileInput.current.value = "";
+        setUploading(false);
         e.preventDefault();
     }
-
     //게시글 업로드
     const handleUpload = (e) => {
         if((title !== "") && (number !== "") && (content !== "")){
@@ -492,7 +498,7 @@ function WritePost(props) {
                         });
                     } else console.log(err);
                 })
-            }
+            }         
         }else{
             Swal.fire({
                 title: "작성 미기재 항목 존재",
@@ -501,7 +507,6 @@ function WritePost(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
-            console.log(number);
         }
         
     }

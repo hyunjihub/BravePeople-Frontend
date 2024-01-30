@@ -3,6 +3,7 @@ import styled from "styled-components";
 import profile from '../../common/resources/img/profile.png';
 import { useNavigate } from "react-router";
 import { FaCamera } from "react-icons/fa";
+import { GoTrash } from "react-icons/go";
 import { IoSettings } from "react-icons/io5";
 import Swal from "sweetalert2";
 
@@ -357,13 +358,27 @@ function MyPage(props) {
         }
         else {
             setIsClicked(true);
+            setCurrentImg(userInfo.profileImage);
+            setCurrentIntro(userInfo.intro);
+            setCurrentName(userInfo.nickname);
         }
     };
 
     // 수정 완료 버튼
     const handleModify = (e) => {        
+<<<<<<< Updated upstream
         if((currentName === null || currentName === "") && (currentIntro === null || currentIntro === "") && (currentImg === null)){
             alert("수정사항이 없습니다.");
+=======
+        if((currentName === userInfo.nickname) && (currentIntro === userInfo.intro) && (currentImg === userInfo.profileImage)){
+            Swal.fire({
+                title: "수정사항 없음",
+                text: "수정된 내용이 없습니다. 다시 한 번 확인해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+>>>>>>> Stashed changes
             setIsClicked(false);
         }else{
             if(currentName !== null && (currentName.length <= -1 || currentName.length > 6)) {
@@ -522,17 +537,17 @@ function MyPage(props) {
     return(
         <Container>
             <Profile>
-                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${(currentImg === null) ? userInfo.profileImage : currentImg})`}}><FaCamera className="icon" size="45" color="ccc"/></ModifyProfile>:
+                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${(currentImg === null) ? userInfo.profileImage : currentImg})`}}><FaCamera className="icon" size="45" color="#ccc"/></ModifyProfile>:
                 <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage})`}}/>}
                 <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                 <Myself>
                     {isClicked?
-                    <ModifyNickname type="text" placeholder={userInfo.nickname} onChange={handleCurrentName}></ModifyNickname>
+                    <ModifyNickname type="text" value={currentName || ""} onChange={handleCurrentName}></ModifyNickname>
                     :<Nickname>{userInfo.nickname}</Nickname>}
                     {myself?<SettingButton onClick={handleIsClicked}><IoSettings size="23" color="#808080"/></SettingButton>:null}
                 </Myself>
                 {isClicked?
-                    <ModifyIntro type="text" placeholder={(userInfo.intro) === null ? "자기소개 문구가 작성되지 않았습니다.":userInfo.intro} onChange={handleCurrentIntro}></ModifyIntro>
+                    <ModifyIntro type="text" value={currentIntro || ""} onChange={handleCurrentIntro}></ModifyIntro>
                     :<Introduce>{(userInfo.intro === null || userInfo.intro === "")?"자기소개 문구가 작성되지 않았습니다.":userInfo.intro}</Introduce>}
                 <Rating>
                     <StarRating value={userInfo.score} size="40"></StarRating>

@@ -31,6 +31,24 @@
 	src: url('./common/resources/fonts/SUITE-Light.woff2') format('woff2');
 }
 
+@font-face {
+	font-family: 'SUITE';
+	font-weight: 600;
+	src: url('./common/resources/fonts/SUITE-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'SUITE';
+	font-weight: 700;
+	src: url('./common/resources/fonts/SUITE-Bold.woff2') format('woff2');
+}
+
+@font-face {
+	font-family: 'SUITE';
+	font-weight: 900;
+	src: url('./common/resources/fonts/SUITE-Heavy.woff2') format('woff2');
+}
+
 html{
     min-width: 100%;
 }

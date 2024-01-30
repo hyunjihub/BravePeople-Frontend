@@ -4,6 +4,8 @@ import styled from "styled-components";
 
 
 const Wrapper = styled.div`
+    width: 100vw;
+    height: 100vh;
     display: flex;
     flex-direction: row;
 `;
@@ -20,6 +22,21 @@ const Button = styled.button`
     font-family: 'SUITE';
 `;
 
+const MainLanding = styled.div`
+    width: 100%;
+    height: 80%;
+    background-color: #fbc6c2;
+`;
+
+const MainTxt = styled.div`
+    width: 60%;
+    height: 40%;
+    font-size: 60px;
+    font-weight: 900;
+    text-align : center;
+    margin: 10% auto;
+`;
+
 function Main(props) {
 
     const navigate = useNavigate();
@@ -27,8 +44,9 @@ function Main(props) {
 
     return(
         <Wrapper>
-            <p />
-            <Button onClick={()=>{navigate("/error");}}>잘못된 404 페이지로</Button>
+            <MainLanding>
+                <MainTxt>메인으로 들어갈 문구 <br /> 흥미로운 문구로 보이는 문구</MainTxt>
+            </MainLanding>
         </Wrapper>
     );
 }
