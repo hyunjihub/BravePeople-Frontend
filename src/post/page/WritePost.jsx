@@ -240,16 +240,19 @@ function WritePost(props) {
         else{ setIsWrite(false) }
     }, []);
     
-    // redux로 변수, 함수 가져오기
-    const { isLog } = useSelector((state)=>({
-        isLog: state.login.isLog
-    }), shallowEqual);
-
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setId = (id) => dispatch(setMemberId(id));
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
+
+    // redux로 변수, 함수 가져오기
+    const { isLog, id, param, loc } = useSelector((state)=>({
+        isLog: state.login.isLogin,
+        id: state.login.memberId,
+        param : state.login.paramId,
+        loc: state.login.location,
+    }), shallowEqual);
 
     // 토큰 재발급 요청 api
     const ReissueToken = () => {
@@ -286,8 +289,7 @@ function WritePost(props) {
 
     // 게시글 수정일 때 데이터 불러오기
     useEffect(()=>{
-
-        if(!isLog){
+        if(!isLog) {
             Swal.fire({
                 title: "비정상적인 접속",
                 text: "비회원은 마이페이지에 접속하실 수 없습니다.",
@@ -295,8 +297,8 @@ function WritePost(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
-            navigate("/main");
-        } else if(postid!=='-1') {
+        }
+        else if(postid!=='-1') {
             axios.get(`http://13.209.77.50:8080/posts/${postid}`)
             .then(function(response){
                 setContent(response.data.contents);
@@ -344,7 +346,7 @@ function WritePost(props) {
     const [isChecked, setIsChecked] = useState(false);
     const handleCheck = (e) => {
         setIsChecked(e.target.checked);
-        if(isChecked===true) setNumber("-1");
+        if(isChecked===false) setNumber("-1");
         else setNumber("");
     };
 
@@ -499,6 +501,7 @@ function WritePost(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            console.log(number);
         }
         
     }
