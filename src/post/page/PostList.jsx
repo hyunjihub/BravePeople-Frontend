@@ -175,6 +175,7 @@ function PostList(props) {
     const [postLength, setPostLength] = useState(0);
 
     useEffect(()=>{
+        window.scrollTo(0, 0);
         setLoading(true);
         // 로그인 상태일 때 게시글 조회
         if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
