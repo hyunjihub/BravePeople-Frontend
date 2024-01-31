@@ -294,7 +294,6 @@ function SignUp(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
-                            setIsDisabled(false);
                         } else if (error.response.data.errorMessage ==="이미 가입 진행중인 이메일" && error.response.status === 400) {
                             Swal.fire({
                                 title: "본인인증 대기 중인 이메일",
@@ -303,10 +302,18 @@ function SignUp(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
+                        } else if (error.response.data.errorMessage ==="이메일 전송 오류" && error.response.status === 400) {
+                            Swal.fire({
+                                title: "이메일 전송 오류",
+                                html: "없는 이메일 주소 입니다. 이메일 주소를 다시 확인해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
                         } else {
                             console.error(error);
-                            setIsDisabled(false);
                         }
+                        setIsDisabled(false);
                     });
                     e.preventDefault();
                 }

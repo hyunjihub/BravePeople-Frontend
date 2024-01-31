@@ -89,7 +89,7 @@ const PostListMenu = styled.div`
     border-radius: 15px;
     background-color: #fff;
     color: #333;
-    font-weight: bold;
+    font-weight: 900;
     line-height: 30px;
     cursor: pointer;
     &:hover{
@@ -242,10 +242,18 @@ export default function Header(props) {
                 navigate("/main");
             })
             .catch(function(err){
-                console.log(err);
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();
                 }
+                else if(err.response.status === 401 && err.response.data.errorMessage === "비회원 접근 불가") {
+                    Swal.fire({
+                        title: "비정상적인 접속",
+                        text: "이미 로그아웃 처리 되셨거나, 로그인이 되지 않은 회원입니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                } else console.log(err);
             });
         }else{
             navigate("/login")
@@ -300,6 +308,14 @@ export default function Header(props) {
             }).catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();
+                } else if (err.response.status === 401 && err.response.data.errorMessage === "존재하지 않는 멤버ID") {
+                    Swal.fire({
+                        title: "존재하지 않는 회원",
+                        html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
                 }
             });
         }

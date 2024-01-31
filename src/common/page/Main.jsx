@@ -25,7 +25,7 @@ const Button = styled.button`
 const MainLanding = styled.div`
     width: 100%;
     height: 80%;
-    background-color: #fbc6c2;
+    background-color: #dee2e6;
 `;
 
 const MainTxt = styled.div`

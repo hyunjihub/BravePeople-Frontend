@@ -184,7 +184,15 @@ function FindId(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
-                        }  else {
+                        } else if (error.response.data.errorMessage ==="이메일 전송 오류" && error.response.status === 400) {
+                            Swal.fire({
+                                title: "이메일 전송 오류",
+                                html: "없는 이메일 주소 입니다. 이메일 주소를 다시 확인해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else {
                             Swal.fire({
                                 title: "계정 정보 없음",
                                 text: "입력하신 정보와 일치하는 계정 정보가 없습니다.",

@@ -308,6 +308,7 @@ function WritePost(props) {
                 if(response.data.price==="-1") setIsChecked(true);
                 setSelectedCategory(response.data.category);
                 type=response.data.type;
+                if(response.data.postImg!=="") setUploading(true);
             })
             .catch(function(error){
                 if((error.response.status === 404 && error.response.data.errorMessage === '존재하지 않는 게시글')) {
@@ -465,6 +466,14 @@ function WritePost(props) {
                             Swal.fire({
                                 title: "게시글 양식 오류",
                                 text: "작성하지 않은 항목이 있는지, 최대 글자수를 넘어가지 않았는지 확인해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        } else if(err.response.status === 400 && err.response.data.errorMessage === "존재하지 않는 멤버ID"){
+                            Swal.fire({
+                                title: "존재하지 않는 회원",
+                                html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
                                 icon: "error",
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
