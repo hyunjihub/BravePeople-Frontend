@@ -27,16 +27,15 @@ const Title = styled.div`
     margin: 50px auto;
 `;
 
-/* 무한스크롤 구현해야 함 */
 const PostListBox = styled.div`
     width: 100%;
     height: 95%;
     overflow-y: scroll;
+    overflow-x: hidden;
     margin: 0px auto;
     &::-webkit-scrollbar {
         display: none;
     }
-    margin: 0px auto;
 `;
 
 const WriteButton = styled.button`
@@ -49,7 +48,6 @@ const WriteButton = styled.button`
     color: #fff;
     font-weight: 600;
     font-size: 100%;
-    margin-right: 6%;
     cursor: pointer;
 `;
 

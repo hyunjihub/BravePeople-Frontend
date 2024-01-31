@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import profile from '../../common/resources/img/profile.png';
+import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { FaCamera } from "react-icons/fa";
-import { GoTrash } from "react-icons/go";
 import { IoSettings } from "react-icons/io5";
+import { FcRules } from "react-icons/fc";
 import Swal from "sweetalert2";
 
 import StarRating from "../components/Rating";
@@ -69,10 +70,13 @@ const ModifyProfile = styled.button`
     background-repeat: no-repeat;
     object-fit: cover;
     background-position: center;
+    display: flex;
+    flex-direction: column;
     &:hover {
-        filter: brightness(80%);
+        filter: brightness(75%);
         .icon {
             opacity: 100;
+            margin: 20% 0 0 40%;
         }
     }
 
@@ -168,13 +172,27 @@ const Myself = styled.div`
 
 const Box = styled.div`
     width: 80%;
-    height: 40%;
+    height: 32%;
     border-radius: 15px;
-    margin: 30px auto;
+    margin: 1% auto 6%;
     box-shadow: 0px 4px 15px -5px rgba(18, 23, 42, 0.1);
     display: flex;
     flex-direction: column;
     background-color: #f7f8fd;
+    border: 1px dashed rgba(0,0,0,0.2);
+`;
+
+const BoardName = styled.div`
+    width: 20%;
+    height: 5%;
+    font-size: 30px;
+    font-weight: 800;
+    margin-left: 10%;
+    color: #000;
+
+    &.write {
+        margin-top: 5.5%;
+    }
 `;
 
 const ModifyButton = styled.button`
@@ -197,20 +215,40 @@ const ButtonContainer = styled.div`
     margin-bottom: 10%;
 `;
 
+const Post = styled.div`
+    font-size: 19px;
+    font-weight: 500;
+    color: #000;
+    margin: 2% 0% 0% 5%;
+
+    &.first {
+        margin-top: 1.5%;
+    }
+`;
+
+const NullPost = styled.div`
+    font-size: 30px;
+    font-weight: 800;
+    color: #000;
+    margin: auto;
+    text-align: center;
+`;
+
 function MyPage(props) {
 
     const navigate = useNavigate();
     
     // state 선언부
-    const [myself, setMySelf] = useState(true);
     const [isClicked, setIsClicked] = useState(false);
+    const [myself, setMySelf] = useState(false);
 
     const [userInfo, setUserInfo] = useState({
         profileImage: null,
         nickname: null,
         intro: null,
         score: 0,
-        medalCount: 0
+        medalCount: 0,
+        posts : []
     });
 
     // redux로 변수, 함수 가져오기
@@ -275,8 +313,8 @@ function MyPage(props) {
             navigate("/main");
         }
         else{
+            {(id===param)? setMySelf(true) : setMySelf(false)};
             //마이페이지에 처음 접근할 때
-            (param === id) ? setMySelf(true) : setMySelf(false);
             if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
                 axios.get(`http://13.209.77.50:8080/member/profile/${param}`,{
                     headers:{
@@ -289,14 +327,16 @@ function MyPage(props) {
                             nickname: response.data.nickname,
                             intro: response.data.introduction,
                             score: response.data.score,
-                            medalCount: response.data.medalCount
+                            medalCount: response.data.medalCount,
+                            posts: response.data.postListVo
                         });
                         sessionStorage.setItem('savedUserInfo', JSON.stringify({
                             profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
                             nickname: response.data.nickname,
                             intro: response.data.introduction,
                             score: response.data.score,
-                            medalCount: response.data.medalCount
+                            medalCount: response.data.medalCount,
+                            posts: response.data.postListVo
                         }));
                     }
                 )
@@ -324,10 +364,12 @@ function MyPage(props) {
                     intro: JSON.parse(sessionStorage.getItem('savedUserInfo')).intro,
                     score: JSON.parse(sessionStorage.getItem('savedUserInfo')).score,
                     medalCount: JSON.parse(sessionStorage.getItem('savedUserInfo')).medalCount,
+                    posts: JSON.parse(sessionStorage.getItem('savedUserInfo')).posts,
                 });
             }
         };
-    }, []);
+    }, [param]);
+
     const [currentName, setCurrentName] = useState(null);
 
     const handleCurrentName = (e) => {
@@ -386,9 +428,9 @@ function MyPage(props) {
                 });
             }else{
                 axios.patch("http://13.209.77.50:8080/member/profile", {
-                    nickname: (currentName === null || currentName === "") ? userInfo.nickname : currentName,
-                    introduction: (currentIntro === null || currentIntro === "") ? userInfo.intro : currentIntro,
-                    profileImg: (currentImg === null) ? userInfo.profileImage : currentImg
+                    nickname: currentName,
+                    introduction: currentIntro,
+                    profileImg: currentImg
                 }, {
                     headers:{
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -405,7 +447,8 @@ function MyPage(props) {
                         nickname: response.data.nickname,
                         intro: response.data.introduction,
                         score: userInfo.score,
-                        medalCount: userInfo.medalCount
+                        medalCount: userInfo.medalCount,
+                        posts: userInfo.posts
                     }));
                     sessionStorage.setItem('savedData', JSON.stringify({
                         isLogin: isLog,
@@ -494,6 +537,12 @@ function MyPage(props) {
             })
         }
     }
+
+    const handleNull = (e) => {
+        setCurrentImg(null);
+        fileInput.current.value = "";
+        e.preventDefault();
+    }
     // 위치 정보
     const { geolocation } = navigator;
     const geolocationOptions = {
@@ -546,11 +595,21 @@ function MyPage(props) {
         }
     }
 
+    //글자수 over시 ...처리
+    const truncate = (str, n) => {
+        return str?.length > n ? str.substr(0, n - 1) + "..." : str;
+    };
+
+    const handleView = (postId) => {
+        navigate(`/viewpost/${postId}`);
+    }
+
     return(
         <Container>
             <Profile>
-                {isClicked?<ModifyProfile onClick={handleProfile} style={{backgroundImage: `url(${(currentImg === null) ? userInfo.profileImage : currentImg})`}}><FaCamera className="icon" size="45" color="#ccc"/></ModifyProfile>:
-                <ProfileButton style={{backgroundImage: `url(${userInfo.profileImage})`}}/>}
+                {isClicked?<ModifyProfile style={{backgroundImage: `url(${(currentImg === null) ? profile : currentImg})`}}><FaCamera onClick={handleProfile} className="icon" size="45" color="#212121"/>
+                <FaTrashAlt onClick={handleNull} className="icon" size="45" color="#212121"/></ModifyProfile>:
+                <ProfileButton style={{backgroundImage: `url(${(userInfo.profileImage === null) ? profile : userInfo.profileImage})`}}/>}
                 <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                 <Myself>
                     {isClicked?
@@ -574,8 +633,20 @@ function MyPage(props) {
             </Profile>
 
             <Board>
-                <Box>내가 쓴 글</Box>
-                <Box>후기</Box>
+                <BoardName className="write">내가 쓴 글</BoardName>
+                <Box> 
+                {userInfo.posts.length === 0 ? (<NullPost>게시글 없음</NullPost>) : (
+                userInfo.posts.map((post, index) => (<Post key={index} onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 35)}</Post>)))}
+                    
+                </Box>
+                <BoardName>후기</BoardName>
+                <Box>
+                    <Post className="first"><FcRules size="23"/> 제목으로 들어갑니다.</Post>
+                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
+                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
+                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
+                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
+                </Box>
             </Board>
         </Container>
     );

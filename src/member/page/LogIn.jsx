@@ -22,6 +22,7 @@ const Label = styled.label`
     text-align: left;
     font-size: 17px;
     font-weight: bold;
+    font-family: 'SUITE';
 `;
 
 const Input = styled.input`

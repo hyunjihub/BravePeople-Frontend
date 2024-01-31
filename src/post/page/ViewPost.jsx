@@ -12,12 +12,13 @@ import Swal from "sweetalert2";
 import axios from "axios";
 
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/redux/modules/login";
+import { setLogin, setMemberId, setLocation, setParamId, setProfileImg } from "../../member/redux/modules/login"
 
 const Wrapper = styled.div`
     width: 42%;
-    height: 100vh;
+    height: 120vh;
     margin: 15px auto;
+    position: relative;
 `;
 
 const Title = styled.div`
@@ -34,27 +35,28 @@ const Title = styled.div`
 const Line = styled.hr`
     color: #d1d1d1;
     opacity: 0.5;
-    margin: 3% 0;
+    margin: 2.5% 0;
 `;
 
 const TitleBox = styled.div`
     width: 90%;
-    height: 5%;
+    height: 2.5%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 0 5%;
+    margin: 4.5% 5% 2%;
 `;
 
 const ContentTitle = styled.div`
-    width: 95%;
+    width: 93%;
     font-size: 28px;
     font-weight: 800;
+    margin-right: 2%;
 `;
 
 const Category = styled.div`
     width: 9%;
-    height: 63%;
+    height: 100%;
     background-color: #f8332f;
     border-radius: 15px;
     color: #fff;
@@ -67,15 +69,15 @@ const Category = styled.div`
 
 const ProfileBox = styled.div`
     width: 90%;
-    height: 5%;
+    height: 4.5%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 3% 6% ;
+    margin: 4% 6% 2%;
 `;
 
 const Profile = styled.img`
-    width: 6.5%;
+    width: 7%;
     height: 100%;
     border-radius: 50%;
     border: none;
@@ -93,7 +95,7 @@ const NicknameBox = styled.div`
 
 const Nickname = styled.div`
     font-size: 20px;
-    font-weight: 600;
+    font-weight: 700;
     margin-right: 1%;
 `;
 
@@ -139,7 +141,7 @@ const ButtonContainer = styled.div`
 
 const Content = styled.div`
     width: 90%;
-    height: 70%;
+    height: 80%;
     color: #000;
     margin: auto;
     font-size: 20px;
@@ -148,13 +150,13 @@ const Content = styled.div`
 `;
 
 const StickyBox = styled.div`
-    width: 70%;
-    height: 7%;
+    width: 75%;
+    height: 5.5%;
+    position: sticky;
+    bottom: 0;
     background-color: #f8332f;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
-    position: sticky;
-    bottom: 0;
     margin: 0 auto;
     display: flex;
     flex-direction: row;
@@ -198,6 +200,7 @@ function ViewPost(props) {
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (id) => dispatch(setMemberId(id));
     const setLoc = (loc) => dispatch(setLocation(loc));
+    const setParam = (paramid) => dispatch(setParamId(paramid)); 
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
 
     // redux로 변수, 함수 가져오기
@@ -311,6 +314,15 @@ function ViewPost(props) {
 
     //클릭시 프로필 페이지 이동
     const handlePage = (e) => {
+        setParam(String(postData.memberId));
+        sessionStorage.setItem('savedUserInfo', JSON.stringify({
+            profileImage: null,
+            nickname: null,
+            intro: null,
+            score: null,
+            medalCount: null,
+        }));
+        navigate("/mypage");
         e.preventDefault();
     }
 
@@ -336,7 +348,7 @@ function ViewPost(props) {
                 {(isActivate)?
                 <ButtonContainer>
                     {(!postData.disabled)?<Button onClick={()=>{navigate(`/postlist/${(postData.type==="원정대")? "helping" : "helped"}/writepost/${postid}`)}}>수정</Button>
-                    :null}
+                    :<HiddenButton />}
                     <Button onClick={handleDelete}>삭제</Button>
                 </ButtonContainer>:null}
             </ProfileBox>

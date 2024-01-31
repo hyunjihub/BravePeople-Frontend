@@ -108,11 +108,11 @@ const Chat = styled.button`
 `;
 
 const Profile = styled.img`
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-    margin-top: -3%;
-    background-color: #000;
+    margin-top: -4%;
+    background-color: #fff;
     border: none;
     background-repeat: no-repeat;
     object-fit: cover;
