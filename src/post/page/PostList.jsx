@@ -178,6 +178,7 @@ function PostList(props) {
         window.scrollTo(0, 0);
         setLoading(true);
         setPage(0);
+        setPostItems([]);
         // 로그인 상태일 때 게시글 조회
         if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
             axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
