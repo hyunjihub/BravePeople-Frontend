@@ -5,7 +5,7 @@ import { PiGenderMaleBold } from "react-icons/pi";
 import { PiGenderFemaleBold } from "react-icons/pi";
 
 const Wrapper = styled.div`
-    width: 90%;
+    width: 42%;
     height: 7%;
     border-radius: 15px;
     margin: 0px auto 30px;

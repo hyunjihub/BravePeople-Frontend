@@ -319,13 +319,9 @@ function ViewPost(props) {
         e.preventDefault();
     }
 
-    const checkFunc = () => {
-        console.log(postData);
-    }
-
     return(
         <Wrapper>
-            <div><button onClick={checkFunc}>TEST</button></div>
+            
             <Title>{postData.type}</Title>
             <Line />
             <TitleBox>

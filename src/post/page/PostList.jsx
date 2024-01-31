@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import PostItem from "../components/PostItem";
@@ -11,20 +11,20 @@ import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 
 const Wrapper = styled.div`
-    width: 42%;
+    width: 100%;
     height: 100vh;
     margin: 15px auto;
 `;
 
 const Title = styled.div`
-    width: 100%;
+    width: 42%;
     height: 5%;
     line-height: 1.5;
     font-size: 40px;
     font-weight: 800;
     text-align: center;
     font-family: 'SUITE';
-    margin: 50px 0 50px;
+    margin: 50px auto;
 `;
 
 /* 무한스크롤 구현해야 함 */
@@ -32,9 +32,11 @@ const PostListBox = styled.div`
     width: 100%;
     height: 95%;
     overflow-y: scroll;
+    margin: 0px auto;
     &::-webkit-scrollbar {
         display: none;
     }
+    margin: 0px auto;
 `;
 
 const WriteButton = styled.button`
@@ -52,10 +54,11 @@ const WriteButton = styled.button`
 `;
 
 const ButtonContainer = styled.div`
-    width: 100%;
+    width: 42%;
     height: 6%;
     display: flex;
     justify-content: flex-end;
+    margin: 0px auto;
 `;
 
 const DonerMenu = styled.button`
@@ -172,7 +175,43 @@ function PostList(props) {
     const [postLength, setPostLength] = useState(0);
 
     useEffect(()=>{
+        setLoading(true);
         // 로그인 상태일 때 게시글 조회
+        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                setPostLength(response.data.data.length);
+                setPostItems(response.data.data);
+                if(!response.data.hasNext) { setLoading(false); }
+            })
+            .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();   
+                } 
+            })
+            // 비로그인 상태일 때 게시글 조회
+        }
+        else{
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=${page}&amount=7`)
+            .then(function(response){
+                setPostLength(response.data.data.length);
+                setPostItems(response.data.data);
+                if(!response.data.hasNext) { setLoading(false); }
+            })
+            .catch(function(error){
+                console.log("비로그인 에러");
+                console.log(error);
+            })
+        }   
+    }, [ishelped]);
+
+    // 거리 바꿀 시 데이터 불러오기
+    useEffect(()=>{
         if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
             axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
             {
@@ -183,38 +222,7 @@ function PostList(props) {
             .then(function(response){
                 setPostLength(response.data.data.length);
                 setPostItems(response.data.data);
-            })
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();   
-                } 
-            })
-            // 비로그인 상태일 때 게시글 조회
-        }else if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=0&amount=5`)
-        .then(function(response){
-            setPostLength(response.data.data.length);
-            setPostItems(response.data.data);
-        })
-        .catch(function(error){
-            console.log("비로그인 에러");
-            console.log(error);
-        })
-        }   
-    }, [ishelped]);
-
-    // 거리 바꿀 시 데이터 불러오기
-    useEffect(()=>{
-        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-                axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
-            {
-                headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
-                setPostLength(response.data.data.length);
-                setPostItems(response.data.data);
+                if(!response.data.data.hasNext) { setLoading(false); }
             })
             .catch(function(error){
                 if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
@@ -223,6 +231,60 @@ function PostList(props) {
             })
         }
     }, [selectedOption])
+
+    // 무한 스크롤
+    const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const pageEnd = useRef();
+   
+    const increasePage = () => { setPage(page => page + 1); };
+
+    const handleScroll = (page) => {
+        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                setPostItems(postItems => [...postItems, ...response.data.data]);
+                if(!response.data.hasNext) { setLoading(false); }
+            })
+            .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();   
+                } 
+            })
+        }
+        else{
+            axios.get(`http://13.209.77.50:8080/posts?type=원정대&page=${page}&amount=7`)
+            .then(function(response){
+                setPostItems(postItems => [...postItems, ...response.data.data]);
+                if(!response.data.hasNext) { setLoading(false); }
+            })
+            .catch(function(error){
+                console.log(error);
+            });
+        }
+    };
+    useEffect(()=>{
+        if(loading) { handleScroll(page); }
+    }, [page])
+
+    useEffect(()=>{
+        if(loading){
+            const observer = new IntersectionObserver(
+                entries => {
+                    if(entries[0].isIntersecting){
+                        increasePage();
+                    }
+                },
+                { threshold: 0 }
+            );
+            observer.observe(pageEnd.current);
+        }
+    }, [loading]);
 
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
@@ -249,6 +311,7 @@ function PostList(props) {
                 postItems.map((item)=>{
                     return <PostItem key={item.postId} value={item} />
                 })}  
+                <div style={{width:"100%", height:"30px"}} ref={pageEnd}></div>
             </PostListBox>
         </Wrapper>
     );
