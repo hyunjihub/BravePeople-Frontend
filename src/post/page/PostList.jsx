@@ -160,6 +160,7 @@ function PostList(props) {
         });
     }
 
+    // 작성버튼
     const handleWrite = (e) => {
         if(!isLog) {
             navigate("/login");
@@ -168,15 +169,23 @@ function PostList(props) {
         e.preventDefault();
     }
 
-    // 게시글 데이터 불러오기 api
-    // 포스트 개수
+    //게시글 조회
+    // 무한 스크롤
+    const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const pageEnd = useRef();
     const [postLength, setPostLength] = useState(0);
 
+    // 게시판 페이지 들어갈 때
     useEffect(()=>{
         window.scrollTo(0, 0);
+        setPostItems([]);
         setLoading(true);
         setPage(0);
-        setPostItems([]);
+    }, [ishelped]);
+
+    // 게시글 불러오기 함수
+    useEffect(()=>{
         // 로그인 상태일 때 게시글 조회
         if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
             axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
@@ -187,98 +196,35 @@ function PostList(props) {
             })
             .then(function(response){
                 setPostLength(response.data.data.length);
-                setPostItems(response.data.data);
-                if(!response.data.hasNext) { setLoading(false); }
+                setPostItems(postItems => [...postItems, ...response.data.data]);
+                setLoading(response.data.hasNext); 
             })
             .catch(function(error){
                 if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();   
                 } 
             })
-            // 비로그인 상태일 때 게시글 조회
         }
         else{
+            // 비로그인 상태일 때 게시글 조회
             axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=${page}&amount=7`)
             .then(function(response){
                 setPostLength(response.data.data.length);
-                setPostItems(response.data.data);
-                if(!response.data.hasNext) { setLoading(false); }
-            })
-            .catch(function(error){
-                console.log("비로그인 에러");
-                console.log(error);
-            })
-        }   
-    }, [ishelped]);
-
-    // 거리 바꿀 시 데이터 불러오기
-    useEffect(()=>{
-        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=0&amount=5`,
-            {
-                headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
-                setPostLength(response.data.data.length);
-                setPostItems(response.data.data);
-                if(!response.data.data.hasNext) { setLoading(false); }
-            })
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();   
-                } 
-            })
-        }
-    }, [selectedOption])
-
-    // 무한 스크롤
-    const [page, setPage] = useState(0);
-    const [loading, setLoading] = useState(false);
-    const pageEnd = useRef();
-   
-    const increasePage = () => { setPage(page => page + 1); };
-
-    const handleScroll = (page) => {
-        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
-            {
-                headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
                 setPostItems(postItems => [...postItems, ...response.data.data]);
-                if(!response.data.hasNext) { setLoading(false); }
-            })
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();   
-                } 
-            })
-        }
-        else{
-            axios.get(`http://13.209.77.50:8080/posts?type=원정대&page=${page}&amount=7`)
-            .then(function(response){
-                setPostItems(postItems => [...postItems, ...response.data.data]);
-                if(!response.data.hasNext) { setLoading(false); }
+                setLoading(response.data.hasNext); 
             })
             .catch(function(error){
                 console.log(error);
             });
         }
-    };
-    useEffect(()=>{
-        if(loading) { handleScroll(page); }
     }, [page])
 
     useEffect(()=>{
         if(loading){
             const observer = new IntersectionObserver(
                 entries => {
-                    if(entries[0].isIntersecting){
-                        increasePage();
+                    if(entries[0].isIntersecting && loading){
+                        setPage(page => page + 1);
                     }
                 },
                 { threshold: 0 }
@@ -286,6 +232,28 @@ function PostList(props) {
             observer.observe(pageEnd.current);
         }
     }, [loading]);
+
+    // 거리 바꿀 시 데이터 불러오기
+    useEffect(()=>{
+        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                setPostLength(response.data.data.length);
+                setPostItems(response.data.data);
+                setLoading(response.data.hasNext); 
+            })
+            .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();   
+                } 
+            })
+        }
+    }, [selectedOption])    
 
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
@@ -307,12 +275,12 @@ function PostList(props) {
             </ButtonContainer>
             
             <PostListBox>
-                {(postLength === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", marginTop:"200px", fontSize:"35px"}}>
+                {((postLength === 0)&&(postItems.length === 0)) ? <div style={{width:"100%", height:"10%", textAlign:"center", marginTop:"200px", fontSize:"35px"}}>
                     등록된 게시물이 없습니다!</div> : 
                 postItems.map((item)=>{
                     return <PostItem key={item.postId} value={item} />
                 })}  
-                <div style={{width:"100%", height:"30px"}} ref={pageEnd}></div>
+                {(loading) && <div style={{width:"100%", height:"30px"}} ref={pageEnd}></div>}
             </PostListBox>
         </Wrapper>
     );
