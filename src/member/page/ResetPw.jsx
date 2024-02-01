@@ -79,39 +79,45 @@ function ResetPw(props) {
     const setLoc = (loc) => dispatch(setLocation(loc)); 
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
 
-    // 토큰 재발급 요청 api
-    const ReissueToken = () => {
-        axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
-            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
-        })
-        .then(function(response){
-            sessionStorage.setItem('jwt',JSON.stringify({
-                access: response.data.accessToken,
-                refresh: response.data.refreshToken
-            }));
-            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
-            navigate("/main");
-        })
-        .catch(function(error){
-            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
-                sessionStorage.removeItem('jwt');
-                sessionStorage.removeItem('savedData');
-                sessionStorage.removeItem('savedUserInfo');
-                setLog(false);
-                setId(null);
-                setProfile(null);
-                setLoc({
-                    latitude: null,
-                    longitude: null
-                });
-                alert("로그인 유지 시간이 종료되었습니다.");
-                navigate("/main");
-            }else{
-                console.log(error);
-            }
-        });
-    }
+        // 토큰 재발급 요청 api
+        const ReissueToken = async () => {
+            try {
+                const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                    accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                    refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+                })
+                sessionStorage.setItem('jwt',JSON.stringify({
+                    access: response.data.accessToken,
+                    expirationTime: Date.now() + (5 * 60 * 1000),
+                    refresh: response.data.refreshToken
+                }));
+                return true;
+            } catch(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                    sessionStorage.removeItem('jwt');
+                    sessionStorage.removeItem('savedData');
+                    sessionStorage.removeItem('savedUserInfo');
+                    setLog(false);
+                    setId(null);
+                    setProfile(null);
+                    setLoc({
+                        latitude: null,
+                        longitude: null
+                    });
+                    Swal.fire({
+                        title: "로그인 기간 만료",
+                        text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                    navigate("/main");
+                }else{
+                    console.log(error);
+                }
+                return false;
+            };
+        }
 
     //패스워드 검증
     const isPassword = (str) => {
@@ -121,7 +127,7 @@ function ResetPw(props) {
         return correctWord.test(str) && Length;
     }
 
-    const handleReset = (e) =>{
+    const handleReset = async (e) =>{
         e.preventDefault();
         if(e.target[0].value!=="" && e.target[1].value!=="") {
             if(isPassword(e.target[0].value)) {
@@ -167,6 +173,10 @@ function ResetPw(props) {
                     }
                     // 회원일 때 비밀번호 재설정 
                     else {
+                        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                            if (!await ReissueToken()) return;
+                        }
+
                         axios.patch('http://13.209.77.50:8080/member/pw', {
                             newPassword: e.target[0].value},
                             {headers:{

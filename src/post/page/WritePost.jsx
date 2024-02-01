@@ -255,19 +255,19 @@ function WritePost(props) {
     }), shallowEqual);
 
     // 토큰 재발급 요청 api
-    const ReissueToken = () => {
-        axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
-            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
-        })
-        .then(function(response){
+    const ReissueToken = async () => {
+        try {
+            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+            })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
+                expirationTime: Date.now() + (5 * 60 * 1000),
                 refresh: response.data.refreshToken
             }));
-            navigate(0);
-        })
-        .catch(function(error){
+            return true;
+        } catch(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -279,43 +279,57 @@ function WritePost(props) {
                     latitude: null,
                     longitude: null
                 });
-                alert("로그인 유지 시간이 종료되었습니다.");
+                Swal.fire({
+                    title: "로그인 기간 만료",
+                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
                 navigate("/main");
             }else{
                 console.log(error);
             }
-        });
+            return false;
+        };
     }
 
     // 게시글 수정일 때 데이터 불러오기
     useEffect(()=>{
-        if(!isLog) {
-            Swal.fire({
-                title: "비정상적인 접속",
-                text: "비회원은 마이페이지에 접속하실 수 없습니다.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-                confirmButtonText: "확인",
-            });
-        }
-        else if(postid!=='-1') {
-            axios.get(`http://13.209.77.50:8080/posts/${postid}`)
-            .then(function(response){
-                setContent(response.data.contents);
-                setCurrentImg(response.data.postImg);
-                setTitle(response.data.title);
-                setNumber(response.data.price);
-                if(response.data.price==="-1") setIsChecked(true);
-                setSelectedCategory(response.data.category);
-                type=response.data.type;
-                if(response.data.postImg!=="") setUploading(true);
-            })
-            .catch(function(error){
-                if((error.response.status === 404 && error.response.data.errorMessage === '존재하지 않는 게시글')) {
-                    navigate("/error");
+        const loadModify = async () => {
+            
+            if(!isLog) {
+                Swal.fire({
+                    title: "비정상적인 접속",
+                    text: "비회원은 마이페이지에 접속하실 수 없습니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+            }
+            else if(postid!=='-1') {
+                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                    if (!await ReissueToken()) return;
                 }
-            });
+                axios.get(`http://13.209.77.50:8080/posts/${postid}`)
+                .then(function(response){
+                    setContent(response.data.contents);
+                    setCurrentImg(response.data.postImg);
+                    setTitle(response.data.title);
+                    setNumber(response.data.price);
+                    if(response.data.price==="-1") setIsChecked(true);
+                    setSelectedCategory(response.data.category);
+                    type=response.data.type;
+                    if(response.data.postImg!=="") setUploading(true);
+                })
+                .catch(function(error){
+                    if((error.response.status === 404 && error.response.data.errorMessage === '존재하지 않는 게시글')) {
+                        navigate("/error");
+                    }
+                });
+            }
         }
+        loadModify();
     }, [])
 
     //가격
@@ -396,7 +410,10 @@ function WritePost(props) {
         }
     }
 
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
+        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
         if (!files[0].name.match(reg)) {
@@ -441,8 +458,12 @@ function WritePost(props) {
         setUploading(false);
         e.preventDefault();
     }
+
     //게시글 업로드
-    const handleUpload = (e) => {
+    const handleUpload = async (e) => {
+        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
         if((title !== "") && (number !== "") && (content !== "")){
             if(postid==='-1') {
                 axios.post('http://13.209.77.50:8080/posts',{

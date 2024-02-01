@@ -71,20 +71,19 @@ function Authentication(props) {
     const setLog = (bool) => dispatch(setLogin(bool));
 
     // 토큰 재발급 요청 api
-    const ReissueToken = () => {
-        axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
-            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
-        })
-        .then(function(response){
+    const ReissueToken = async () => {
+        try {
+            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+            })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
+                expirationTime: Date.now() + (5 * 60 * 1000),
                 refresh: response.data.refreshToken
             }));
-            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
-            navigate("/main");
-        })
-        .catch(function(error){
+            return true;
+        } catch(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -96,15 +95,26 @@ function Authentication(props) {
                     latitude: null,
                     longitude: null
                 });
-                alert("로그인 유지 시간이 종료되었습니다.");
+                Swal.fire({
+                    title: "로그인 기간 만료",
+                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
                 navigate("/main");
             }else{
                 console.log(error);
             }
-        });
+            return false;
+        };
     }
 
-    const handleAuth = (e) =>{
+    const handleAuth = async (e) =>{
+        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
+
         if(e.target[0].value !== "") {
             axios.post('http://13.209.77.50:8080/member/pw', {
             nowPassword: e.target[0].value,

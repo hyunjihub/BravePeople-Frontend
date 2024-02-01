@@ -4,6 +4,7 @@ import styled from "styled-components";
 import PostItem from "../components/PostItem";
 import { BiMenuAltRight } from "react-icons/bi";
 import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
 import axios from "axios";
 
 //redux
@@ -127,20 +128,19 @@ function PostList(props) {
     }), shallowEqual);
 
     // 토큰 재발급 요청 api
-    const ReissueToken = () => {
-        axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
-            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
-        })
-        .then(function(response){
+    const ReissueToken = async () => {
+        try {
+            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+            })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
+                expirationTime: Date.now() + (5 * 60 * 1000),
                 refresh: response.data.refreshToken
             }));
-            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
-            navigate("/main");
-        })
-        .catch(function(error){
+            return true;
+        } catch(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -152,12 +152,19 @@ function PostList(props) {
                     latitude: null,
                     longitude: null
                 });
-                alert("로그인 유지 시간이 종료되었습니다.");
+                Swal.fire({
+                    title: "로그인 기간 만료",
+                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
                 navigate("/main");
             }else{
                 console.log(error);
             }
-        });
+            return false;
+        };
     }
 
     // 작성버튼
@@ -186,37 +193,45 @@ function PostList(props) {
 
     // 게시글 불러오기 함수
     useEffect(()=>{
-        // 로그인 상태일 때 게시글 조회
-        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
-            {
-                headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+        const loadPost = async () => {
+            // 로그인 상태일 때 게시글 조회
+            if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
+                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                    if (!await ReissueToken()) return;
                 }
-            })
-            .then(function(response){
-                setPostLength(response.data.data.length);
-                setPostItems(postItems => [...postItems, ...response.data.data]);
-                setLoading(response.data.hasNext); 
-            })
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();   
-                } 
-            })
+
+                axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
+                {
+                    headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }
+                })
+                .then(function(response){
+                    setPostLength(response.data.data.length);
+                    setPostItems(postItems => [...postItems, ...response.data.data]);
+                    setLoading(response.data.hasNext); 
+                })
+                .catch(function(error){
+                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken();   
+                    } 
+                })
+            }
+            else{
+                // 비로그인 상태일 때 게시글 조회
+                axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=${page}&amount=7`)
+                .then(function(response){
+                    setPostLength(response.data.data.length);
+                    setPostItems(postItems => [...postItems, ...response.data.data]);
+                    setLoading(response.data.hasNext); 
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+            }
         }
-        else{
-            // 비로그인 상태일 때 게시글 조회
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=${page}&amount=7`)
-            .then(function(response){
-                setPostLength(response.data.data.length);
-                setPostItems(postItems => [...postItems, ...response.data.data]);
-                setLoading(response.data.hasNext); 
-            })
-            .catch(function(error){
-                console.log(error);
-            });
-        }
+
+        loadPost();
     }, [page])
 
     useEffect(()=>{
@@ -235,24 +250,33 @@ function PostList(props) {
 
     // 거리 바꿀 시 데이터 불러오기
     useEffect(()=>{
-        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
-            {
-                headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+
+        const changeDistance = async () => {
+            if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
+                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                    if (!await ReissueToken()) return;
                 }
-            })
-            .then(function(response){
-                setPostLength(response.data.data.length);
-                setPostItems(response.data.data);
-                setLoading(response.data.hasNext); 
-            })
-            .catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();   
-                } 
-            })
+    
+                axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
+                {
+                    headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }
+                })
+                .then(function(response){
+                    setPostLength(response.data.data.length);
+                    setPostItems(response.data.data);
+                    setLoading(response.data.hasNext); 
+                })
+                .catch(function(error){
+                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken();   
+                    } 
+                })
+            }
         }
+        changeDistance();
+        
     }, [selectedOption])    
 
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price

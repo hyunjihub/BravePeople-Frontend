@@ -241,20 +241,19 @@ function ViewPost(props) {
     }, []);
 
     // 토큰 재발급 요청 api
-    const ReissueToken = () => {
-        axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
-            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
-        })
-        .then(function(response){
+    const ReissueToken = async () => {
+        try {
+            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+            })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
+                expirationTime: Date.now() + (5 * 60 * 1000),
                 refresh: response.data.refreshToken
             }));
-            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
-            navigate("/main");
-        })
-        .catch(function(error){
+            return true;
+        } catch(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -266,16 +265,26 @@ function ViewPost(props) {
                     latitude: null,
                     longitude: null
                 });
-                alert("로그인 유지 시간이 종료되었습니다.");
+                Swal.fire({
+                    title: "로그인 기간 만료",
+                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
                 navigate("/main");
             }else{
                 console.log(error);
             }
-        });
+            return false;
+        };
     }
 
     //삭제 버튼 클릭시 삭제 API
-    const handleDelete = (e) => {
+    const handleDelete = async (e) => {
+        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
         Swal.fire({
             title: "삭제하시겠습니까?",
             text: "삭제된 게시글은 복구할 수 없습니다. 정말 삭제하시겠습니까?",
@@ -314,15 +323,20 @@ function ViewPost(props) {
 
     //클릭시 프로필 페이지 이동
     const handlePage = (e) => {
-        setParam(String(postData.memberId));
-        sessionStorage.setItem('savedUserInfo', JSON.stringify({
-            profileImage: null,
-            nickname: null,
-            intro: null,
-            score: null,
-            medalCount: null,
-        }));
-        navigate("/mypage");
+        if(!isLog) {
+            navigate("/login");
+        }
+        else {
+            setParam(String(postData.memberId));
+            sessionStorage.setItem('savedUserInfo', JSON.stringify({
+                profileImage: null,
+                nickname: null,
+                intro: null,
+                score: null,
+                medalCount: null,
+            }));
+            navigate("/mypage");
+        }
         e.preventDefault();
     }
 

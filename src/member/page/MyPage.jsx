@@ -265,21 +265,20 @@ function MyPage(props) {
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
 
-    // 토큰 재발급 요청 api
-    const ReissueToken = () => {
-        axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
-            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
-        })
-        .then(function(response){
+     // 토큰 재발급 요청 api
+     const ReissueToken = async () => {
+        try {
+            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+            })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
+                expirationTime: Date.now() + (5 * 60 * 1000),
                 refresh: response.data.refreshToken
             }));
-            alert("토큰 기한이 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
-            navigate("/main");
-        })
-        .catch(function(error){
+            return true;
+        } catch(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -291,83 +290,98 @@ function MyPage(props) {
                     latitude: null,
                     longitude: null
                 });
-                alert("로그인 유지 시간이 종료되었습니다.");
+                Swal.fire({
+                    title: "로그인 기간 만료",
+                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
                 navigate("/main");
             }else{
                 console.log(error);
             }
-        });
+            return false;
+        };
     }
     
     // 마이페이지 실행 시 
-    useEffect(()=>{
-        // 비회원일 때 
-        if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
-            Swal.fire({
-                title: "비정상적인 접속",
-                text: "비회원은 마이페이지에 접속하실 수 없습니다.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-                confirmButtonText: "확인",
-            });
-            navigate("/main");
-        }
-        else{
-            {(id===param)? setMySelf(true) : setMySelf(false)};
-            //마이페이지에 처음 접근할 때
-            if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
-                axios.get(`http://13.209.77.50:8080/member/profile/${param}`,{
-                    headers:{
-                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                    }
-                })
-                .then(function(response){
-                        setUserInfo({
-                            profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
-                            nickname: response.data.nickname,
-                            intro: response.data.introduction,
-                            score: response.data.score,
-                            medalCount: response.data.medalCount,
-                            posts: response.data.postListVo
-                        });
-                        sessionStorage.setItem('savedUserInfo', JSON.stringify({
-                            profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
-                            nickname: response.data.nickname,
-                            intro: response.data.introduction,
-                            score: response.data.score,
-                            medalCount: response.data.medalCount,
-                            posts: response.data.postListVo
-                        }));
-                    }
-                )
-                .catch(function(error){
-                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken();   
-                    } else if (error.response.data.errorMessage ==="존재하지 않는 멤버ID" && error.response.status === 400) {
-                        Swal.fire({
-                            title: "존재하지 않는 회원",
-                            html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
-                            icon: "error",
-                            confirmButtonColor: "#d33",
-                            confirmButtonText: "확인",
-                        });
-                    }
-                    else {
-                        console.log(error);
-                    }
+    useEffect(() =>{
+
+        const loadMypage = async () => {
+            // 비회원일 때 
+            if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
+                Swal.fire({
+                    title: "비정상적인 접속",
+                    text: "비회원은 마이페이지에 접속하실 수 없습니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
                 });
-            }else{
-                // 마이페이지에 처음 접근하는 것이 아닐 때
-                setUserInfo({
-                    profileImage: JSON.parse(sessionStorage.getItem('savedUserInfo')).profileImage,
-                    nickname: JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname,
-                    intro: JSON.parse(sessionStorage.getItem('savedUserInfo')).intro,
-                    score: JSON.parse(sessionStorage.getItem('savedUserInfo')).score,
-                    medalCount: JSON.parse(sessionStorage.getItem('savedUserInfo')).medalCount,
-                    posts: JSON.parse(sessionStorage.getItem('savedUserInfo')).posts,
-                });
+                navigate("/main");
+                return;
             }
-        };
+            else{
+                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                    if (!await ReissueToken()) return;
+                }
+                {(id===param)? setMySelf(true) : setMySelf(false)};
+                //마이페이지에 처음 접근할 때
+                if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
+                    axios.get(`http://13.209.77.50:8080/member/profile/${param}`,{
+                        headers:{
+                            Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                        }
+                    })
+                    .then(function(response){
+                            setUserInfo({
+                                profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
+                                nickname: response.data.nickname,
+                                intro: response.data.introduction,
+                                score: response.data.score,
+                                medalCount: response.data.medalCount,
+                                posts: response.data.postListVo
+                            });
+                            sessionStorage.setItem('savedUserInfo', JSON.stringify({
+                                profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
+                                nickname: response.data.nickname,
+                                intro: response.data.introduction,
+                                score: response.data.score,
+                                medalCount: response.data.medalCount,
+                                posts: response.data.postListVo
+                            }));
+                        }
+                    )
+                    .catch(function(error){
+                        if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                            ReissueToken();   
+                        } else if (error.response.data.errorMessage ==="존재하지 않는 멤버ID" && error.response.status === 400) {
+                            Swal.fire({
+                                title: "존재하지 않는 회원",
+                                html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
+                                icon: "error",
+                                confirmButtonColor: "#d33",
+                                confirmButtonText: "확인",
+                            });
+                        }
+                        else {
+                            console.log(error);
+                        }
+                    });
+                }else{
+                    // 마이페이지에 처음 접근하는 것이 아닐 때
+                    setUserInfo({
+                        profileImage: JSON.parse(sessionStorage.getItem('savedUserInfo')).profileImage,
+                        nickname: JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname,
+                        intro: JSON.parse(sessionStorage.getItem('savedUserInfo')).intro,
+                        score: JSON.parse(sessionStorage.getItem('savedUserInfo')).score,
+                        medalCount: JSON.parse(sessionStorage.getItem('savedUserInfo')).medalCount,
+                        posts: JSON.parse(sessionStorage.getItem('savedUserInfo')).posts,
+                    });
+                }
+            };
+        }
+        loadMypage();
     }, [param]);
 
     const [currentName, setCurrentName] = useState(null);
@@ -407,7 +421,10 @@ function MyPage(props) {
     };
 
     // 수정 완료 버튼
-    const handleModify = (e) => {        
+    const handleModify = async (e) => {       
+        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if (!await ReissueToken()) return;
+        } 
         if((currentName === userInfo.nickname) && (currentIntro === userInfo.intro) && (currentImg === userInfo.profileImage)){
             Swal.fire({
                 title: "수정사항 없음",
@@ -500,7 +517,11 @@ function MyPage(props) {
     const frm = new FormData();
 
     //프로필 이미지 불러오기
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
+        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
+
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
 
@@ -551,8 +572,11 @@ function MyPage(props) {
         maximumAge: 1000 * 3600 * 24,
     }
 
-    const SetLocation = () => {
-        const handleSuccess = (pos) => {
+    const SetLocation = async () => {
+        const handleSuccess = async (pos) => {
+            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if (!await ReissueToken()) return;
+            }
             axios.patch("http://13.209.77.50:8080/member/location", {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
@@ -561,14 +585,22 @@ function MyPage(props) {
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
             }).then(function(response){
-                    setLoc({
+                setLoc({
+                    latitude: response.data.lat,
+                    longitude: response.data.lng
+                });
+                const presessionStorageId = JSON.parse(sessionStorage.getItem('savedData')).id;
+
+                sessionStorage.setItem('savedData', JSON.stringify({
+                    isLogin: true,
+                    id: presessionStorageId,
+                    loc : {
                         latitude: response.data.lat,
                         longitude: response.data.lng
-                    })
-            }).catch(function(error){
-                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();
-                } else if(error.response.status === 401 && error.response.data.errorMessage === "존재하지 않는 멤버ID"){
+                    }
+                }));
+            }).catch(function(err){
+                if (err.response.status === 401 && err.response.data.errorMessage === "존재하지 않는 멤버ID") {
                     Swal.fire({
                         title: "존재하지 않는 회원",
                         html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
@@ -576,8 +608,6 @@ function MyPage(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                }else{
-                console.log(error);
                 }
             });
         }

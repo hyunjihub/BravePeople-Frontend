@@ -149,40 +149,6 @@ export default function Header(props) {
     const setLoc = (loc) => dispatch(setLocation(loc)); 
     const setProfile = (profile) => dispatch(setProfileImg(profile));
 
-    const instance = axios.create({
-        baseURL: 'http://13.209.77.50:8080/',
-    });
-
-    instance.interceptors.request.use(
-        config => {
-            const token = JSON.parse(sessionStorage.getItem('jwt')).access;
-            if (token!== null) config.headers.Authorization = `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`;
-            return config;
-        },
-        error => {
-            return Promise.reject(error);
-        }
-    );
-
-    instance.interceptors.response.use(
-        response => {
-            return response;
-        },
-        error => {
-            console.log("안 들어와");
-            if(error.response.status===401 && error.response.data.errorMessage === "Access Token 만료") {
-                return ReissueToken()
-                .then(()=>{
-                    return instance(error.config);
-                })
-                .catch(err => {
-                    return Promise.reject(err);
-                });
-            }
-            return Promise.reject(error);
-        }
-    );
-
     // 웹 스토리지에 데이터 생성 및 초기값 설정
     // sessionStorage - JWT
     if(sessionStorage.getItem('jwt') === null){
@@ -221,21 +187,19 @@ export default function Header(props) {
     },[isLog]);
 
     // 토큰 재발급 요청 api
-    const ReissueToken = () => {
-        axios.post("http://13.209.77.50:8080/auth/reissue",{
-            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
-            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
-        })
-        .then(function(response){
+    const ReissueToken = async () => {
+        try {
+            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+            })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
                 expirationTime: Date.now() + (5 * 60 * 1000),
                 refresh: response.data.refreshToken
             }));
-            console.log("재발급");
-            console.log(JSON.parse(sessionStorage.getItem('jwt')).expirationTime);
-        })
-        .catch(function(error){
+            return true;
+        } catch(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -247,17 +211,27 @@ export default function Header(props) {
                     latitude: null,
                     longitude: null
                 });
-                alert("로그인 유지 시간이 종료되었습니다.");
+                Swal.fire({
+                    title: "로그인 기간 만료",
+                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
                 navigate("/main");
             }else{
                 console.log(error);
             }
-        });
+            return false;
+        };
     }
 
     // 로그아웃
-    const handleLogOut = (e) => {
+    const handleLogOut = async (e) => {
         if(isLog) {
+            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if (!await ReissueToken()) return;
+            }
             axios.post("http://13.209.77.50:8080/member/logout", {}, {
                 headers: {
                     'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -316,15 +290,12 @@ export default function Header(props) {
         maximumAge: 1000 * 3600 * 24,
     }
 
-    const SetLocation = () => {
-        const handleSuccess = (pos) => {
-            console.log(JSON.parse(sessionStorage.getItem('jwt')).expirationTime);
-            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime < Date.now()) {
-                console.log(JSON.parse(sessionStorage.getItem('jwt')).expirationTime);
-                console.log("만료 시간 지남");
-                ReissueToken();
+    const SetLocation = async () => {
+        const handleSuccess = async (pos) => {
+            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if (!await ReissueToken()) return;
             }
-
+            console.log("axios");
             axios.patch("http://13.209.77.50:8080/member/location", {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
