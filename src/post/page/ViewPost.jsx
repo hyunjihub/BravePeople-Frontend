@@ -204,11 +204,9 @@ function ViewPost(props) {
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, param, loc } = useSelector((state)=>({
+    const { isLog, id } = useSelector((state)=>({
         isLog: state.login.isLogin,
         id: state.login.memberId,
-        param : state.login.paramId,
-        loc: state.login.location,
     }), shallowEqual);
 
     const { postid } = useParams();

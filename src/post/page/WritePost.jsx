@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FaCamera } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import Swal from "sweetalert2";
@@ -247,11 +247,8 @@ function WritePost(props) {
     const setLog = (bool) => dispatch(setLogin(bool));
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, param, loc } = useSelector((state)=>({
+    const { isLog } = useSelector((state)=>({
         isLog: state.login.isLogin,
-        id: state.login.memberId,
-        param : state.login.paramId,
-        loc: state.login.location,
     }), shallowEqual);
 
     // 토큰 재발급 요청 api

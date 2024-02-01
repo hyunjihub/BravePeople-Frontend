@@ -295,7 +295,6 @@ export default function Header(props) {
             if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
                 if (!await ReissueToken()) return;
             }
-            console.log("axios");
             axios.patch("http://13.209.77.50:8080/member/location", {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude

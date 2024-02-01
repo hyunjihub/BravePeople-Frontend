@@ -4,6 +4,7 @@ import styled from "styled-components";
 import PostItem from "../components/PostItem";
 import { BiMenuAltRight } from "react-icons/bi";
 import { useNavigate } from "react-router";
+import uuid from 'react-uuid';
 import Swal from "sweetalert2";
 import axios from "axios";
 
@@ -302,7 +303,7 @@ function PostList(props) {
                 {((postLength === 0)&&(postItems.length === 0)) ? <div style={{width:"100%", height:"10%", textAlign:"center", marginTop:"200px", fontSize:"35px"}}>
                     등록된 게시물이 없습니다!</div> : 
                 postItems.map((item)=>{
-                    return <PostItem key={item.postId} value={item} />
+                    return <PostItem key={uuid()} value={item} />
                 })}  
                 {(loading) && <div style={{width:"100%", height:"30px"}} ref={pageEnd}></div>}
             </PostListBox>
