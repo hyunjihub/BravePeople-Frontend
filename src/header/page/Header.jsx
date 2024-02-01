@@ -149,6 +149,40 @@ export default function Header(props) {
     const setLoc = (loc) => dispatch(setLocation(loc)); 
     const setProfile = (profile) => dispatch(setProfileImg(profile));
 
+    const instance = axios.create({
+        baseURL: 'http://13.209.77.50:8080/',
+    });
+
+    instance.interceptors.request.use(
+        config => {
+            const token = JSON.parse(sessionStorage.getItem('jwt')).access;
+            if (token!== null) config.headers.Authorization = `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`;
+            return config;
+        },
+        error => {
+            return Promise.reject(error);
+        }
+    );
+
+    instance.interceptors.response.use(
+        response => {
+            return response;
+        },
+        error => {
+            console.log("안 들어와");
+            if(error.response.status===401 && error.response.data.errorMessage === "Access Token 만료") {
+                return ReissueToken()
+                .then(()=>{
+                    return instance(error.config);
+                })
+                .catch(err => {
+                    return Promise.reject(err);
+                });
+            }
+            return Promise.reject(error);
+        }
+    );
+
     // 웹 스토리지에 데이터 생성 및 초기값 설정
     // sessionStorage - JWT
     if(sessionStorage.getItem('jwt') === null){
@@ -195,10 +229,11 @@ export default function Header(props) {
         .then(function(response){
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
+                expirationTime: Date.now() + (5 * 60 * 1000),
                 refresh: response.data.refreshToken
             }));
-            alert("토큰 기한 만료로 페이지 요청이 취소되었습니다. 메인페이지로 이동합니다.");
-            navigate("/main");
+            console.log("재발급");
+            console.log(JSON.parse(sessionStorage.getItem('jwt')).expirationTime);
         })
         .catch(function(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
@@ -283,6 +318,13 @@ export default function Header(props) {
 
     const SetLocation = () => {
         const handleSuccess = (pos) => {
+            console.log(JSON.parse(sessionStorage.getItem('jwt')).expirationTime);
+            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime < Date.now()) {
+                console.log(JSON.parse(sessionStorage.getItem('jwt')).expirationTime);
+                console.log("만료 시간 지남");
+                ReissueToken();
+            }
+
             axios.patch("http://13.209.77.50:8080/member/location", {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
@@ -306,9 +348,7 @@ export default function Header(props) {
                     }
                 }));
             }).catch(function(err){
-                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();
-                } else if (err.response.status === 401 && err.response.data.errorMessage === "존재하지 않는 멤버ID") {
+                if (err.response.status === 401 && err.response.data.errorMessage === "존재하지 않는 멤버ID") {
                     Swal.fire({
                         title: "존재하지 않는 회원",
                         html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
@@ -319,6 +359,7 @@ export default function Header(props) {
                 }
             });
         }
+
         const handleError = (err) => {
             console.log(err);
         }
@@ -381,7 +422,7 @@ export default function Header(props) {
                 {isLog ? <LocationBox onClick={SetLocation}><IoLocationSharp size="30" color="#f8332f"/> <Location>{sigudong}</Location></LocationBox>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
                 <HeaderButton onClick={handleLogOut}>{isLog?"로그아웃":"로그인"}</HeaderButton>
-                {isLog ? <Profile onClick={MyPageButtonClicked} src={((profile === null || profile === undefined)? Nullprofile : profile)}></Profile>: <HiddenProfile />}
+                {isLog ? <Profile onClick={MyPageButtonClicked} src={((profile === null || profile === undefined)? Nullprofile : profile)} alt="프로필"></Profile>: <HiddenProfile />}
             </RightContainer>
         </Wrapper>
     );
