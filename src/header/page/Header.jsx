@@ -12,7 +12,7 @@ import axios from 'axios';
 // redux
 import HeaderButton from "../components/HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setMemberId, setLocation, setParamId, setProfileImg } from "../../member/redux/modules/login"
+import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/redux/modules/login"
 
 
 const Wrapper = styled.div`
@@ -145,7 +145,6 @@ export default function Header(props) {
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
-    const setParam = (paramid) => dispatch(setParamId(paramid)); 
     const setLoc = (loc) => dispatch(setLocation(loc)); 
     const setProfile = (profile) => dispatch(setProfileImg(profile));
 
@@ -270,7 +269,6 @@ export default function Header(props) {
     };
 
     const MyPageButtonClicked = () => {
-        setParam(id);
         sessionStorage.setItem('savedUserInfo', JSON.stringify({
             profileImage: null,
             nickname: null,
@@ -278,7 +276,7 @@ export default function Header(props) {
             score: null,
             medalCount: null,
         }));
-        navigate("/mypage");
+        navigate(`/profile/${id}`);
     }
 
     // 위치 정보

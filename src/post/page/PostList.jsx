@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import PostItem from "../components/PostItem";
@@ -12,10 +12,14 @@ import axios from "axios";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 
+//무한스크롤
+import { useInView } from "react-intersection-observer";
+
 const Wrapper = styled.div`
     width: 100%;
-    height: 100vh;
+    height: 1000px;
     margin: 15px auto;
+    overflow-y: auto;
 `;
 
 const Title = styled.div`
@@ -35,9 +39,6 @@ const PostListBox = styled.div`
     overflow-y: scroll;
     overflow-x: hidden;
     margin: 0px auto;
-    &::-webkit-scrollbar {
-        display: none;
-    }
 `;
 
 const WriteButton = styled.button`
@@ -180,109 +181,89 @@ function PostList(props) {
     //게시글 조회
     // 무한 스크롤
     const [page, setPage] = useState(0);
+    const [pageEnd, inView] = useInView();
+    const [hasNext, setHasNext] = useState(true);
     const [loading, setLoading] = useState(false);
-    const pageEnd = useRef();
-    const [postLength, setPostLength] = useState(0);
 
+    const setDefault = () =>{
+        return new Promise( (resolve, reject) => { 
+            setLoading(true); 
+            window.scrollTo(0, 0);
+            setPostItems([]);
+            setPage(0);
+            setHasNext(true);
+            resolve(); 
+        });
+    };
     // 게시판 페이지 들어갈 때
     useEffect(()=>{
-        window.scrollTo(0, 0);
-        setPostItems([]);
-        setLoading(true);
-        setPage(0);
+        setDefault()
+        .then(()=>setLoading(false));
     }, [ishelped]);
 
     // 게시글 불러오기 함수
-    useEffect(()=>{
-        const loadPost = async () => {
-            // 로그인 상태일 때 게시글 조회
-            if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
-                    if (!await ReissueToken()) return;
+    // 로그인 상태일 때 게시글 조회
+    const loadPost = async () => {
+        if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
+            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if (!await ReissueToken()) return;
+            }
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
-
-                axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=7`,
-                {
-                    headers:{
-                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                    }
-                })
-                .then(function(response){
-                    setPostLength(response.data.data.length);
-                    setPostItems(postItems => [...postItems, ...response.data.data]);
-                    setLoading(response.data.hasNext); 
-                })
-                .catch(function(error){
-                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken();   
-                    } 
-                })
-            }
-            else{
-                // 비로그인 상태일 때 게시글 조회
-                axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=${page}&amount=7`)
-                .then(function(response){
-                    setPostLength(response.data.data.length);
-                    setPostItems(postItems => [...postItems, ...response.data.data]);
-                    setLoading(response.data.hasNext); 
-                })
-                .catch(function(error){
-                    console.log(error);
-                });
-            }
+            })
+            .then(function(response){
+                setPostItems(postItems => [...postItems, ...response.data.data]);
+                setHasNext(response.data.hasNext);
+                setPage((page)=>(page+1));
+                setLoading(false);
+            })
+            .catch(function(error){
+                if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();   
+                } 
+            })
         }
-
-        loadPost();
-    }, [page])
+        else{
+            // 비로그인 상태일 때 게시글 조회
+            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=${page}&amount=5`)
+            .then(function(response){
+                setPostItems(postItems => [...postItems, ...response.data.data]);
+                setHasNext(response.data.hasNext);
+                setPage((page)=>(page+1));
+                setLoading(false);
+            })
+            .catch(function(error){
+                console.log(error);
+            });
+        }
+    }
 
     useEffect(()=>{
-        if(loading){
-            const observer = new IntersectionObserver(
-                entries => {
-                    if(entries[0].isIntersecting && loading){
-                        setPage(page => page + 1);
-                    }
-                },
-                { threshold: 0 }
-            );
-            observer.observe(pageEnd.current);
+        if(!loading){
+            setDefault().then( ()=> { setLoading(false); })
         }
-    }, [loading]);
-
-    // 거리 바꿀 시 데이터 불러오기
-    useEffect(()=>{
-
-        const changeDistance = async () => {
-            if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
-                    if (!await ReissueToken()) return;
-                }
-    
-                axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
-                {
-                    headers:{
-                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                    }
-                })
-                .then(function(response){
-                    setPostLength(response.data.data.length);
-                    setPostItems(response.data.data);
-                    setLoading(response.data.hasNext); 
-                })
-                .catch(function(error){
-                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken();   
-                    } 
-                })
-            }
-        }
-        changeDistance();
-        
     }, [selectedOption])    
+
+    useEffect(()=>{
+        if(inView) { 
+            setLoading(true);
+            loadPost();
+        }
+    }, [inView])
+    
+    const clickFunc = () => {
+        console.log(`loading:${loading}`);
+        console.log(`hasNext:${hasNext}`);
+        console.log(`inView:${inView}`);
+    };
 
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
         <Wrapper>
+            <div style={{position:"fixed", left:"100px", top:"200px"}}><button onClick={clickFunc}>test</button></div>
             <Title>{type}</Title>
             <ButtonContainer>
                 {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ? 
@@ -300,12 +281,12 @@ function PostList(props) {
             </ButtonContainer>
             
             <PostListBox>
-                {((postLength === 0)&&(postItems.length === 0)) ? <div style={{width:"100%", height:"10%", textAlign:"center", marginTop:"200px", fontSize:"35px"}}>
+                {(postItems.length === 0) ? <div style={{width:"100%", height:"10%", textAlign:"center", marginTop:"200px", fontSize:"35px"}}>
                     등록된 게시물이 없습니다!</div> : 
                 postItems.map((item)=>{
                     return <PostItem key={uuid()} value={item} />
                 })}  
-                {(loading) && <div style={{width:"100%", height:"30px"}} ref={pageEnd}></div>}
+                {(!loading && hasNext) && <div style={{width:"100%", height:"30px"}} ref={pageEnd}></div>}
             </PostListBox>
         </Wrapper>
     );

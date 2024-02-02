@@ -51,9 +51,16 @@
 
 html{
     min-width: 100%;
+	height: 1000px;
 }
 
 body{
     min-width: 100vw;
+	height: 1000px;
+	-ms-overflow-style: none;
     font-family: 'SUITE';
+}
+
+&::-webkit-scrollbar{
+	display: none;
 }

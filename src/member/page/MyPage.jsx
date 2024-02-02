@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import profile from '../../common/resources/img/profile.png';
 import { FaTrashAlt } from "react-icons/fa";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import { FcRules } from "react-icons/fc";
@@ -252,10 +252,9 @@ function MyPage(props) {
     });
 
     // redux로 변수, 함수 가져오기
-    const { isLog, id, param, loc } = useSelector((state)=>({
+    const { isLog, id, loc } = useSelector((state)=>({
         isLog: state.login.isLogin,
         id: state.login.memberId,
-        param : state.login.paramId,
         loc: state.login.location,
     }), shallowEqual);
 
@@ -305,9 +304,10 @@ function MyPage(props) {
         };
     }
     
+    const { memberid } = useParams();
+
     // 마이페이지 실행 시 
     useEffect(() =>{
-
         const loadMypage = async () => {
             // 비회원일 때 
             if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
@@ -325,10 +325,10 @@ function MyPage(props) {
                 if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
                     if (!await ReissueToken()) return;
                 }
-                {(id===param)? setMySelf(true) : setMySelf(false)};
+                {(id===memberid)? setMySelf(true) : setMySelf(false)};
                 //마이페이지에 처음 접근할 때
                 if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
-                    axios.get(`http://13.209.77.50:8080/member/profile/${param}`,{
+                    axios.get(`http://13.209.77.50:8080/member/profile/${memberid}`,{
                         headers:{
                             Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                         }
@@ -382,7 +382,7 @@ function MyPage(props) {
             };
         }
         loadMypage();
-    }, [param]);
+    }, [memberid]);
 
     const [currentName, setCurrentName] = useState(null);
 
