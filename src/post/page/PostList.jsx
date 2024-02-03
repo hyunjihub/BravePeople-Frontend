@@ -137,7 +137,7 @@ function PostList(props) {
             })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
-                expirationTime: Date.now() + (5 * 60 * 1000),
+                expirationTime: response.data.accessTokenExpiresIn,
                 refresh: response.data.refreshToken
             }));
             return true;
@@ -197,7 +197,7 @@ function PostList(props) {
         const loadPost = async () => {
             // 로그인 상태일 때 게시글 조회
             if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
                     if (!await ReissueToken()) return;
                 }
 
@@ -254,7 +254,7 @@ function PostList(props) {
 
         const changeDistance = async () => {
             if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
-                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
                     if (!await ReissueToken()) return;
                 }
     

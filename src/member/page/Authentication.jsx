@@ -79,7 +79,7 @@ function Authentication(props) {
             })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
-                expirationTime: Date.now() + (5 * 60 * 1000),
+                expirationTime: response.data.accessTokenExpiresIn,
                 refresh: response.data.refreshToken
             }));
             return true;
@@ -111,7 +111,7 @@ function Authentication(props) {
     }
 
     const handleAuth = async (e) =>{
-        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
             if (!await ReissueToken()) return;
         }
 

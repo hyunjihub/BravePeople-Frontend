@@ -260,7 +260,7 @@ function WritePost(props) {
             })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
-                expirationTime: Date.now() + (5 * 60 * 1000),
+                expirationTime: response.data.accessTokenExpiresIn,
                 refresh: response.data.refreshToken
             }));
             return true;
@@ -305,7 +305,7 @@ function WritePost(props) {
                 });
             }
             else if(postid!=='-1') {
-                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
                     if (!await ReissueToken()) return;
                 }
                 axios.get(`http://13.209.77.50:8080/posts/${postid}`)
@@ -380,10 +380,10 @@ function WritePost(props) {
     //내용
     const [content, setContent] = useState("")
     const handleContent = (e) => {
-        if(e.target.value.length>2000) {
+        if(e.target.value.length>1000) {
             Swal.fire({
                 title: "내용 최대 글자수",
-                text: "내용의 최대 글자수는 2,000자 입니다. 내용 글자수를 확인해주세요.",
+                text: "내용의 최대 글자수는 1,000자 입니다. 내용 글자수를 확인해주세요.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
@@ -401,14 +401,17 @@ function WritePost(props) {
     }
 
     const fileInput = React.createRef();
-    const handleImg = (e) => {
+    const handleImg = async (e) => {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
         if (!uploading) {
             fileInput.current.click();
         }
     }
 
     const handleChange = async (e) => {
-        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
             if (!await ReissueToken()) return;
         }
         const files = e.target.files;
@@ -422,7 +425,15 @@ function WritePost(props) {
                 confirmButtonText: "확인",
             });
         }
-        else if (files && files.length > 0) {
+        else if (files[0].size>1024 ** 2 * 10){
+            Swal.fire({
+                title: "불가능한 파일 크기",
+                text: "프로필 이미지는 10MB이하만 사용 가능합니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        } else if (files && files.length === 1) {
             const frm = new FormData();
             frm.append('file', files[0]);
             axios.post("http://13.209.77.50:8080/image", frm, {
@@ -458,7 +469,7 @@ function WritePost(props) {
 
     //게시글 업로드
     const handleUpload = async (e) => {
-        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
             if (!await ReissueToken()) return;
         }
         if((title !== "") && (number !== "") && (content !== "")){
@@ -589,8 +600,8 @@ function WritePost(props) {
                     cols="30" rows="5"
                     value={content || ""}
                     onChange={handleContent}
-                    placeholder="내용을 입력해주세요. 최대 2,000자"/>
-                    <Length>{content.length}/2000</Length>
+                    placeholder="내용을 입력해주세요. 최대 1,000자"/>
+                    <Length>{content.length}/1000</Length>
                     <ImageContainer>
                         <FileInput onClick={handleImg}>
                             {(currentImg === "") ? <FaCamera className="icon" size="45" color="ccc"/> : 
