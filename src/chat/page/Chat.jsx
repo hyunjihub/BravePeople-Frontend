@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import profile from "../../common/resources/img/profile.png";
 
@@ -130,8 +130,22 @@ const Dialogue = styled.div`
 `;
 
 function Chat(props) {
+
+    const [nowRoomId, setNowRoomId] = useState(null);
+
+    useEffect(()=>{
+        const setNowRoom = async() => {
+            setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); 
+        }
+        setNowRoom();
+        return() => {
+            sessionStorage.removeItem('nowRoomId');
+        }
+    }, []);
+
     return(
         <Container>
+            <div><button onClick={()=>console.log(nowRoomId)}>click</button></div>
             <ChatList>
 
             </ChatList>

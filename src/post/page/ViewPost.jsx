@@ -229,16 +229,27 @@ function ViewPost(props) {
         price: ""
     });
 
-    // 버튼들(수정, 삭제, 달려가기, 부탁하기) 활성화 여부
+    // 버튼(달려가기, 부탁하기) 활성화 여부
     const [isActivate, setIsActivate] = useState(false);
+    // 버튼(수정하기, 삭제하기) 활성화 여부
+    const [isSelf, setIsSelf] = useState(false);
 
     // 데이터 불러오기
     useEffect(()=>{
         axios.get(`http://13.209.77.50:8080/posts/${postid}`)
         .then(function(response){
             setPostData(response.data);
-            if((id !== null)&&(id === response.data.memberId.toString())){ setIsActivate(true); }
-            else { setIsActivate(false); }
+            if(id === null) { setIsActivate(false); }
+            else{
+                if(id === response.data.memberId.toString()) { 
+                    setIsSelf(true)
+                    setIsActivate(false);
+                }
+                else {
+                    setIsSelf(false)
+                    setIsActivate(true);
+                }
+            }
         })
         .catch(function(error){
             console.log(error);
@@ -303,7 +314,7 @@ function ViewPost(props) {
             if (result.isConfirmed) {
                 axios.delete(`http://13.209.77.50:8080/posts/${postid}`, {
                     headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }})
                 .then(function(response){
                     Swal.fire({
@@ -344,9 +355,32 @@ function ViewPost(props) {
         e.preventDefault();
     }
 
+    // 부탁하기/달려가기 버튼
+    const handleRequestButton = (e) => {
+        const moveChat = async () => {
+            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+                if(!await ReissueToken()) return;
+            }
+            axios.get(`http://13.209.77.50:8080/posts/${postid}/request`,
+            {
+                headers :{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                console.log(response);
+                sessionStorage.setItem('nowRoomId', JSON.stringify(response.data.roomId));
+                navigate("/chat");
+            })
+            .catch(function(error){
+                console.log(error);
+            })
+        }
+        //moveChat();
+    }
+
     return(
         <Wrapper>
-            
             <Title>{postData.type}</Title>
             <Line />
             <TitleBox>
@@ -363,7 +397,7 @@ function ViewPost(props) {
                     </Rating>
                     <Time>{postData.createdAt}</Time>
                 </NicknameBox>
-                {(isActivate)?
+                {(isSelf)?
                 <ButtonContainer>
                     {(!postData.disabled)?<Button onClick={()=>{navigate(`/postlist/${(postData.type==="원정대")? "helping" : "helped"}/writepost/${postid}`)}}>수정</Button>
                     :<HiddenButton />}
@@ -376,7 +410,7 @@ function ViewPost(props) {
                 {postData.contents}
             </Content>
             <StickyBox>
-                <ChatButton disabled={!isActivate} onClick={()=>{alert(`${(postData.type==="원정대")? "의뢰하기" : "원정가기"}버튼 눌림`)}}>
+                <ChatButton disabled={!isActivate} onClick={handleRequestButton}>
                     {(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
                 <Price>{postData.price!=="-1"?postData.price+"원":"가격협의"}</Price>
             </StickyBox>
