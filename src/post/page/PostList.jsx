@@ -253,17 +253,10 @@ function PostList(props) {
             loadPost();
         }
     }, [inView])
-    
-    const clickFunc = () => {
-        console.log(`loading:${loading}`);
-        console.log(`hasNext:${hasNext}`);
-        console.log(`inView:${inView}`);
-    };
 
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
         <Wrapper>
-            <div style={{position:"fixed", left:"100px", top:"200px"}}><button onClick={clickFunc}>test</button></div>
             <Title>{type}</Title>
             <ButtonContainer>
                 {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ? 
