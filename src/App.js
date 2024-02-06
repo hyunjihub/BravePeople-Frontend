@@ -28,7 +28,7 @@ export default function App(props) {
                     <Route path="/chat" element={<Chat />}/>
                     <Route path="/findid" element={<FindId />}/>
                     <Route path="/login" element={<LogIn />}/>
-                    <Route path="/mypage" element={<MyPage />}/>
+                    <Route path="/profile/:memberid" element={<MyPage />}/>
                     <Route path="/postlist/:ishelped" element={<PostList />}/>
                     <Route path="/resetpw" element={<ResetPw />}/>
                     <Route path="/authentication" element={<Authentication />} />

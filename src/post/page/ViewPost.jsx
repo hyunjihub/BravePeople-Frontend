@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { setLogin, setMemberId, setLocation, setParamId, setProfileImg } from "../../member/redux/modules/login"
+import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/redux/modules/login"
 
 const Wrapper = styled.div`
     width: 42%;
@@ -208,7 +208,6 @@ function ViewPost(props) {
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (id) => dispatch(setMemberId(id));
     const setLoc = (loc) => dispatch(setLocation(loc));
-    const setParam = (paramid) => dispatch(setParamId(paramid)); 
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
 
     // redux로 변수, 함수 가져오기
@@ -333,7 +332,6 @@ function ViewPost(props) {
             navigate("/login");
         }
         else {
-            setParam(String(postData.memberId));
             sessionStorage.setItem('savedUserInfo', JSON.stringify({
                 profileImage: null,
                 nickname: null,
@@ -341,7 +339,7 @@ function ViewPost(props) {
                 score: null,
                 medalCount: null,
             }));
-            navigate("/mypage");
+            navigate(`/profile/${String(postData.memberId)}`);
         }
         e.preventDefault();
     }

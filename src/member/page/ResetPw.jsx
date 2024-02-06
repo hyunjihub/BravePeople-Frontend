@@ -8,7 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 // redux
-import { setLogin, setMemberId, setLocation, setParamId, setProfileImg } from "../redux/modules/login";
+import { setLogin, setMemberId, setLocation, setProfileImg } from "../redux/modules/login";
 import { useDispatch } from "react-redux";
 
 const Title = styled.div`
@@ -75,7 +75,6 @@ function ResetPw(props) {
     const dispatch = useDispatch();
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
-    const setParam = (paramid) => dispatch(setParamId(paramid)); 
     const setLoc = (loc) => dispatch(setLocation(loc)); 
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
 
@@ -186,7 +185,6 @@ function ResetPw(props) {
                             sessionStorage.clear();
                             setLog(false);
                             setId(null);
-                            setParam(null);
                             setLoc({
                                 latitude: null,
                                 longitude: null
