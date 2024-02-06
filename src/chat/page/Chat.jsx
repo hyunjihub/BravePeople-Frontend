@@ -6,20 +6,24 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 import { useDispatch } from "react-redux";
+import { BsCameraFill } from "react-icons/bs";
 
-const Chatting = styled.div`
-    width: 400px;
+
+import Chatting from "../components/Chatting";
+import List from "../components/Chatlist";
+
+const ChatPage = styled.div`
+    width: 480px;
     height: 600px;
     border-radius: 18px;
     box-shadow: 1px 0px 20px 0 rgba(0, 0, 0, 0.2);
     background-color: #fff;
-    overflow: hidden;
     border: 1px solid rgba(0, 0, 0, 0.1);
     margin-left: 10px;
 `;
 
 const ChatList = styled.div`
-    width: 650px;
+    width: 50%;
     height: 600px;
     border-radius: 18px;
     box-shadow: 0px 1px 20px 0 rgba(0, 0, 0, 0.2);
@@ -29,57 +33,64 @@ const ChatList = styled.div`
 `;
 
 const Container = styled.div`
-    width: 1000px;
-    height: 650px;
+    width: 55%;
+    height: 60%;
     display: flex;
+    border-radius: 18px;
     flex-direction: row;
     flex: space-between;
     margin: 120px auto;
 `;
 
 const Header = styled.div`
-    height: 100px;
-    background-color: #ECECEC;
+    height: 15%;
+    background-color: #fff;
     box-shadow: 0 4px 4px -4px rgba(0, 0, 0, 0.3);
     position: sticky;
+    border-radius: 18px;
     top: 0;
     z-index: 999;
+    display: flex;
+    flex-direction: row;
 `;
 
 const Footer = styled.div`
-    height: 130px;
-    background-color: #ECECEC;
+    height: 15%;
+    background-color: #fff;
     box-shadow: 0 -4px 4px -4px rgba(0, 0, 0, 0.3);
     position: sticky;
     bottom: 0;
     z-index: 999;
+    display: flex;
+    flex-direction: row;
 `;
 
 const Profile = styled.img`
-    width: 50px;
-    height: 50px;
-    margin: 30px 15px;
+    width: 15%;
+    height: 100%;
+    margin: 5% 2.5% 0 5%;
     z-index: 999;
+    cursor: pointer;
 `;
 
 const User = styled.div`
     width: 400px;
-    height: 50px;
-    position: relative;
+    height: 65%;
+    display: flex;
+    flex-direction: row;
 `;
 
 const Nickname = styled.div`
+    width: 40%;
     font-size: 22px;
     color: #000;
-    font-weight: bold;
-    position: absolute;
-    left: 75px;
-    top: 25px;
+    font-weight: 700;
+    margin-top: 6%;
 `;
 
 const Button = styled.button`
-    width: 80px;
-    height: 22px;
+    width: 45%;
+    height: 100%;
     background-color: #f8332f;
     font-size: 15px;
     color: #fff;
@@ -87,11 +98,12 @@ const Button = styled.button`
     border-radius: 5px;
     font-family: 'SUITE';
     margin-right: 5px;
+    cursor: pointer;
 `;
 
 const DisableButton = styled.button`
-    width: 80px;
-    height: 22px;
+    width: 45%;
+    height: 100%;
     background-color: #EB9F9C;
     opacity: 0.7;
     font-size: 15px;
@@ -100,39 +112,86 @@ const DisableButton = styled.button`
     border-radius: 5px;
     font-family: 'SUITE';
     margin-right: 5px;
+    cursor: pointer;
 `;
 
 const ButtonList = styled.div`
-    position : absolute;
-    top: 55px;
-    left: 75px;
+    width: 13%;
+    height: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    margin-top: 4%;
+    align-items: center;
+
+    &.request {
+        flex-direction: row;
+        width: 70%;
+        height: 50%;
+        margin: 0;
+    }
+
+    &.user {
+        height: 120%;
+        width: 70%;
+        margin-top: 1.5%;
+        align-items: flex-start;
+    }
 `;
 
 const SendBox = styled.textarea`
-    width: 300px;
-    height: 100px;
+    width: 80%;
+    height: 100%;
     border-radius: 15px;
-    border: 2px solid rgba(0, 0, 0, 0.3);
-    outline-color: rgba(248, 51, 47, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    outline: 1px solid rgb(248, 51, 47);
     overflow-y: scroll;
     &::-webkit-scrollbar {
         display: none;
     }
-    margin: 15px 10px 0 10px;
     font-family: 'SUITE';
     box-sizing: border-box;
     padding: 10px;
+    margin: 3% 2%;
+    cursor: pointer;
+    font-size: 14px;
 `;
 
 const Dialogue = styled.div`
-    height: 420px;
+    height: 65%;
     overflow-y: scroll;
     &::-webkit-scrollbar {
         display: none;
     }
+    min-height: 55%;
 `;
+
+const SendButton = styled.button`
+    width: 100%;
+    height: 40%;
+    background-color: #f8332f;
+    font-family: 'SUITE';
+    font-size: 15px;
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    margin: 7% 0;
+    cursor: pointer;
+`;
+
+const Filter = styled.button`
+    width: 50%;
+    font-size: 25px;
+    font-weight: 800;
+    color: #000;
+    padding: 6% 15%;
+    box-sizing: border-box;
+    border: none;
+    background-color: #fff;
+    font-family: 'SUITE';
+
+    border-bottom: 2px solid ${({ selected }) => (selected ? "#f8332f" : "#fff")};
+`;
+
 
 function Chat(props) {
 
@@ -226,27 +285,45 @@ function Chat(props) {
         }
     }
 
+    const [selectedFilter, setSelectedFilter] = useState("대기/진행");
+    const handleFilterSelect = (filter) => {
+        setSelectedFilter(filter);
+    };
+
     return(
         <Container>
             <ChatList>
-
+                <Header>
+                    <Filter onClick={() => handleFilterSelect("대기/진행")} selected={selectedFilter === "대기/진행"}>대기/진행</Filter>
+                    <Filter onClick={() => handleFilterSelect("완료/취소")} selected={selectedFilter === "완료/취소"}>완료/취소</Filter>
+                </Header>
+                <List value={selectedFilter}/>
             </ChatList>
-            <Chatting>
+            <ChatPage>
                 <Header>
                     <User>
                         <Profile src={profile} alt="프로필" />
-                        <Nickname>원정대원</Nickname>
-                        <ButtonList>                    
-                            <DisableButton disabled="disabled">의뢰취소</DisableButton>
-                            <Button>의뢰완료</Button>
+                        <ButtonList className="user">
+                            <Nickname>원정대원</Nickname>
+                            <ButtonList className="request">                    
+                                <DisableButton disabled="disabled">의뢰취소</DisableButton>
+                                <Button>의뢰완료</Button>
+                            </ButtonList>
                         </ButtonList>
                     </User>
                 </Header>
-                <Dialogue></Dialogue>
+                <Dialogue>
+                    <Chatting />
+                </Dialogue>
                 <Footer>
-                    <SendBox></SendBox>
+                    <SendBox placeholder="메시지를 입력해주세요"></SendBox>
+                    <ButtonList>
+                        <BsCameraFill size="30" color="f8332f"/>
+                        <SendButton>전송</SendButton>
+                    </ButtonList>
+                    
                 </Footer>
-            </Chatting>
+            </ChatPage>
         </Container>
         
     );
