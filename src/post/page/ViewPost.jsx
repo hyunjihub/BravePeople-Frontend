@@ -16,7 +16,7 @@ import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/
 
 const Wrapper = styled.div`
     width: 42%;
-    height: 120vh;
+    height: 130vh;
     margin: 15px auto;
     position: relative;
 `;
@@ -69,7 +69,7 @@ const Category = styled.div`
 
 const ProfileBox = styled.div`
     width: 90%;
-    height: 4.5%;
+    height: 4%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -83,6 +83,7 @@ const Profile = styled.img`
     border: none;
     background-repeat: no-repeat;
     object-fit: cover;
+    cursor: pointer;
 `;
 
 const NicknameBox = styled.div`
@@ -141,17 +142,23 @@ const ButtonContainer = styled.div`
 
 const Content = styled.div`
     width: 90%;
-    height: 80%;
+    height: 87%;
     color: #000;
     margin: auto;
-    font-size: 20px;
+    font-size: 17px;
     display: flex;
     flex-direction: column;
+    overflow-wrap: break-word;
+    hyphens: auto; 
+
+    &.small{
+        height: 60%;
+    }
 `;
 
 const StickyBox = styled.div`
     width: 75%;
-    height: 5.5%;
+    height: 5%;
     position: sticky;
     bottom: 0;
     background-color: #f8332f;
@@ -170,6 +177,7 @@ const ChatButton = styled.button`
     font-size: 30px;
     color: #fff;
     margin: auto;
+    cursor: pointer;
 `;
 
 const Price = styled.div`
@@ -183,7 +191,7 @@ const Price = styled.div`
 `;
 
 const Image = styled.img`
-    width: 70%;
+    width: 65%;
     margin: 2% auto 3%;
 `;
 
@@ -246,7 +254,7 @@ function ViewPost(props) {
             })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
-                expirationTime: Date.now() + (5 * 60 * 1000),
+                expirationTime: response.data.accessTokenExpiresIn,
                 refresh: response.data.refreshToken
             }));
             return true;
@@ -279,7 +287,7 @@ function ViewPost(props) {
 
     //삭제 버튼 클릭시 삭제 API
     const handleDelete = async (e) => {
-        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
             if (!await ReissueToken()) return;
         }
         Swal.fire({

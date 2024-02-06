@@ -116,6 +116,7 @@ const Profile = styled.img`
     border: none;
     background-repeat: no-repeat;
     object-fit: cover;
+    cursor: pointer;
 `;
 
 const HiddenProfile = styled.div`
@@ -192,13 +193,15 @@ export default function Header(props) {
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
+            console.log(response);
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
-                expirationTime: Date.now() + (5 * 60 * 1000),
+                expirationTime: response.data.accessTokenExpiresIn,
                 refresh: response.data.refreshToken
             }));
             return true;
         } catch(error){
+            console.log(error);
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -228,7 +231,7 @@ export default function Header(props) {
     // 로그아웃
     const handleLogOut = async (e) => {
         if(isLog) {
-            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
                 if (!await ReissueToken()) return;
             }
             axios.post("http://13.209.77.50:8080/member/logout", {}, {
@@ -290,7 +293,7 @@ export default function Header(props) {
 
     const SetLocation = async () => {
         const handleSuccess = async (pos) => {
-            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime-60000) <= Date.now()) {
                 if (!await ReissueToken()) return;
             }
             axios.patch("http://13.209.77.50:8080/member/location", {

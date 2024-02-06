@@ -51,7 +51,6 @@ const ProfileButton = styled.button`
     overflow: hidden;
     margin: 10% 20% 3%;
     border: none;
-    cursor: pointer;
     background-repeat: no-repeat;
     object-fit: cover;
     background-position: center;
@@ -120,6 +119,11 @@ const Introduce = styled.div`
     font-size: 15px;
     text-align: center;
     margin-bottom: 5%;
+
+    &.time {
+        margin-bottom: 0%;
+        margin-top: 3%;
+    }
 `;
 
 const Modify = styled.button`
@@ -183,7 +187,7 @@ const Box = styled.div`
 `;
 
 const BoardName = styled.div`
-    width: 20%;
+    width: 55%;
     height: 5%;
     font-size: 30px;
     font-weight: 800;
@@ -220,6 +224,7 @@ const Post = styled.div`
     font-weight: 500;
     color: #000;
     margin: 2% 0% 0% 5%;
+    cursor: pointer;
 
     &.first {
         margin-top: 1.5%;
@@ -232,6 +237,13 @@ const NullPost = styled.div`
     color: #000;
     margin: auto;
     text-align: center;
+`;
+
+const PostBox = styled.div`
+    width: 95%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 `;
 
 function MyPage(props) {
@@ -273,7 +285,7 @@ function MyPage(props) {
             })
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
-                expirationTime: Date.now() + (5 * 60 * 1000),
+                expirationTime: response.data.accessTokenExpiresIn,
                 refresh: response.data.refreshToken
             }));
             return true;
@@ -322,7 +334,7 @@ function MyPage(props) {
                 return;
             }
             else{
-                if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+                if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
                     if (!await ReissueToken()) return;
                 }
                 {(id===memberid)? setMySelf(true) : setMySelf(false)};
@@ -422,17 +434,10 @@ function MyPage(props) {
 
     // 수정 완료 버튼
     const handleModify = async (e) => {       
-        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
             if (!await ReissueToken()) return;
-        } 
+        }
         if((currentName === userInfo.nickname) && (currentIntro === userInfo.intro) && (currentImg === userInfo.profileImage)){
-            Swal.fire({
-                title: "수정사항 없음",
-                text: "수정된 내용이 없습니다. 다시 한 번 확인해주세요.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-                confirmButtonText: "확인",
-            });
             setIsClicked(false);
         }else{
             if(currentName !== null && (currentName.length <= -1 || currentName.length > 6)) {
@@ -511,14 +516,17 @@ function MyPage(props) {
     }
 
     const fileInput = React.createRef();
-    const handleProfile = (e) => {
+    const handleProfile = async (e) => {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
         fileInput.current.click();
     }
     const frm = new FormData();
 
     //프로필 이미지 불러오기
     const handleChange = async (e) => {
-        if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
             if (!await ReissueToken()) return;
         }
 
@@ -528,13 +536,22 @@ function MyPage(props) {
         if (!files[0].name.match(reg)) {
             Swal.fire({
                 title: "불가능한 파일 확장자",
-                text: "프로필 이미지는 jpg, jpeg, png만 사용가능합니다.",
+                text: "프로필 이미지는 jpg, jpeg, png만 사용 가능합니다.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
         }
-        else if (files && files.length > 0) {
+        else if (files[0].size>1024 ** 2 * 10){
+            Swal.fire({
+                title: "불가능한 파일 크기",
+                text: "프로필 이미지는 10MB이하만 사용 가능합니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        } else if (files && files.length === 1) {
+            console.log(files[0].size);
             frm.append('file', files[0]);
             axios.post("http://13.209.77.50:8080/image", frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
@@ -574,7 +591,7 @@ function MyPage(props) {
 
     const SetLocation = async () => {
         const handleSuccess = async (pos) => {
-            if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
+            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
                 if (!await ReissueToken()) return;
             }
             axios.patch("http://13.209.77.50:8080/member/location", {
@@ -658,15 +675,20 @@ function MyPage(props) {
                     {isClicked?<ModifyButton onClick={handleModify}>수정완료</ModifyButton>:null}
                     {isClicked?<ModifyButton onClick={handleIsClicked}>취소</ModifyButton>:null}
                 </ButtonContainer>
-                <Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>
-                <Modify onClick={SetLocation}>위치정보 재설정</Modify>  
+                {myself?<Modify onClick={()=>navigate("/authentication")}>비밀번호 재설정</Modify>:null}
+                {myself?<Modify onClick={SetLocation}>위치정보 재설정</Modify>:null}
+                
             </Profile>
 
             <Board>
-                <BoardName className="write">내가 쓴 글</BoardName>
+                <BoardName className="write">{myself?"내가 작성한 글":userInfo.nickname+"(이)가 작성한 글"}</BoardName>
                 <Box> 
                 {userInfo.posts.length === 0 ? (<NullPost>게시글 없음</NullPost>) : (
-                userInfo.posts.map((post, index) => (<Post key={index} onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 35)}</Post>)))}
+                userInfo.posts.map((post, index) => (
+                <PostBox>
+                    <Post key={index} onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 30)}</Post>
+                    <Introduce className="time">{post.createdAt}</Introduce>
+                </PostBox>)))}
                     
                 </Box>
                 <BoardName>후기</BoardName>
