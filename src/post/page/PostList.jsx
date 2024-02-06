@@ -36,8 +36,6 @@ const Title = styled.div`
 const PostListBox = styled.div`
     width: 100%;
     height: 95%;
-    overflow-y: scroll;
-    overflow-x: hidden;
     margin: 0px auto;
 `;
 
@@ -247,11 +245,18 @@ function PostList(props) {
         }
     }, [selectedOption])    
 
+    const setLoad = async(load) => {
+        setLoading(load);
+    }
+
     useEffect(()=>{
-        if(inView) { 
-            setLoading(true);
-            loadPost();
-        }
+        if(inView) {
+            const setData = async() => {
+                await setLoad(true);
+                loadPost();
+            }
+            setData();
+        } 
     }, [inView])
 
     // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price

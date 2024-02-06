@@ -356,7 +356,7 @@ function ViewPost(props) {
     }
 
     // 부탁하기/달려가기 버튼
-    const handleRequestButton = (e) => {
+    const handleRequestButton = async(e) => {
         const moveChat = async () => {
             if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
                 if(!await ReissueToken()) return;
@@ -377,6 +377,8 @@ function ViewPost(props) {
             })
         }
         //moveChat();
+        sessionStorage.setItem('nowRoomId', 1);
+        navigate("/chat");
     }
 
     return(

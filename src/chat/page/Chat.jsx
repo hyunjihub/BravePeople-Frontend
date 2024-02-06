@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import profile from "../../common/resources/img/profile.png";
+import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
+import axios from "axios";
+import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
+import { useDispatch } from "react-redux";
 
 const Chatting = styled.div`
     width: 400px;
@@ -131,21 +136,98 @@ const Dialogue = styled.div`
 
 function Chat(props) {
 
-    const [nowRoomId, setNowRoomId] = useState(null);
+    const navigate = useNavigate();
 
+    // redux 함수 dispatch
+    const dispatch = useDispatch();
+    const setLoc = (loc) => dispatch(setLocation(loc));
+    const setId = (id) => dispatch(setMemberId(id));
+    const setProfile = (pro) => dispatch(setProfileImg(pro));
+    const setLog = (bool) => dispatch(setLogin(bool));
+
+
+    const [nowRoomId, setNowRoomId] = useState(null);
+    const [prevChat, setPrevChat] = useState([]);
+
+
+    // 토큰 재발급 요청 api
+    const ReissueToken = async () => {
+        try {
+            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+                accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+                refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+            })
+            sessionStorage.setItem('jwt',JSON.stringify({
+                access: response.data.accessToken,
+                expirationTime: response.data.accessTokenExpiresIn,
+                refresh: response.data.refreshToken
+            }));
+            return true;
+        } catch(error){
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                sessionStorage.removeItem('jwt');
+                sessionStorage.removeItem('savedData');
+                sessionStorage.removeItem('savedUserInfo');
+                setLog(false);
+                setId(null);
+                setProfile(null);
+                setLoc({
+                    latitude: null,
+                    longitude: null
+                });
+                Swal.fire({
+                    title: "로그인 기간 만료",
+                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+                navigate("/main");
+            }else{
+                console.log(error);
+            }
+            return false;
+        };
+    }
+
+    // 페이지 처음 접속할 때
     useEffect(()=>{
-        const setNowRoom = async() => {
-            setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); 
-        }
-        setNowRoom();
+        if(sessionStorage.getItem('nowRoomId'))  { setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); }
+       
         return() => {
             sessionStorage.removeItem('nowRoomId');
         }
     }, []);
 
+    
+    useEffect(()=>{
+        console.log(nowRoomId);
+    }, [nowRoomId]);
+
+    // 채팅내역 불러오기
+    const getPrevChat = () => {
+        const getChat = async () => {
+            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+                if(!await ReissueToken()) return;
+            }
+            axios.get(`http://13.209.77.50:8080/chats`,
+            {
+                headers :{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                console.log(response);
+                setPrevChat(response.data);
+            })
+            .catch(function(error){
+                console.log(error);
+            })
+        }
+    }
+
     return(
         <Container>
-            <div><button onClick={()=>console.log(nowRoomId)}>click</button></div>
             <ChatList>
 
             </ChatList>
