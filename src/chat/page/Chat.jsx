@@ -9,8 +9,8 @@ import { useDispatch } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 
 
-import Chatting from "../components/Chatting";
-import List from "../components/Chatlist";
+import Chatting from "../components/chatting";
+import List from "../components/chatlist";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -205,7 +205,13 @@ function Chat(props) {
     const setLog = (bool) => dispatch(setLogin(bool));
 
 
+    // 현재 active된 채팅방 id
     const [nowRoomId, setNowRoomId] = useState(null);
+
+    // 채팅방 리스트
+    const [chatListm, setChatList] = useState([]);
+
+    // 이전 채팅 내역
     const [prevChat, setPrevChat] = useState([]);
 
 
@@ -252,6 +258,8 @@ function Chat(props) {
     // 페이지 처음 접속할 때
     useEffect(()=>{
         if(sessionStorage.getItem('nowRoomId'))  { setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); }
+
+        // getChatList();
        
         return() => {
             sessionStorage.removeItem('nowRoomId');
@@ -261,7 +269,30 @@ function Chat(props) {
     
     useEffect(()=>{
         console.log(nowRoomId);
+        // getPrevChat();
     }, [nowRoomId]);
+
+    // 채팅방 리스트
+    const getChatList = () => {
+        const getList = async () => {
+            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+                if(!await ReissueToken()) return;
+            }
+            axios.get(`http://13.209.77.50:8080/chats`,
+            {
+                headers :{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                console.log(response);
+                setChatList(response.data);
+            })
+            .catch(function(error){
+                console.log(error);
+            })
+        }
+    }
 
     // 채팅내역 불러오기
     const getPrevChat = () => {
@@ -269,7 +300,7 @@ function Chat(props) {
             if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
                 if(!await ReissueToken()) return;
             }
-            axios.get(`http://13.209.77.50:8080/chats`,
+            axios.get(`http://13.209.77.50:8080/chats/${nowRoomId}`,
             {
                 headers :{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -285,6 +316,7 @@ function Chat(props) {
         }
     }
 
+    // 채팅방 리스트 진행 중 or 진행 중 아님으로 분류
     const [selectedFilter, setSelectedFilter] = useState("대기/진행");
     const handleFilterSelect = (filter) => {
         setSelectedFilter(filter);
