@@ -29,9 +29,11 @@ const Container = styled.div`
 
 const Chat = styled.div`
   margin: 2% 0;
+  scrollY: auto;
 `;
 
 function Chatting(props) {
+
     const messages = [
         { sender: 'Alice', text: '안녕하세요!', time: '오후 3:00' },
         { sender: 'Bob', text: '안녕하세요!', time: '오후 3:01' },
@@ -43,7 +45,6 @@ function Chatting(props) {
         { sender: 'Alice', text: '의뢰가능할까요?', time: '오후 3:02' },
         { sender: 'Alice', text: '의뢰가능할까요?', time: '오후 3:02' },
         { sender: 'Alice', text: '두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트', time: '오후 3:02' },
-
     ];
 
     return (

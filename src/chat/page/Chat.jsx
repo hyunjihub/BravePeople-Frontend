@@ -268,7 +268,7 @@ function Chat(props) {
 
     
     useEffect(()=>{
-        console.log(nowRoomId);
+        console.log(`nowRoomId : ${nowRoomId}`);
         // getPrevChat();
     }, [nowRoomId]);
 
