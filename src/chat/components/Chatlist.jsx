@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import profile from "../../common/resources/img/profile.png";
 import { useNavigate } from "react-router";
 
@@ -69,6 +69,7 @@ function Chatlist(props) {
 
   const navigate = useNavigate();
 
+  // 더미 데이터
   const list = [
     {
       roomId: 1,
@@ -179,6 +180,8 @@ function Chatlist(props) {
     navigate(`/profile/${String(e.target.getAttribute('value'))}`);
     e.preventDefault();
   }
+
+  
 
   return (
       <Chat>

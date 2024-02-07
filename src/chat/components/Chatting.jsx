@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import testImg from "../resources/testImg.jpg";
 
 const Bubble = styled.div`
@@ -25,7 +25,6 @@ const Container = styled.div`
   width: 100%;
   margin: 1%;
   align-items: flex-end;
-  overflow-y: auto;
 
   &.full {
     flex-direction: column;
@@ -33,8 +32,14 @@ const Container = styled.div`
 `;
 
 const Chat = styled.div`
+  width: 100%;
+  height: 100%;
   margin: 2% 0;
-  scrollY: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  &::-webkit-scrollbar{
+    display:none;
+  }
 `;
 
 const Image = styled.img`
@@ -81,16 +86,23 @@ function Chatting(props) {
       }
     }
 
+    // 페이지 스크롤 맨 아래로 이동
+    const scrollRef = useRef();
+
+    useEffect(()=>{
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }, []);
+
     return (
-        <Chat>
-          {messages.map((messages) => (
-            <Container className="full" key={messages.chatId}>
-              {handleChangeDate(messages.chatId) && <Date>{messages.date}</Date>}
-              <Container isUser={messages.senderId === 1}>
-                <Bubble isUser={messages.senderId === 1}>
-                  {(messages.message!==null)?messages.message:<Image src={testImg} alt="전송이미지" />}
+        <Chat ref={scrollRef}>
+          {messages.map((message) => (
+            <Container className="full" key={message.chatId}>
+              {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
+              <Container isUser={message.senderId === 1}>
+                <Bubble isUser={message.senderId === 1}>
+                  {(message.message!==null)?message.message:<Image src={testImg} alt="전송이미지" />}
                 </Bubble>
-                <Time>{messages.time}</Time>
+                <Time>{message.time}</Time>
               </Container>
             </Container>
           ))}
