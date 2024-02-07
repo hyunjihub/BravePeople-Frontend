@@ -88,14 +88,19 @@ function Chatting(props) {
 
     // 페이지 스크롤 맨 아래로 이동
     const scrollRef = useRef();
+    const [msgArr, setMsgArr] = useState([]);
+
+    useEffect(()=>{
+      setMsgArr(messages);
+    });
 
     useEffect(()=>{
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }, []);
+    },[msgArr]);
 
     return (
         <Chat ref={scrollRef}>
-          {messages.map((message) => (
+          {msgArr.map((message) => (
             <Container className="full" key={message.chatId}>
               {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
               <Container isUser={message.senderId === 1}>
