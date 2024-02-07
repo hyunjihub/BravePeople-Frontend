@@ -375,6 +375,7 @@ function MyPage(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
+                            navigate("/main");
                         }
                         else {
                             console.log(error);
@@ -551,7 +552,6 @@ function MyPage(props) {
                 confirmButtonText: "확인",
             });
         } else if (files && files.length === 1) {
-            console.log(files[0].size);
             frm.append('file', files[0]);
             axios.post("http://13.209.77.50:8080/image", frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',

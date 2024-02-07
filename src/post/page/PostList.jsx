@@ -20,6 +20,9 @@ const Wrapper = styled.div`
     height: 1000px;
     margin: 15px auto;
     overflow-y: auto;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 `;
 
 const Title = styled.div`

@@ -8,9 +8,8 @@ import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/
 import { useDispatch } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 
-
-import Chatting from "../components/chatting";
-import List from "../components/chatlist";
+import Chatting from "../components/Chatting";
+import List from "../components/Chatlist";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -28,7 +27,10 @@ const ChatList = styled.div`
     border-radius: 18px;
     box-shadow: 0px 1px 20px 0 rgba(0, 0, 0, 0.2);
     background-color: #fff;
-    overflow: hidden;
+    overflow-y: scroll;
+    &::-webkit-scrollbar {
+        display: none;
+    }
     border: 1px solid rgba(0, 0, 0, 0.1);
 `;
 
@@ -162,7 +164,6 @@ const Dialogue = styled.div`
     &::-webkit-scrollbar {
         display: none;
     }
-    min-height: 55%;
 `;
 
 const SendButton = styled.button`
@@ -190,6 +191,7 @@ const Filter = styled.button`
     font-family: 'SUITE';
 
     border-bottom: 2px solid ${({ selected }) => (selected ? "#f8332f" : "#fff")};
+    transition: border-bottom 0.7s ease;
 `;
 
 
@@ -316,11 +318,86 @@ function Chat(props) {
         }
     }
 
+    //클릭시 프로필 페이지 이동 오류방지 위해 주석처리 함
+    const handlePage = (e) => {
+        sessionStorage.setItem('savedUserInfo', JSON.stringify({
+            profileImage: null,
+            nickname: null,
+            intro: null,
+            score: null,
+            medalCount: null,
+        }));
+        //추후 변수명(otherId) 변경
+        //navigate(`/profile/${String(otherId)}`);
+        e.preventDefault();
+    }
+
     // 채팅방 리스트 진행 중 or 진행 중 아님으로 분류
     const [selectedFilter, setSelectedFilter] = useState("대기/진행");
     const handleFilterSelect = (filter) => {
         setSelectedFilter(filter);
     };
+
+    const fileInput = React.createRef();
+    const handleProfile = async (e) => {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
+        fileInput.current.click();
+    }
+    const frm = new FormData();
+
+    //프로필 이미지 불러오기
+    const handleChange = async (e) => {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+            if (!await ReissueToken()) return;
+        }
+
+        const files = e.target.files;
+        var reg = /(.*?)\.(jpg|jpeg|png)$/;
+
+        if (!files[0].name.match(reg)) {
+            Swal.fire({
+                title: "불가능한 파일 확장자",
+                text: "프로필 이미지는 jpg, jpeg, png만 사용 가능합니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        }
+        else if (files[0].size>1024 ** 2 * 10){
+            Swal.fire({
+                title: "불가능한 파일 크기",
+                text: "프로필 이미지는 10MB이하만 사용 가능합니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+        } else if (files && files.length === 1) {
+            frm.append('file', files[0]);
+            axios.post("http://13.209.77.50:8080/image", frm, {
+                headers: {'Content-Type' : 'Multipart/form-data',
+                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }}).then(function(response){
+                console.log(response.data.imgUrl);
+                fileInput.current.value = "";
+            }).catch(function(err){
+                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
+                    ReissueToken();
+                } else if((err.response.status === 400 && err.response.data.errorMessage === '파일 업로드 실패')) {
+                    Swal.fire({
+                        title: "파일 업로드 오류",
+                        text: "파일 업로드 오류가 발생했습니다. 다시 시도해주세요.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                } else {
+                    console.log(err);
+                }
+            })
+        }
+    }
 
     return(
         <Container>
@@ -334,7 +411,7 @@ function Chat(props) {
             <ChatPage>
                 <Header>
                     <User>
-                        <Profile src={profile} alt="프로필" />
+                        <Profile onClick={handlePage} src={profile} alt="프로필" />
                         <ButtonList className="user">
                             <Nickname>원정대원</Nickname>
                             <ButtonList className="request">                    
@@ -350,7 +427,8 @@ function Chat(props) {
                 <Footer>
                     <SendBox placeholder="메시지를 입력해주세요"></SendBox>
                     <ButtonList>
-                        <BsCameraFill size="30" color="f8332f"/>
+                        <BsCameraFill onClick={handleProfile} size="30" color="f8332f"/>
+                        <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                         <SendButton>전송</SendButton>
                     </ButtonList>
                     
