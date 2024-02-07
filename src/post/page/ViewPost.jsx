@@ -16,7 +16,7 @@ import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/
 
 const Wrapper = styled.div`
     width: 42%;
-    height: 130vh;
+    height: 100vh;
     margin: 15px auto;
     position: relative;
 `;
@@ -40,7 +40,7 @@ const Line = styled.hr`
 
 const TitleBox = styled.div`
     width: 90%;
-    height: 2.5%;
+    height: 3%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -69,7 +69,7 @@ const Category = styled.div`
 
 const ProfileBox = styled.div`
     width: 90%;
-    height: 4%;
+    height: 5%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -142,7 +142,6 @@ const ButtonContainer = styled.div`
 
 const Content = styled.div`
     width: 90%;
-    height: 87%;
     color: #000;
     margin: auto;
     font-size: 17px;
@@ -150,15 +149,14 @@ const Content = styled.div`
     flex-direction: column;
     overflow-wrap: break-word;
     hyphens: auto; 
+    min-height: 55%;
+    padding-bottom: 10%;
 
-    &.small{
-        height: 60%;
-    }
 `;
 
 const StickyBox = styled.div`
     width: 75%;
-    height: 5%;
+    height: 7%;
     position: sticky;
     bottom: 0;
     background-color: #f8332f;

@@ -7,7 +7,7 @@ const Bubble = styled.div`
   color: ${({ isUser }) => (isUser ? '#fff' : '#000')};
   font-size: 15px;
   background-color: ${({ isUser }) => (isUser ? '#f8332f' : '#f3f0f5')};
-  margin: 1% 3%;
+  margin: 0% 3%;
   border-radius: 15px;
   padding: 2%;
 `;
@@ -23,7 +23,7 @@ const Container = styled.div`
   float: ${({ isUser }) => (isUser ? 'right' : 'left')};
   clear: both;
   width: 100%;
-  margin: 1%;
+  margin: 0.5%;
   align-items: flex-end;
 
   &.full {
@@ -64,55 +64,55 @@ const Date = styled.div`
 
 function Chatting(props) {
 
-    const messages = [
-        { chatId: 1, senderId: 1, message: '안녕하세요!', date: '2월 7일', time: '오후 3:00', img: null },
-        { chatId: 2, senderId: 2, message: '안녕하세요!', date: '2월 7일', time: '오후 3:01', img: null },
-        { chatId: 3, senderId: 1, message: '의뢰가능할까요?', date: '2월 7일', time: '오후 3:01', img: null },
-        { chatId: 4, senderId: 2, message: '네', date: '2월 7일', time: '오후 3:02', img: null },
-        { chatId: 5, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 6, senderId: 1, message: 'wish I could stay awhile I have all the old pictures of you I knew you would come around again you miss the young us like before, you are so naive you never believed me and what I said now you are saying I was so right then you are so lonely now', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 7, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 8, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 9, senderId: 1, message: null, date: '2월 9일', time: '오후 3:02', img: testImg },
-        { chatId: 10, senderId: 1, message: '두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트', date: '2월 9일', time: '오후 3:02', img: null },
-    ];
+  const messages = props.value;
+  const length = messages.length;
 
-    const handleChangeDate = (chatId) => {
-      if(chatId===1) {
-        return true;
-      } else {
-        if(messages[chatId-2].date===messages[chatId-1].date) return false;
-        else return true;
+  //date 값 변경 확인
+  const handleChangeDate = (chatId) => {
+    if(chatId===1) {
+      return true;
+    } else {
+      if(messages[chatId-2].date===messages[chatId-1].date) return false;
+      else return true;
+    }
+  }
+
+  //date 값 변경 확인
+  const handleChangeTime = (chatId) => { 
+    if(chatId===length) {
+      return true;
+    } else {
+      if(messages[chatId].date===messages[chatId-1].date) {
+        if(messages[chatId].senderId===messages[chatId-1].senderId) {
+          if(messages[chatId].time===messages[chatId-1].time) return false;
+        }
       }
     }
+    return true;
+  }
 
     // 페이지 스크롤 맨 아래로 이동
     const scrollRef = useRef();
-    const [msgArr, setMsgArr] = useState([]);
-
-    useEffect(()=>{
-      setMsgArr(messages);
-    });
 
     useEffect(()=>{
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    },[msgArr]);
+    }, []);
 
     return (
         <Chat ref={scrollRef}>
-          {msgArr.map((message) => (
+          {messages.map((message) => (
             <Container className="full" key={message.chatId}>
               {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
               <Container isUser={message.senderId === 1}>
                 <Bubble isUser={message.senderId === 1}>
                   {(message.message!==null)?message.message:<Image src={testImg} alt="전송이미지" />}
                 </Bubble>
-                <Time>{message.time}</Time>
+                {handleChangeTime(message.chatId) && <Time>{message.time}</Time>}
               </Container>
-            </Container>
-          ))}
-        </Chat>
-      );   
+          </Container>
+        ))}
+      </Chat>
+    );   
 } 
 
 export default Chatting;
