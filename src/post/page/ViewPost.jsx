@@ -357,26 +357,23 @@ function ViewPost(props) {
 
     // 부탁하기/달려가기 버튼
     const handleRequestButton = async(e) => {
-        const moveChat = async () => {
-            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
-                if(!await ReissueToken()) return;
-            }
-            axios.get(`http://13.209.77.50:8080/posts/${postid}/request`,
-            {
-                headers :{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
-                console.log(response);
-                sessionStorage.setItem('nowRoomId', JSON.stringify(response.data.roomId));
-                navigate("/chat");
-            })
-            .catch(function(error){
-                console.log(error);
-            })
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
         }
-        //moveChat();
+        axios.get(`http://13.209.77.50:8080/posts/${postid}/request`,
+        {
+            headers :{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+        })
+        .then(function(response){
+            console.log(response);
+            sessionStorage.setItem('nowRoomId', JSON.stringify(response.data.roomId));
+            navigate("/chat");
+        })
+        .catch(function(error){
+            console.log(error);
+        })
         sessionStorage.setItem('nowRoomId', 1);
         navigate("/chat");
     }
