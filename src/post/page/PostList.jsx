@@ -216,7 +216,7 @@ function PostList(props) {
                 }
             })
             .then(function(response){
-                setPostItems(postItems => [...postItems, ...response.data.data]);
+                setPostItems(postItems => [...postItems, response.data.data]);
                 setHasNext(response.data.hasNext);
                 setPage((page)=>(page+1));
                 setLoading(false);

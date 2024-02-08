@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import profile from "../../common/resources/img/profile.png";
 import { useNavigate } from "react-router";
@@ -10,6 +10,9 @@ import { BsCameraFill } from "react-icons/bs";
 
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
+
+import SockJS from "sockjs-client";
+import { Stomp, CompatClient } from "@stomp/stompjs";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -206,12 +209,15 @@ function Chat(props) {
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
 
+    // client
+    const client = useRef<CompatClient>(null);
+
 
     // 현재 active된 채팅방 id
     const [nowRoomId, setNowRoomId] = useState(null);
 
     // 채팅방 리스트
-    const [chatListm, setChatList] = useState([]);
+    const [chatList, setChatList] = useState([]);
 
     // 이전 채팅 내역
     const [prevChat, setPrevChat] = useState([]);
@@ -318,6 +324,57 @@ function Chat(props) {
         }
     }
 
+    // 소켓 연결
+    const connectHandler = () => {
+        const socket = new SockJS(`ws:// 13.209.77.50:8080/ws-stomp`);
+        
+        client.current = Stomp.over(socket);
+        client.current.connect({
+            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+            'Content-Type' : 'application/json'
+        },
+            ()=>{
+                client.current.subscribe(`/sub/${nowRoomId}`,
+                    (message)=>{
+                        setPrevChat(prevChat=>
+                            [...prevChat, message]
+                        );
+                    },
+                    {
+                        Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                        'Content-Type' : 'application/json'
+                    }
+                );
+            }     
+        );
+    }
+
+    // useEffect(()=>{
+    //     connectHandler();
+    // }, [nowRoomId]);
+
+    // 메시지 전송
+    const [msg, setMsg] = useState("");
+
+    const sendHandler = () => {
+        if(client.current && client.current.connected){
+            client.current.send(`/pub/${nowRoomId}`,{
+                Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                'Content-Type' : 'application/json'
+            },
+            JSON.stringify({
+                message: msg,
+                img: null
+            }));
+        }
+        setMsg("");
+    }
+
+    // 메시지 입력 박스
+    const handleTextbox = (e) => {
+        setMsg(e.target.value);
+    }
+
     //클릭시 프로필 페이지 이동 오류방지 위해 주석처리 함
     const handlePage = (e) => {
         sessionStorage.setItem('savedUserInfo', JSON.stringify({
@@ -347,8 +404,8 @@ function Chat(props) {
     }
     const frm = new FormData();
 
-    //프로필 이미지 불러오기
-    const handleChange = async (e) => {
+    //이미지 전송
+    const handleImage = async (e) => {
         if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
             if (!await ReissueToken()) return;
         }
@@ -379,7 +436,16 @@ function Chat(props) {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
-                console.log(response.data.imgUrl);
+                if(client.current && client.current.connected){
+                    client.current.send(`/pub/${nowRoomId}`,{
+                        Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                        'Content-Type' : 'application/json'
+                    },
+                    JSON.stringify({
+                        message: null,
+                        img: response.data.imgUrl
+                    }));
+                }
                 fileInput.current.value = "";
             }).catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
@@ -425,13 +491,12 @@ function Chat(props) {
                     <Chatting />
                 </Dialogue>
                 <Footer>
-                    <SendBox placeholder="메시지를 입력해주세요"></SendBox>
+                    <SendBox placeholder="메시지를 입력해주세요" onChange={handleTextbox} value={msg}></SendBox>
                     <ButtonList>
                         <BsCameraFill onClick={handleProfile} size="30" color="f8332f"/>
-                        <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
-                        <SendButton>전송</SendButton>
-                    </ButtonList>
-                    
+                        <input type="file" ref={fileInput} onChange={handleImage} style={{ display: "none" }}/>
+                        <SendButton onClick={sendHandler}>전송</SendButton>
+                    </ButtonList>       
                 </Footer>
             </ChatPage>
         </Container>

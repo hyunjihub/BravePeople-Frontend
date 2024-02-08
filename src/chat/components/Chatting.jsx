@@ -92,7 +92,7 @@ function Chatting(props) {
 
     useEffect(()=>{
       setMsgArr(messages);
-    });
+    }, []);
 
     useEffect(()=>{
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -100,7 +100,7 @@ function Chatting(props) {
 
     return (
         <Chat ref={scrollRef}>
-          {msgArr.map((message) => (
+          {msgArr.map((message, i) => (
             <Container className="full" key={message.chatId}>
               {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
               <Container isUser={message.senderId === 1}>
