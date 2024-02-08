@@ -473,9 +473,11 @@ function Chat(props) {
         );
     }
 
-    // useEffect(()=>{
-    //     connectHandler();
-    // }, [nowRoomId]);
+    useEffect(()=>{
+        if(nowRoomId !== null){
+            connectHandler();
+        }
+    }, [nowRoomId]);
 
     // 메시지 전송
     const [msg, setMsg] = useState("");
