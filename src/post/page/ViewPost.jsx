@@ -355,6 +355,17 @@ function ViewPost(props) {
 
     // 부탁하기/달려가기 버튼
     const handleRequestButton = async(e) => {
+
+        if(!isActivate) {
+            Swal.fire({
+                title: "본인이 작성한 게시글",
+                text: "본인의 게시글로 원정 또는 의뢰를 진행할 수 없습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+            return;
+        }
         if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
@@ -406,7 +417,7 @@ function ViewPost(props) {
                 {postData.contents}
             </Content>
             <StickyBox>
-                <ChatButton disabled={!isActivate} onClick={handleRequestButton}>
+                <ChatButton onClick={handleRequestButton}>
                     {(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
                 <Price>{postData.price!=="-1"?postData.price+"원":"가격협의"}</Price>
             </StickyBox>

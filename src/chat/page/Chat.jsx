@@ -220,7 +220,7 @@ function Chat(props) {
     const navigate = useNavigate();
 
     //채팅 데이터 (UI 및 검증용 임시 데이터)
-    const messages = [
+    const [messages, setMessages] = useState([
         { chatId: 1, senderId: 1, message: '안녕하세요!', date: '2월 7일', time: '오후 3:00', img: null },
         { chatId: 2, senderId: 2, message: '안녕하세요!', date: '2월 7일', time: '오후 3:01', img: null },
         { chatId: 3, senderId: 1, message: '의뢰가능할까요?', date: '2월 7일', time: '오후 3:01', img: null },
@@ -231,7 +231,7 @@ function Chat(props) {
         { chatId: 8, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
         { chatId: 9, senderId: 1, message: null, date: '2월 9일', time: '오후 3:02', img: testImg },
         { chatId: 10, senderId: 1, message: '두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트', date: '2월 9일', time: '오후 3:02', img: null },
-    ];
+    ]);
 
     //채팅리스트 데이터 (UI 및 검증용 임시 데이터)
     const list = [
@@ -482,7 +482,27 @@ function Chat(props) {
     const [msg, setMsg] = useState("");
 
     const sendHandler = async () => {
+
+        // 빈 메시지 무시
+        if (msg.trim() === "") {
+            return;
+        }
+
         console.log("전송할 메시지:", msg);
+
+        const newMessage = {
+            chatId: messages.length + 1, // 실제로는 백엔드에서 할당해야 함
+            senderId: 1, // 실제로는 사용자 ID에 따라 할당해야 함
+            message: msg,
+            date: '2월 10일', 
+            time: '오후 3:35', //시간 고정
+            img: null 
+        };
+
+        setMessages([...messages, newMessage]);
+
+        console.log(messages);
+
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,

@@ -686,8 +686,8 @@ function MyPage(props) {
                 <Box> 
                 {userInfo.posts.length === 0 ? (<NullPost>게시글 없음</NullPost>) : (
                 userInfo.posts.map((post) => (
-                <PostBox>
-                    <Post key={uuid()} onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 30)}</Post>
+                <PostBox key={uuid()}>
+                    <Post onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 30)}</Post>
                     <Introduce className="time">{post.createdAt}</Introduce>
                 </PostBox>)))}
                     

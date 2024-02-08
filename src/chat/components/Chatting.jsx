@@ -97,10 +97,10 @@ function Chatting(props) {
 
     useEffect(()=>{
       setMsgArr(messages);
-    }, []);
+    }, [messages]);
     useEffect(()=>{
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }, []);
+    }, [msgArr]);
 
     return (
         <Chat ref={scrollRef}>
@@ -116,7 +116,7 @@ function Chatting(props) {
           </Container>
         ))}
       </Chat>
-    );   
+    );    
 } 
 
 export default Chatting;
