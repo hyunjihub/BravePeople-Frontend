@@ -7,6 +7,7 @@ import axios from "axios";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 import { useDispatch } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
+import testImg from "../resources/testImg.jpg";
 
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
@@ -169,6 +170,22 @@ const Dialogue = styled.div`
     }
 `;
 
+const Unselected = styled.div`
+    width: 480px;
+    height: 600px;
+    border-radius: 18px;
+    box-shadow: 1px 0px 20px 0 rgba(0, 0, 0, 0.2);
+    background-color: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-left: 10px;
+    font-size: 25px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+`;
+
 const SendButton = styled.button`
     width: 100%;
     height: 40%;
@@ -201,6 +218,114 @@ const Filter = styled.button`
 function Chat(props) {
 
     const navigate = useNavigate();
+
+    //채팅 데이터 (UI 및 검증용 임시 데이터)
+    const messages = [
+        { chatId: 1, senderId: 1, message: '안녕하세요!', date: '2월 7일', time: '오후 3:00', img: null },
+        { chatId: 2, senderId: 2, message: '안녕하세요!', date: '2월 7일', time: '오후 3:01', img: null },
+        { chatId: 3, senderId: 1, message: '의뢰가능할까요?', date: '2월 7일', time: '오후 3:01', img: null },
+        { chatId: 4, senderId: 2, message: '네', date: '2월 7일', time: '오후 3:02', img: null },
+        { chatId: 5, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
+        { chatId: 6, senderId: 1, message: 'wish I could stay awhile I have all the old pictures of you I knew you would come around again you miss the young us like before, you are so naive you never believed me and what I said now you are saying I was so right then you are so lonely now', date: '2월 8일', time: '오후 3:02', img: null },
+        { chatId: 7, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
+        { chatId: 8, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
+        { chatId: 9, senderId: 1, message: null, date: '2월 9일', time: '오후 3:02', img: testImg },
+        { chatId: 10, senderId: 1, message: '두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트', date: '2월 9일', time: '오후 3:02', img: null },
+    ];
+
+    //채팅리스트 데이터 (UI 및 검증용 임시 데이터)
+    const list = [
+        {
+          roomId: 1,
+          memberId: 1,
+          nickname: 'User 1',
+          lastChat: '마지막으로 친 채팅이오',
+          lastSendAt: '오후 3:30',
+          isRead: true,
+          status: "대기/진행",
+        },
+        {
+          roomId: 2,
+          memberId: 2,
+          nickname: 'User 2',
+          lastChat: '안녕안녕안녕',
+          lastSendAt: '오후 12:45',
+          isRead: false,
+          status: "완료/취소",
+        },
+        {
+          roomId: 3,
+          memberId: 3,
+          nickname: 'User 3',
+          lastChat: 'wish I could stay awhile I have all the old pictures of you I knew you would come around again you miss the young us like before, you are so naive you never believed me and what I said now you are saying I was so right then you are so lonely now',
+          lastSendAt: '2월 6일',
+          isRead: true,
+          status: "대기/진행",
+        },
+        {
+          roomId: 4,
+          memberId: 4,
+          nickname: 'User 4',
+          lastChat: '처음부터 달랐어 불길하게 달콤한 느낌 이미 난 흔들렸어 내 맘대로 되는 게 없어서 싫은데 좋아',
+          lastSendAt: '1월 30일',
+          isRead: false,
+          status: "완료/취소",
+        },
+        {
+          roomId: 5,
+          memberId: 5,
+          nickname: 'User 5',
+          lastChat: '마치 된 것 같아 손오공',
+          lastSendAt: '12월 30일',
+          isRead: false,
+          status: "완료/취소",
+        },
+        {
+          roomId: 6,
+          memberId: 6,
+          nickname: 'User 6',
+          lastChat: '힘을 다하고 쓰러져도 포기를 모르고 날뛰는 중',
+          lastSendAt: '12월 30일',
+          isRead: true,
+          status: "완료/취소",
+        },
+        {
+          roomId: 7,
+          memberId: 7,
+          nickname: 'User 7',
+          lastChat: 'So I guess Now Ive got to go',
+          lastSendAt: '12월 30일',
+          isRead: false,
+          status: "완료/취소",
+        },
+        {
+          roomId: 8,
+          memberId: 8,
+          nickname: 'User 8',
+          lastChat: '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16',
+          lastSendAt: '12월 30일',
+          isRead: false,
+          status: "대기/진행",
+        },
+        {
+          roomId: 9,
+          memberId: 9,
+          nickname: 'User 9',
+          lastChat: '마치 된 것 같아 손오공',
+          lastSendAt: '12월 30일',
+          isRead: false,
+          status: "완료/취소",
+        },
+        {
+          roomId: 10,
+          memberId: 10,
+          nickname: 'User 10',
+          lastChat: '마치 된 것 같아 손오공',
+          lastSendAt: '12월 30일',
+          isRead: true,
+          status: "완료/취소",
+        },
+      ];
 
     // redux 함수 dispatch
     const dispatch = useDispatch();
@@ -266,8 +391,7 @@ function Chat(props) {
     // 페이지 처음 접속할 때
     useEffect(()=>{
         if(sessionStorage.getItem('nowRoomId'))  { setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); }
-
-        // getChatList();
+        getChatList();
        
         return() => {
             sessionStorage.removeItem('nowRoomId');
@@ -472,33 +596,35 @@ function Chat(props) {
                     <Filter onClick={() => handleFilterSelect("대기/진행")} selected={selectedFilter === "대기/진행"}>대기/진행</Filter>
                     <Filter onClick={() => handleFilterSelect("완료/취소")} selected={selectedFilter === "완료/취소"}>완료/취소</Filter>
                 </Header>
-                <List value={selectedFilter}/>
+                <List value={list} filter={selectedFilter} setState={setNowRoomId}/>
             </ChatList>
-            <ChatPage>
-                <Header>
-                    <User>
-                        <Profile onClick={handlePage} src={profile} alt="프로필" />
-                        <ButtonList className="user">
-                            <Nickname>원정대원</Nickname>
-                            <ButtonList className="request">                    
-                                <DisableButton disabled="disabled">의뢰취소</DisableButton>
-                                <Button>의뢰완료</Button>
+            {(nowRoomId===null)?<Unselected>선택된 채팅방이 없습니다.</Unselected>:
+                <ChatPage>
+                    <Header>
+                        <User>
+                            <Profile onClick={handlePage} src={profile} alt="프로필" />
+                            <ButtonList className="user">
+                                <Nickname>{list.find(item => item.roomId === nowRoomId)?.nickname}</Nickname>
+                                <ButtonList className="request">                    
+                                    <DisableButton disabled="disabled">의뢰취소</DisableButton>
+                                    <Button>의뢰완료</Button>
+                                </ButtonList>
                             </ButtonList>
-                        </ButtonList>
-                    </User>
-                </Header>
-                <Dialogue>
-                    <Chatting />
-                </Dialogue>
-                <Footer>
-                    <SendBox placeholder="메시지를 입력해주세요" onChange={handleTextbox} value={msg}></SendBox>
-                    <ButtonList>
-                        <BsCameraFill onClick={handleProfile} size="30" color="f8332f"/>
-                        <input type="file" ref={fileInput} onChange={handleImage} style={{ display: "none" }}/>
-                        <SendButton onClick={sendHandler}>전송</SendButton>
-                    </ButtonList>       
-                </Footer>
-            </ChatPage>
+                        </User>
+                    </Header>
+                    <Dialogue>
+                        <Chatting />
+                    </Dialogue>
+                    <Footer>
+                        <SendBox placeholder="메시지를 입력해주세요" onChange={handleTextbox} value={msg}></SendBox>
+                        <ButtonList>
+                            <BsCameraFill onClick={handleProfile} size="30" color="f8332f"/>
+                            <input type="file" ref={fileInput} onChange={handleImage} style={{ display: "none" }}/>
+                            <SendButton onClick={sendHandler}>전송</SendButton>
+                        </ButtonList>       
+                    </Footer>
+                </ChatPage>
+            }
         </Container>
         
     );
