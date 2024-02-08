@@ -365,7 +365,6 @@ function ViewPost(props) {
             }
         })
         .then(function(response){
-            console.log(response);
             sessionStorage.setItem('nowRoomId', JSON.stringify(response.data.roomId));
             navigate("/chat");
         })

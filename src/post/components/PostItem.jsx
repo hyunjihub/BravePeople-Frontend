@@ -80,8 +80,12 @@ function PostItem(props) {
         return str?.length > n ? str.substr(0, n - 1) + "..." : str;
     };
     
+    const test = () => {
+        console.log(props.value.category);
+    }
+
     return(
-        <Wrapper>
+        <Wrapper onClick={test}>
             <FirstLine onClick={handleView}>
                 <Category>{props.value.category}</Category>
                 {(props.value.gender === "남성")?<PiGenderMaleBold size="30" color="#254995"/>:<PiGenderFemaleBold size="30" color="#a93957"/>}

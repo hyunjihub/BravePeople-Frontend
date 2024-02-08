@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router";
 import { FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import { FcRules } from "react-icons/fc";
+import uuid from 'react-uuid';
 import Swal from "sweetalert2";
 
 import StarRating from "../components/Rating";
@@ -684,9 +685,9 @@ function MyPage(props) {
                 <BoardName className="write">{myself?"내가 작성한 글":userInfo.nickname+"(이)가 작성한 글"}</BoardName>
                 <Box> 
                 {userInfo.posts.length === 0 ? (<NullPost>게시글 없음</NullPost>) : (
-                userInfo.posts.map((post, index) => (
+                userInfo.posts.map((post) => (
                 <PostBox>
-                    <Post key={index} onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 30)}</Post>
+                    <Post key={uuid()} onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 30)}</Post>
                     <Introduce className="time">{post.createdAt}</Introduce>
                 </PostBox>)))}
                     

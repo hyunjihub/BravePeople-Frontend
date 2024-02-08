@@ -216,14 +216,14 @@ function PostList(props) {
                 }
             })
             .then(function(response){
-                setPostItems(postItems => [...postItems, response.data.data]);
+                setPostItems(postItems => [...postItems, ...response.data.data]);
                 setHasNext(response.data.hasNext);
                 setPage((page)=>(page+1));
                 setLoading(false);
             })
             .catch(function(error){
                 if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();   
+                    ReissueToken();
                 } 
             })
         }

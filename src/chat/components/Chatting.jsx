@@ -4,9 +4,9 @@ import testImg from "../resources/testImg.jpg";
 
 const Bubble = styled.div`
   max-width: 50%;
-  color: ${({ isUser }) => (isUser ? '#fff' : '#000')};
+  color: ${({ isuser }) => (isuser ? '#fff' : '#000')};
   font-size: 15px;
-  background-color: ${({ isUser }) => (isUser ? '#f8332f' : '#f3f0f5')};
+  background-color: ${({ isuser }) => (isuser ? '#f8332f' : '#f3f0f5')};
   margin: 0% 3%;
   border-radius: 15px;
   padding: 2%;
@@ -19,8 +19,8 @@ const Time = styled.div`
 
 const Container = styled.div`
   display: flex;
-  flex-direction: ${({ isUser }) => (isUser ? 'row-reverse' : 'row')};
-  float: ${({ isUser }) => (isUser ? 'right' : 'left')};
+  flex-direction: ${({ isuser }) => (isuser ? 'row-reverse' : 'row')};
+  float: ${({ isuser }) => (isuser ? 'right' : 'left')};
   clear: both;
   width: 100%;
   margin: 0.5%;
@@ -107,8 +107,8 @@ function Chatting(props) {
           {msgArr.map((message) => (
             <Container className="full" key={message.chatId}>
               {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
-              <Container isUser={message.senderId === 1}>
-                <Bubble isUser={message.senderId === 1}>
+              <Container isuser={message.senderId === 1 ? true : false}>
+                <Bubble isuser={message.senderId === 1 ? true : false}>
                   {(message.message!==null)?message.message:<Image src={testImg} alt="전송이미지" />}
                 </Bubble>
                 {handleChangeTime(message.chatId) && <Time>{message.time}</Time>}

@@ -335,7 +335,7 @@ function Chat(props) {
     const setLog = (bool) => dispatch(setLogin(bool));
 
     // client
-    const client = useRef<CompatClient>(null);
+    const client = useRef(null);
 
 
     // 현재 active된 채팅방 id
@@ -391,7 +391,7 @@ function Chat(props) {
     // 페이지 처음 접속할 때
     useEffect(()=>{
         if(sessionStorage.getItem('nowRoomId'))  { setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); }
-        getChatList();
+        //getChatList();
        
         return() => {
             sessionStorage.removeItem('nowRoomId');
@@ -401,56 +401,53 @@ function Chat(props) {
     
     useEffect(()=>{
         console.log(`nowRoomId : ${nowRoomId}`);
-        // getPrevChat();
+        //getPrevChat();
     }, [nowRoomId]);
 
     // 채팅방 리스트
-    const getChatList = () => {
-        const getList = async () => {
-            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
-                if(!await ReissueToken()) return;
-            }
-            axios.get(`http://13.209.77.50:8080/chats`,
-            {
-                headers :{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
-                console.log(response);
-                setChatList(response.data);
-            })
-            .catch(function(error){
-                console.log(error);
-            })
+    const getChatList = async () => {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
         }
+        axios.get(`http://13.209.77.50:8080/chats`,
+        {
+            headers :{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+        })
+        .then(function(response){
+            console.log(response);
+            setChatList(response.data);
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+
     }
 
     // 채팅내역 불러오기
-    const getPrevChat = () => {
-        const getChat = async () => {
-            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
-                if(!await ReissueToken()) return;
-            }
-            axios.get(`http://13.209.77.50:8080/chats/${nowRoomId}`,
-            {
-                headers :{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
-                console.log(response);
-                setPrevChat(response.data);
-            })
-            .catch(function(error){
-                console.log(error);
-            })
+    const getPrevChat = async () => {
+        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
         }
+        axios.get(`http://13.209.77.50:8080/chats/${nowRoomId}`,
+        {
+            headers :{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+        })
+        .then(function(response){
+            console.log(response);
+            setPrevChat(response.data);
+        })
+        .catch(function(error){
+            console.log(error);
+        })
     }
 
     // 소켓 연결
     const connectHandler = () => {
-        const socket = new SockJS(`ws:// 13.209.77.50:8080/ws-stomp`);
+        const socket = new WebSocket(`ws://13.209.77.50:8080/ws-stomp`);
         
         client.current = Stomp.over(socket);
         client.current.connect({
@@ -460,6 +457,7 @@ function Chat(props) {
             ()=>{
                 client.current.subscribe(`/sub/${nowRoomId}`,
                     (message)=>{
+                        console.log("수신된 메시지:", message);
                         setPrevChat(prevChat=>
                             [...prevChat, message]
                         );
@@ -473,6 +471,7 @@ function Chat(props) {
         );
     }
 
+
     useEffect(()=>{
         if(nowRoomId !== null){
             connectHandler();
@@ -482,9 +481,10 @@ function Chat(props) {
     // 메시지 전송
     const [msg, setMsg] = useState("");
 
-    const sendHandler = () => {
-        if(client.current && client.current.connected){
-            client.current.send(`/pub/${nowRoomId}`,{
+    const sendHandler = async () => {
+        console.log("전송할 메시지:", msg);
+        if(client.current !== null && client.current.connected){
+            await client.current.send(`/pub/${nowRoomId}`,{
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
                 'Content-Type' : 'application/json'
             },
@@ -615,7 +615,7 @@ function Chat(props) {
                         </User>
                     </Header>
                     <Dialogue>
-                        <Chatting />
+                        <Chatting value={messages} />
                     </Dialogue>
                     <Footer>
                         <SendBox placeholder="메시지를 입력해주세요" onChange={handleTextbox} value={msg}></SendBox>
