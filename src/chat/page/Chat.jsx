@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
-import { useDispatch } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 import testImg from "../resources/testImg.jpg";
 
@@ -328,7 +328,12 @@ function Chat(props) {
         },
       ];
 
-    // redux 함수 dispatch
+    // redux 변수, 함수 연결하기
+    const { id, isLog } = useSelector((state)=>({
+        isLog: state.login.isLogin,
+        id: state.login.memberId
+    }), shallowEqual);
+
     const dispatch = useDispatch();
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setId = (id) => dispatch(setMemberId(id));
@@ -346,7 +351,7 @@ function Chat(props) {
     const [chatList, setChatList] = useState([]);
 
     // 이전 채팅 내역
-    const [prevChat, setPrevChat] = useState([]);
+    const [chatMessage, setChatMessage] = useState([]);
 
 
     // 토큰 재발급 요청 api
@@ -391,9 +396,15 @@ function Chat(props) {
 
     // 페이지 처음 접속할 때
     useEffect(()=>{
-        if(sessionStorage.getItem('nowRoomId'))  { setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); }
-        //getChatList();
-       
+        if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
+            alert("로그인 후 이용해주세요.");
+            navigate("/main");
+        }else if((JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog)
+        || (JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog)){
+            if(sessionStorage.getItem('nowRoomId'))  { setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); }
+            //getChatList();
+        }
+        
         return() => {
             sessionStorage.removeItem('nowRoomId');
         }
@@ -439,7 +450,7 @@ function Chat(props) {
         })
         .then(function(response){
             console.log(response);
-            setPrevChat(response.data);
+            setChatMessage(response.data);
         })
         .catch(function(error){
             console.log(error);
@@ -460,7 +471,7 @@ function Chat(props) {
                 client.current.subscribe(`/sub/${nowRoomId}`,
                     (message)=>{
                         console.log("수신된 메시지:", message);
-                        setPrevChat(prevChat=>
+                        setChatMessage(prevChat=>
                             [...prevChat, message]
                         );
                     },
@@ -506,6 +517,7 @@ function Chat(props) {
                 'Content-Type' : 'application/json'
             },
             JSON.stringify({
+                senderId: id,
                 message: msg,
                 img: null
             }));
