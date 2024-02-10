@@ -356,6 +356,11 @@ function ViewPost(props) {
     // 부탁하기/달려가기 버튼
     const handleRequestButton = async(e) => {
 
+        if(!isLog) {
+            navigate("/login");
+            return;
+        }
+
         if(!isActivate) {
             Swal.fire({
                 title: "본인이 작성한 게시글",

@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import React, { useEffect, useRef, useState } from "react";
-import testImg from "../resources/testImg.jpg";
 
 const Bubble = styled.div`
   max-width: 50%;
@@ -37,8 +36,22 @@ const Chat = styled.div`
   margin: 2% 0;
   overflow-y: auto;
   overflow-x: hidden;
-  &::-webkit-scrollbar{
-    display:none;
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 15px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+      background: #C7C8CC;
+      border-radius: 15px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+      background: #f8322f; 
   }
 `;
 
@@ -102,6 +115,12 @@ function Chatting(props) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [msgArr]);
 
+    // 사진 클릭 시 확대 개발을 위한 테스트 코드
+    const test = (img) => {
+      props.setModal(true);
+      props.setImg(img);
+    }
+
     return (
         <Chat ref={scrollRef}>
           {msgArr.map((message) => (
@@ -109,7 +128,7 @@ function Chatting(props) {
               {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
               <Container isuser={message.senderId === 1 ? true : false}>
                 <Bubble isuser={message.senderId === 1 ? true : false}>
-                  {(message.message!==null)?message.message:<Image src={testImg} alt="전송이미지" />}
+                  {(message.message!==null)?message.message:<Image onClick={()=>test(message.img)} src={message.img} alt="전송이미지" />}
                 </Bubble>
                 {handleChangeTime(message.chatId) && <Time>{message.time}</Time>}
               </Container>

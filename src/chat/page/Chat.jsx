@@ -9,8 +9,9 @@ import { useDispatch } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 import testImg from "../resources/testImg.jpg";
 
-import Chatting from "../components/Chatting";
+import Chatting from "../components/Chatting"; //자꾸 오류표시 나는데 껏다키면 오류없고, 작동 문제없음 무시
 import List from "../components/Chatlist";
+import Modal from "../components/Modal";
 
 import SockJS from "sockjs-client";
 import { Stomp, CompatClient } from "@stomp/stompjs";
@@ -450,6 +451,7 @@ function Chat(props) {
         const socket = new WebSocket(`ws://13.209.77.50:8080/ws-stomp`);
         
         client.current = Stomp.over(socket);
+        client.current.debug = () => {};
         client.current.connect({
             Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
             'Content-Type' : 'application/json'
@@ -471,7 +473,6 @@ function Chat(props) {
         );
     }
 
-
     useEffect(()=>{
         if(nowRoomId !== null){
             connectHandler();
@@ -488,20 +489,16 @@ function Chat(props) {
             return;
         }
 
-        console.log("전송할 메시지:", msg);
-
         const newMessage = {
             chatId: messages.length + 1, // 실제로는 백엔드에서 할당해야 함
             senderId: 1, // 실제로는 사용자 ID에 따라 할당해야 함
             message: msg,
             date: '2월 10일', 
-            time: '오후 3:35', //시간 고정
+            time: '오후 3:35', //현재 시간 고정
             img: null 
         };
 
         setMessages([...messages, newMessage]);
-
-        console.log(messages);
 
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
@@ -582,6 +579,18 @@ function Chat(props) {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
+                console.log(response);
+                const newMessage = {
+                    chatId: messages.length + 1, // 실제로는 백엔드에서 할당해야 함
+                    senderId: 1, // 실제로는 사용자 ID에 따라 할당해야 함
+                    message: null,
+                    date: '2월 10일', 
+                    time: '오후 4:35', //현재 시간 고정
+                    img: response.data.imgUrl
+                };
+        
+                setMessages([...messages, newMessage]);
+
                 if(client.current && client.current.connected){
                     client.current.send(`/pub/${nowRoomId}`,{
                         Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
@@ -611,6 +620,10 @@ function Chat(props) {
         }
     }
 
+    // 이미지 클릭 시, 모달 창
+    const [modalOpen, setModalOpen] = useState(false);
+    const [clickImg, setClickImg] = useState(null);
+
     return(
         <Container>
             <ChatList>
@@ -635,7 +648,7 @@ function Chat(props) {
                         </User>
                     </Header>
                     <Dialogue>
-                        <Chatting value={messages} />
+                        <Chatting value={messages} setModal={setModalOpen} setImg={setClickImg}/>
                     </Dialogue>
                     <Footer>
                         <SendBox placeholder="메시지를 입력해주세요" onChange={handleTextbox} value={msg}></SendBox>
@@ -647,6 +660,7 @@ function Chat(props) {
                     </Footer>
                 </ChatPage>
             }
+            {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
         </Container>
         
     );
