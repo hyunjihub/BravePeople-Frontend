@@ -9,7 +9,7 @@ import axios from 'axios';
 
 // redux
 import { useDispatch } from "react-redux";
-import { setLogin, setMemberId, setLocation, setProfileImg } from "../redux/modules/login";
+import { setLogin, setMemberId, setLocation, setProfileImg, setIsNew } from "../redux/modules/login";
 
 const Form = styled.form`
     width: 400px;
@@ -79,6 +79,7 @@ export default function LogIn(props) {
     const setId = (id) => dispatch(setMemberId(id));
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
+    const setisNewChat = (isNew) => dispatch(setIsNew(isNew));
 
     const handleLogin = (e) => {
         e.preventDefault();

@@ -12,7 +12,7 @@ import axios from 'axios';
 // redux
 import HeaderButton from "../components/HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/redux/modules/login"
+import { setLogin, setMemberId, setLocation, setProfileImg, setIsNew } from "../../member/redux/modules/login"
 
 
 const Wrapper = styled.div`
@@ -137,11 +137,12 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, id, loc, profile } = useSelector( state => ({
+    const { isLog, id, loc, profile, isNewChat } = useSelector( state => ({
         isLog: state.login.isLogin,
         id: state.login.memberId,
         loc: state.login.location,
-        profile: state.login.profileImg
+        profile: state.login.profileImg,
+        isNewChat: state.login.isNew
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
