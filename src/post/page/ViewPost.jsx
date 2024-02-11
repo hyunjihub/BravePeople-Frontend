@@ -49,7 +49,7 @@ const TitleBox = styled.div`
 
 const ContentTitle = styled.div`
     width: 93%;
-    font-size: 28px;
+    font-size: 150%;
     font-weight: 800;
     margin-right: 2%;
 `;

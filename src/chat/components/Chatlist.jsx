@@ -2,6 +2,7 @@ import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 import profile from "../../common/resources/img/profile.png";
 import { useNavigate } from "react-router";
+import uuid from 'react-uuid';
 
 const Chat = styled.div`
   margin: 2% 0;
@@ -91,25 +92,33 @@ function Chatlist(props) {
 
   //클릭시 채팅방id 전달
   const handleChat = (roomId) => {
+    console.log(roomId);
     props.setState(roomId);
   }
 
   return (
-      <Chat>
-        {list.map((list) => (
-          props.filter === list.status && 
-          (<Container key={list.roomId} onClick={() => handleChat(list.roomId)}>
-          <Profile onClick={handlePage} value={list.memberId} src={profile} alt="프로필 이미지" />
-          {(list.isRead===true)&&<Unread>!</Unread>}
+    <Chat>
+    {list
+      .filter(list => {
+        if (props.filter === "대기/진행") {
+          return list.status === "대기중" || list.status === "진행중";
+        } else if (props.filter === "완료/취소") {
+          return list.status === "완료" || list.status === "취소";
+        }
+      })
+      .map(list => (
+        <Container key={uuid()} onClick={() => handleChat(list.roomId)}>
+          <Profile onClick={handlePage} value={list.otherId} src={(list.otherProfileImg === null) ? profile : list.otherProfileImg} alt="프로필 이미지" />
+          {list.isRead && <Unread>!</Unread>}
           <ChatContainer>
-            <Nickname>{list.nickname}</Nickname>
+            <Nickname>{list.otherNickname}</Nickname>
             <LastChat>{truncate(list.lastChat, 30)}</LastChat>
           </ChatContainer>
           <Time>{list.lastSendAt}</Time>
-        </Container>)
-        ))}
-      </Chat>
-    );   
+        </Container>
+      ))}
+    </Chat>
+  );   
 } 
 
 export default Chatlist;

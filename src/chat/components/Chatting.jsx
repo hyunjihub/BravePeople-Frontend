@@ -6,9 +6,21 @@ const Bubble = styled.div`
   color: ${({ isuser }) => (isuser ? '#fff' : '#000')};
   font-size: 15px;
   background-color: ${({ isuser }) => (isuser ? '#f8332f' : '#f3f0f5')};
-  margin: 0% 3%;
+  margin: 0% 5%;
   border-radius: 15px;
   padding: 2%;
+  position: relative; 
+`;
+
+const Tail = styled.div`
+  border-top: 15px solid ${({ isuser }) => (isuser ? '#f8332f' : '#f3f0f5')};
+  border-left: 15px solid transparent;
+  border-right: 0px solid transparent;
+  border-bottom: 0px solid transparent;
+  content: "";
+  position: absolute;
+  top: 10px;
+  left: -12px;
 `;
 
 const Time = styled.div`
@@ -128,6 +140,7 @@ function Chatting(props) {
               {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
               <Container isuser={message.senderId === 1 ? true : false}>
                 <Bubble isuser={message.senderId === 1 ? true : false}>
+                  <Tail isuser={message.senderId === 1 ? true : false} />
                   {(message.message!==null)?message.message:<Image onClick={()=>test(message.img)} src={message.img} alt="전송이미지" />}
                 </Bubble>
                 {handleChangeTime(message.chatId) && <Time>{message.time}</Time>}

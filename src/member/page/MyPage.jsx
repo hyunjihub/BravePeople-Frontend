@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 
 import StarRating from "../components/Rating";
 import BadgeCount from "../components/Badge";
+import Modal from "../../chat/components/Modal";
 
 import axios from "axios";
 
@@ -652,12 +653,23 @@ function MyPage(props) {
         navigate(`/viewpost/${postId}`);
     }
 
+    // 이미지 클릭 시, 모달 창
+    const [modalOpen, setModalOpen] = useState(false);
+    const [clickImg, setClickImg] = useState(null);
+
+    const handleExpand = (img) => {
+        if(img!==null) {
+            setClickImg(img);
+            setModalOpen(true);
+        }
+    }
+
     return(
         <Container>
             <Profile>
                 {isClicked?<ModifyProfile style={{backgroundImage: `url(${(currentImg === null) ? profile : currentImg})`}}><FaCamera onClick={handleProfile} className="icon" size="45" color="#212121"/>
                 <FaTrashAlt onClick={handleNull} className="icon" size="45" color="#212121"/></ModifyProfile>:
-                <ProfileButton style={{backgroundImage: `url(${(userInfo.profileImage === null) ? profile : userInfo.profileImage})`}}/>}
+                <ProfileButton onClick={()=>{handleExpand(userInfo.profileImage)}} style={{backgroundImage: `url(${(userInfo.profileImage === null) ? profile : userInfo.profileImage})`}}/>}
                 <input type="file" ref={fileInput} onChange={handleChange} style={{ display: "none" }}/>
                 <Myself>
                     {isClicked?
@@ -701,6 +713,7 @@ function MyPage(props) {
                     <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
                 </Box>
             </Board>
+            {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
         </Container>
     );
 }

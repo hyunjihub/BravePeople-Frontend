@@ -1,19 +1,18 @@
 import styled from "styled-components";
 import React, { useEffect, useRef, useState } from "react";
 
-const Container = styled.div`
-    position: fixed;
-    top: 20%;
-    left: 30%;
-    width: 40%;
-    height: 65%;
-    background-color: #fff;
+const Content = styled.div`
+    width: 65%;
+    height: 90%;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999999;
-    border-radius: 15px;
-    box-shadow: 12px 12px 2px 1px rgba(0, 0, 0, .2);
+    flex-direction: column;
+    box-sizing: border-box;
+`;
+
+const ImageWrapper = styled.div`
+    width: 70%;
+    max-height: 50%;
+    margin: 10% auto 5%;
     overflow-y : auto;
     &::-webkit-scrollbar {
         width: 7px;
@@ -34,30 +33,36 @@ const Container = styled.div`
     }
 `;
 
-const Content = styled.div`
-    width: 100%;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 5%;
-    box-sizing: border-box;
-`;
-
 const Image = styled.img`
-    width: 80%;
-    margin: 10% auto 2%;
+    width: 100%;
+    height: auto;
 `;
 
 const Button = styled.button`
-    width: 10%;
+    width: 13%;
+    padding: 1% 0%;
     color: #fff;
     font-family: 'SUITE';
     margin: 2% auto 0;
-    font-size: 18px;
+    font-size: 130%;
     border: none;
     background-color: #f8332f;
     border-radius: 15px;
     cursor: pointer;
+`;
+
+const Background = styled.div`
+    width: 90%;
+    height: 120%;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 999;
+    position: fixed;
+    top: 5%;
+    left: 5%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
 `;
 
 function Modal(props) {
@@ -68,12 +73,15 @@ function Modal(props) {
     }
 
     return (
-        <Container>
-            <Content>
-                <Image src={props.img} alt="선택한 이미지" />
-                <Button onClick={close}>닫기</Button>
-            </Content>
-        </Container>
+        <Background>
+                <Content>
+                    <ImageWrapper>
+                        <Image src={props.img} alt="선택한 이미지" />
+                    </ImageWrapper>
+                    <Button onClick={close}>닫기</Button>
+                </Content>
+        </Background>
+        
     );
 }
 

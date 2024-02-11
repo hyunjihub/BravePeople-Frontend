@@ -20,7 +20,7 @@ const Wrapper = styled.div`
 const Title = styled.button`
     width: 65%;
     font-weight: 800;
-    font-size: 25px;
+    font-size: 140%;
     text-align: left;
     border: none;
     background-color: #f7f8fd;
@@ -40,7 +40,7 @@ const UploadTime = styled.div`
 const Price = styled.div`
     width: 15%;
     height: 100%;
-    font-size: 20px;
+    font-size: 100%;
     color: #868e96;
     flex: flex-end;
 `;

@@ -214,13 +214,16 @@ export default function Header(props) {
                     latitude: null,
                     longitude: null
                 });
-                Swal.fire({
+                if(!isLogOut) {
+                    Swal.fire({
                     title: "로그인 기간 만료",
                     text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
-                });
+                    });
+                }
+                setIsLogOut(false);
                 navigate("/main");
             }else{
                 console.log(error);
@@ -229,8 +232,17 @@ export default function Header(props) {
         };
     }
 
+    //로그아웃 -> 리프레쉬 만료 때 alert없이 로그아웃 하기 위한 변수
+    //isLogOut이 true일 때는, refresh 만료 시 alert가 출력 안 되게 함
+    const [isLogOut, setIsLogOut] = useState(false);
+
+    const handleIsLogOut = () => {
+        setIsLogOut(true);
+    }
+
     // 로그아웃
     const handleLogOut = async (e) => {
+        handleIsLogOut();
         if(isLog) {
             if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
                 if (!await ReissueToken()) return;
@@ -255,7 +267,17 @@ export default function Header(props) {
             })
             .catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();
+                    sessionStorage.removeItem('jwt');
+                    sessionStorage.removeItem('savedData');
+                    sessionStorage.removeItem('savedUserInfo');
+                    setLog(false);
+                    setId(null);
+                    setProfile(null);
+                    setLoc({
+                        latitude: null,
+                        longitude: null
+                    });
+                    navigate("/main");
                 }
                 else if(err.response.status === 401 && err.response.data.errorMessage === "비회원 접근 불가") {
                     Swal.fire({
