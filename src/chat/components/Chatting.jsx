@@ -6,7 +6,7 @@ const Bubble = styled.div`
   color: ${({ isuser }) => (isuser ? '#fff' : '#000')};
   font-size: 15px;
   background-color: ${({ isuser }) => (isuser ? '#f8332f' : '#f3f0f5')};
-  margin: 0% 5%;
+  margin: 0% ${({ isuser }) => (isuser ? '5%' : '2%')} 0% ${({ isuser }) => (isuser ? '2%' : '5%')};
   border-radius: 15px;
   padding: 2%;
   position: relative; 
@@ -14,13 +14,13 @@ const Bubble = styled.div`
 
 const Tail = styled.div`
   border-top: 15px solid ${({ isuser }) => (isuser ? '#f8332f' : '#f3f0f5')};
-  border-left: 15px solid transparent;
-  border-right: 0px solid transparent;
-  border-bottom: 0px solid transparent;
+  border-left: ${({ isuser }) => (isuser ?  '0' : '15px solid transparent')};
+  border-right: ${({ isuser }) => (isuser ? '15px solid transparent' : '0')};
+  border-bottom: ${({ isuser }) => (isuser ? '15px solid transparent' : '0')};
   content: "";
   position: absolute;
   top: 10px;
-  left: -12px;
+  ${({ isuser }) => (isuser ? 'right: -12px;' : 'left: -12px;')};
 `;
 
 const Time = styled.div`
@@ -93,23 +93,23 @@ function Chatting(props) {
   const length = messages.length;
 
   //date 값 변경 확인
-  const handleChangeDate = (chatId) => {
-    if(chatId===1) {
+  const handleChangeDate = (index) => {
+    if(index===0) {
       return true;
     } else {
-      if(messages[chatId-2].date===messages[chatId-1].date) return false;
+      if(messages[index].date===messages[index-1].date) return false;
       else return true;
     }
   }
 
   //date 값 변경 확인
-  const handleChangeTime = (chatId) => { 
-    if(chatId===length) {
+  const handleChangeTime = (index) => { 
+    if(index===length-1) {
       return true;
     } else {
-      if(messages[chatId].date===messages[chatId-1].date) {
-        if(messages[chatId].senderId===messages[chatId-1].senderId) {
-          if(messages[chatId].time===messages[chatId-1].time) return false;
+      if(messages[index].date===messages[index+1].date) {
+        if(messages[index].senderId===messages[index+1].senderId) {
+          if(messages[index].time===messages[index+1].time) return false;
         }
       }
     }
@@ -135,15 +135,15 @@ function Chatting(props) {
 
     return (
         <Chat ref={scrollRef}>
-          {msgArr.map((message) => (
-            <Container className="full" key={message.chatId}>
-              {handleChangeDate(message.chatId) && <Date>{message.date}</Date>}
+          {msgArr.map((message, index) => (
+            <Container className="full" key={index}>
+              {handleChangeDate(index) && <Date>{message.date}</Date>}
               <Container isuser={message.senderId === 1 ? true : false}>
                 <Bubble isuser={message.senderId === 1 ? true : false}>
                   <Tail isuser={message.senderId === 1 ? true : false} />
                   {(message.message!==null)?message.message:<Image onClick={()=>test(message.img)} src={message.img} alt="전송이미지" />}
                 </Bubble>
-                {handleChangeTime(message.chatId) && <Time>{message.time}</Time>}
+                {handleChangeTime(index) && <Time>{message.time}</Time>}
               </Container>
           </Container>
         ))}

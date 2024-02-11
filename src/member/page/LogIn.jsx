@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
@@ -49,7 +49,7 @@ const Button = styled.button`
     box-sizing: border-box;
     padding: 15px;
     font-size: 18px;
-    margin: 24px 0;
+    margin: 20px 0;
     font-family: 'SUITE';
 `;
 
@@ -69,6 +69,14 @@ const Text = styled.div`
     display: flex;
     justify-content: center;
     gap: 10px;
+`;
+
+const Caps = styled.div`
+    font-size: 15px;
+    font-weight: 600;
+    margin: 10px 0 5px;
+    text-align: center;
+    color: rgb(255, 0, 0);
 `;
 
 export default function LogIn(props) {
@@ -136,6 +144,14 @@ export default function LogIn(props) {
         }
     }
 
+    const [capsLockFlag, setCapsLockFlag] = useState(false);
+    const checkCapsLock = (e) => {
+        let capsLock = e.getModifierState("CapsLock");
+        setCapsLockFlag(capsLock);
+    };
+
+
+
     return (
         <Form onSubmit={handleLogin}>
             <Title>로그인</Title>
@@ -150,7 +166,9 @@ export default function LogIn(props) {
                 name="password"
                 type="password"
                 placeholder="비밀번호"
+                onKeyUp={(e) => checkCapsLock(e)}
             /> 
+            {capsLockFlag && <Caps>Caps Lock이 켜져 있습니다.</Caps>}
             <Button type="submit">로그인</Button>
             <Text>
                 <LinkText to="/signUp">회원가입</LinkText>

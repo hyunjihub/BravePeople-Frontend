@@ -10,9 +10,9 @@ const Content = styled.div`
 `;
 
 const ImageWrapper = styled.div`
-    width: 70%;
-    max-height: 50%;
-    margin: 10% auto 5%;
+    width: 80%;
+    max-height: 70%;
+    margin: 2% auto 2%;
     overflow-y : auto;
     &::-webkit-scrollbar {
         width: 7px;
@@ -52,13 +52,13 @@ const Button = styled.button`
 `;
 
 const Background = styled.div`
-    width: 90%;
+    width: 100%;
     height: 120%;
     background-color: rgba(255, 255, 255, 0.9);
-    z-index: 999;
+    z-index: 999999;
     position: fixed;
-    top: 5%;
-    left: 5%;
+    top: 0%;
+    left: 0%;
     display: flex;
     justify-content: center;
     align-items: center;

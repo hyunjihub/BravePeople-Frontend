@@ -215,24 +215,29 @@ const Filter = styled.button`
     transition: border-bottom 0.7s ease;
 `;
 
+const Null = styled.div`
+    width: 160%;
+    font-size: 50px;
+    text-align: center;
+    margin: 10% auto 2%;
+    font-weight: 700;
+
+    &.detail {
+        font-size: 30px;
+        font-weight: 400;
+        margin-top: 2%;
+    }
+`;
+
+const NullContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+`;
+
 
 function Chat(props) {
 
     const navigate = useNavigate();
-
-    //채팅 데이터 (UI 및 검증용 임시 데이터)
-    const [messages, setMessages] = useState([
-        { chatId: 1, senderId: 1, message: '안녕하세요!', date: '2월 7일', time: '오후 3:00', img: null },
-        { chatId: 2, senderId: 2, message: '안녕하세요!', date: '2월 7일', time: '오후 3:01', img: null },
-        { chatId: 3, senderId: 1, message: '의뢰가능할까요?', date: '2월 7일', time: '오후 3:01', img: null },
-        { chatId: 4, senderId: 2, message: '네', date: '2월 7일', time: '오후 3:02', img: null },
-        { chatId: 5, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 6, senderId: 1, message: 'wish I could stay awhile I have all the old pictures of you I knew you would come around again you miss the young us like before, you are so naive you never believed me and what I said now you are saying I was so right then you are so lonely now', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 7, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 8, senderId: 1, message: '의뢰가능할까요?', date: '2월 8일', time: '오후 3:02', img: null },
-        { chatId: 9, senderId: 1, message: null, date: '2월 9일', time: '오후 3:02', img: testImg },
-        { chatId: 10, senderId: 1, message: '두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트두줄이상작성해보는테스트', date: '2월 9일', time: '오후 3:02', img: null },
-    ]);
 
     // redux 변수, 함수 연결하기
     const { id, isLog } = useSelector((state)=>({
@@ -257,6 +262,12 @@ function Chat(props) {
 
     // 이전 채팅 내역
     const [chatMessage, setChatMessage] = useState([]);
+
+    const [userInfo, setUserInfo] = useState({
+        profileImage: null,
+        nickname: null,
+        memberId: null,
+    });
 
 
     // 토큰 재발급 요청 api
@@ -318,7 +329,7 @@ function Chat(props) {
     
     useEffect(()=>{
         console.log(`nowRoomId : ${nowRoomId}`);
-        //getPrevChat();
+        if(nowRoomId!==null) getPrevChat();
     }, [nowRoomId]);
 
     // 채팅방 리스트
@@ -353,8 +364,12 @@ function Chat(props) {
             }
         })
         .then(function(response){
-            console.log(response);
-            setChatMessage(response.data);
+            setUserInfo({
+                profileImage: response.data.otherProfileImg,
+                nickname: response.data.otherNickname,
+                memberId: response.data.otherId,
+            });
+            setChatMessage(response.data.messages);
         })
         .catch(function(error){
             console.log(error);
@@ -405,7 +420,7 @@ function Chat(props) {
         }
 
         const newMessage = {
-            chatId: messages.length + 1, // 실제로는 백엔드에서 할당해야 함
+            chatId: chatMessage.length + 1, // 실제로는 백엔드에서 할당해야 함
             senderId: 1, // 실제로는 사용자 ID에 따라 할당해야 함
             message: msg,
             date: '2월 10일', 
@@ -413,7 +428,7 @@ function Chat(props) {
             img: null 
         };
 
-        setMessages([...messages, newMessage]);
+        setChatMessage([...chatMessage, newMessage]);
 
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
@@ -436,7 +451,7 @@ function Chat(props) {
     }
 
     //클릭시 프로필 페이지 이동 오류방지 위해 주석처리 함
-    const handlePage = (e) => {
+    const handlePage = (id) => {
         sessionStorage.setItem('savedUserInfo', JSON.stringify({
             profileImage: null,
             nickname: null,
@@ -444,9 +459,7 @@ function Chat(props) {
             score: null,
             medalCount: null,
         }));
-        //추후 변수명(otherId) 변경
-        //navigate(`/profile/${String(otherId)}`);
-        e.preventDefault();
+        navigate(`/profile/${String(id)}`);
     }
 
     // 채팅방 리스트 진행 중 or 진행 중 아님으로 분류
@@ -506,7 +519,7 @@ function Chat(props) {
                     img: response.data.imgUrl
                 };
         
-                setMessages([...messages, newMessage]);
+                setChatMessage([...chatMessage, newMessage]);
 
                 if(client.current && client.current.connected){
                     client.current.send(`/pub/${nowRoomId}`,{
@@ -544,6 +557,11 @@ function Chat(props) {
 
     return(
         <Container>
+            {(false)?<NullContainer>
+                <Null>대화중인 채팅방이 없습니다.</Null>
+                <Null className="detail">의뢰/원정을 통해 새로운 채팅을 시작하세요.</Null>
+            </NullContainer>:
+            <>
             <ChatList>
                 <Header>
                     <Filter onClick={() => handleFilterSelect("대기/진행")} selected={selectedFilter === "대기/진행"}>대기/진행</Filter>
@@ -555,9 +573,9 @@ function Chat(props) {
                 <ChatPage>
                     <Header>
                         <User>
-                            <Profile onClick={handlePage} src={profile} alt="프로필" />
+                            <Profile onClick={()=>handlePage(userInfo.memberId)} src={(userInfo.profileImage===null)?profile:userInfo.profileImage} alt="프로필" />
                             <ButtonList className="user">
-                                <Nickname>닉네임</Nickname>
+                                <Nickname>{userInfo.nickname}</Nickname>
                                 <ButtonList className="request">                    
                                     <DisableButton disabled="disabled">의뢰취소</DisableButton>
                                     <Button>의뢰완료</Button>
@@ -566,7 +584,7 @@ function Chat(props) {
                         </User>
                     </Header>
                     <Dialogue>
-                        <Chatting value={messages} setModal={setModalOpen} setImg={setClickImg}/>
+                        <Chatting value={chatMessage} setModal={setModalOpen} setImg={setClickImg}/>
                     </Dialogue>
                     <Footer>
                         <SendBox placeholder="메시지를 입력해주세요" onChange={handleTextbox} value={msg}></SendBox>
@@ -579,6 +597,8 @@ function Chat(props) {
                 </ChatPage>
             }
             {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
+            </>
+        }
         </Container>
         
     );
