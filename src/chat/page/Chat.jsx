@@ -78,6 +78,9 @@ const Profile = styled.img`
     margin: 5% 2.5% 0 5%;
     z-index: 999;
     cursor: pointer;
+    border-radius : 50%;
+    background-repeat: no-repeat;
+    object-fit: cover;
 `;
 
 const User = styled.div`
@@ -364,6 +367,7 @@ function Chat(props) {
             }
         })
         .then(function(response){
+            console.log(response);
             setUserInfo({
                 profileImage: response.data.otherProfileImg,
                 nickname: response.data.otherNickname,
@@ -420,15 +424,15 @@ function Chat(props) {
         }
 
         const newMessage = {
-            chatId: chatMessage.length + 1, // 실제로는 백엔드에서 할당해야 함
-            senderId: 1, // 실제로는 사용자 ID에 따라 할당해야 함
+            chatId: null, // 실제로는 백엔드에서 할당 됨
+            senderId: id,
             message: msg,
             date: '2월 10일', 
-            time: '오후 3:35', //현재 시간 고정
+            time: '오후 3:35', //현재 시간 고정 (임시)
             img: null 
         };
 
-        setChatMessage([...chatMessage, newMessage]);
+        setChatMessage([newMessage, ...chatMessage]);
 
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
@@ -511,8 +515,8 @@ function Chat(props) {
             }}).then(function(response){
                 console.log(response);
                 const newMessage = {
-                    chatId: messages.length + 1, // 실제로는 백엔드에서 할당해야 함
-                    senderId: 1, // 실제로는 사용자 ID에 따라 할당해야 함
+                    chatId: null, // 실제로는 백엔드에서 할당해야 함
+                    senderId: id, 
                     message: null,
                     date: '2월 10일', 
                     time: '오후 4:35', //현재 시간 고정
@@ -527,6 +531,7 @@ function Chat(props) {
                         'Content-Type' : 'application/json'
                     },
                     JSON.stringify({
+                        senderId: id,
                         message: null,
                         img: response.data.imgUrl
                     }));

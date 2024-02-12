@@ -1,6 +1,8 @@
 import styled from "styled-components";
 import React, { useEffect, useRef, useState } from "react";
 
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+
 const Bubble = styled.div`
   max-width: 50%;
   color: ${({ isuser }) => (isuser ? '#fff' : '#000')};
@@ -89,21 +91,35 @@ const Date = styled.div`
 
 function Chatting(props) {
 
+  // redux로 변수, 함수 가져오기
+  const { isLog, id } = useSelector((state)=>({
+    isLog: state.login.isLogin,
+    id: state.login.memberId,
+  }), shallowEqual);
+
   const messages = props.value;
   const length = messages.length;
 
   //date 값 변경 확인
   const handleChangeDate = (index) => {
-    if(index===0) {
-      return true;
-    } else {
-      if(messages[index].date===messages[index-1].date) return false;
-      else return true;
-    }
+
+    console.log(index + " : " + messages[index].date);
+      if(index===messages.length-1) {
+        return true;
+      } else {
+        if(messages[index].date===messages[index+1].date) return false;
+        else return true;
+      }
   }
 
   //date 값 변경 확인
   const handleChangeTime = (index) => { 
+
+    console.log(index + " : " + messages[index].time);
+    return true;
+
+    /*
+    console.log(index);
     if(index===length-1) {
       return true;
     } else {
@@ -112,8 +128,7 @@ function Chatting(props) {
           if(messages[index].time===messages[index+1].time) return false;
         }
       }
-    }
-    return true;
+    }*/
   }
 
     // 페이지 스크롤 맨 아래로 이동
@@ -127,28 +142,32 @@ function Chatting(props) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }, [msgArr]);
 
-    // 사진 클릭 시 확대 개발을 위한 테스트 코드
-    const test = (img) => {
+    // 사진 클릭 시 확대
+    const handleExpand = (img) => {
       props.setModal(true);
       props.setImg(img);
     }
 
     return (
-        <Chat ref={scrollRef}>
-          {msgArr.map((message, index) => (
-            <Container className="full" key={index}>
-              {handleChangeDate(index) && <Date>{message.date}</Date>}
-              <Container isuser={message.senderId === 1 ? true : false}>
-                <Bubble isuser={message.senderId === 1 ? true : false}>
-                  <Tail isuser={message.senderId === 1 ? true : false} />
-                  {(message.message!==null)?message.message:<Image onClick={()=>test(message.img)} src={message.img} alt="전송이미지" />}
+      <Chat ref={scrollRef}>
+        {msgArr.map((message, index) => {
+          const reversedIndex = msgArr.length - 1 - index;
+          const reversedMessage = msgArr[reversedIndex];
+          return (
+            <Container className="full" key={reversedIndex}>
+              {handleChangeDate(reversedIndex) && <Date>{reversedMessage.date}</Date>}
+              <Container isuser={String(reversedMessage.senderId) === id ? true : false}>
+                <Bubble isuser={String(reversedMessage.senderId) === id ? true : false}>
+                  <Tail isuser={String(reversedMessage.senderId) === id ? true : false} />
+                  {reversedMessage.message !== null ? reversedMessage.message : <Image onClick={() => handleExpand(reversedMessage.img)} src={reversedMessage.img} alt="전송이미지" />}
                 </Bubble>
-                {handleChangeTime(index) && <Time>{message.time}</Time>}
+                {handleChangeTime(reversedIndex) && <Time>{reversedMessage.time}</Time>}
               </Container>
-          </Container>
-        ))}
+            </Container>
+          );
+        })}
       </Chat>
-    );    
+    );   
 } 
 
 export default Chatting;

@@ -53,9 +53,6 @@ const ProfileButton = styled.button`
     overflow: hidden;
     margin: 10% 20% 3%;
     border: none;
-    background-repeat: no-repeat;
-    object-fit: cover;
-    background-position: center;
 `;
 
 const ModifyProfile = styled.button`

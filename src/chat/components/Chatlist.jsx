@@ -10,7 +10,7 @@ const Chat = styled.div`
 
 const Container = styled.div`
     width: 100%;
-    height: 30%;
+    height: 60%;
     overflow-y: auto;
     margin-bottom: 1%;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
@@ -35,6 +35,9 @@ const Profile = styled.img`
     height: 15%;
     cursor: pointer;
     margin: 2%;
+    border-radius : 50%;
+    background-repeat: no-repeat;
+    object-fit: cover;
 `;
 
 const Time = styled.div`
