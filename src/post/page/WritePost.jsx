@@ -305,7 +305,7 @@ function WritePost(props) {
                 });
             }
             else if(postid!=='-1') {
-                if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+                if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                     if (!await ReissueToken()) return;
                 }
                 axios.get(`http://13.209.77.50:8080/posts/${postid}`)
@@ -402,7 +402,7 @@ function WritePost(props) {
 
     const fileInput = React.createRef();
     const handleImg = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
         if (!uploading) {
@@ -411,7 +411,7 @@ function WritePost(props) {
     }
 
     const handleChange = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
         const files = e.target.files;
@@ -469,7 +469,7 @@ function WritePost(props) {
 
     //게시글 업로드
     const handleUpload = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
         if((title !== "") && (number !== "") && (content !== "")){

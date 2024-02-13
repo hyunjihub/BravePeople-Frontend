@@ -108,7 +108,7 @@ export default function LogIn(props) {
                 // 토큰 저장
                 sessionStorage.setItem('jwt', JSON.stringify({
                     access: response.data.tokenDto.accessToken,
-                    expirationTime: response.data.accessTokenExpiresIn,
+                    expirationTime: response.data.tokenDto.accessTokenExpiresIn,
                     refresh: response.data.tokenDto.refreshToken
                 }));
                 // 새로고침으로 인한 데이터 삭제 방지용 데이터 저장
@@ -149,8 +149,6 @@ export default function LogIn(props) {
         let capsLock = e.getModifierState("CapsLock");
         setCapsLockFlag(capsLock);
     };
-
-
 
     return (
         <Form onSubmit={handleLogin}>

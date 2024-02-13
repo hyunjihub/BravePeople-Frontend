@@ -244,7 +244,7 @@ export default function Header(props) {
     const handleLogOut = async (e) => {
         handleIsLogOut();
         if(isLog) {
-            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
             axios.post("http://13.209.77.50:8080/member/logout", {}, {
@@ -316,7 +316,7 @@ export default function Header(props) {
 
     const SetLocation = async () => {
         const handleSuccess = async (pos) => {
-            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime-60000) <= Date.now()) {
+            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
             axios.patch("http://13.209.77.50:8080/member/location", {

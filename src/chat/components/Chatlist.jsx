@@ -3,6 +3,10 @@ import React, { useEffect, useState } from "react";
 import profile from "../../common/resources/img/profile.png";
 import { useNavigate } from "react-router";
 import uuid from 'react-uuid';
+import axios from "axios";
+import Swal from "sweetalert2";
+import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 
 const Chat = styled.div`
   margin: 2% 0;
@@ -30,14 +34,16 @@ const LastChat = styled.div`
     color: #808080;
 `;
 
-const Profile = styled.img`
-    width: 10%;
-    height: 15%;
+const Profile = styled.div`
+    width: 50px;
+    height: 50px;
     cursor: pointer;
-    margin: 2%;
-    border-radius : 50%;
+    margin: 2% 1% 2% 2%;
+    border-radius: 50%;
+    background-size: cover;
     background-repeat: no-repeat;
-    object-fit: cover;
+    overflow: hidden;
+    background-position: center;
 `;
 
 const Time = styled.div`
@@ -75,13 +81,62 @@ function Chatlist(props) {
 
   const navigate = useNavigate();
 
+  const dispatch = useDispatch();
+  const setLoc = (loc) => dispatch(setLocation(loc));
+  const setId = (id) => dispatch(setMemberId(id));
+  const setProfile = (pro) => dispatch(setProfileImg(pro));
+  const setLog = (bool) => dispatch(setLogin(bool));
+
+  // 토큰 재발급 요청 api
+  const ReissueToken = async () => {
+    try {
+        const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
+            refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
+        })
+        sessionStorage.setItem('jwt',JSON.stringify({
+            access: response.data.accessToken,
+            expirationTime: response.data.accessTokenExpiresIn,
+            refresh: response.data.refreshToken
+        }));
+        return true;
+    } catch(error){
+        if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+            sessionStorage.removeItem('jwt');
+            sessionStorage.removeItem('savedData');
+            sessionStorage.removeItem('savedUserInfo');
+            setLog(false);
+            setId(null);
+            setProfile(null);
+            setLoc({
+                latitude: null,
+                longitude: null
+            });
+            Swal.fire({
+                title: "로그인 기간 만료",
+                text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+            navigate("/main");
+        }else{
+            console.log(error);
+        }
+        return false;
+      };
+  }
+
   //글자수 over시 ...처리
   const truncate = (str, n) => {
     return str?.length > n ? str.substr(0, n - 1) + "..." : str;
   };
 
   //클릭시 프로필 페이지 이동
-  const handlePage = (e) => {
+  const handlePage = async (e) => {
+    if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+      if(!await ReissueToken()) return;
+    }
     sessionStorage.setItem('savedUserInfo', JSON.stringify({
         profileImage: null,
         nickname: null,
@@ -94,8 +149,10 @@ function Chatlist(props) {
   }
 
   //클릭시 채팅방id 전달
-  const handleChat = (roomId) => {
-    console.log(roomId);
+  const handleChat = async (roomId) => {
+    if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+      if(!await ReissueToken()) return;
+    }
     props.setState(roomId);
   }
 
@@ -111,7 +168,7 @@ function Chatlist(props) {
       })
       .map(list => (
         <Container key={uuid()} onClick={() => handleChat(list.roomId)}>
-          <Profile onClick={handlePage} value={list.otherId} src={(list.otherProfileImg === null) ? profile : list.otherProfileImg} alt="프로필 이미지" />
+          <Profile onClick={handlePage} value={list.otherId} style={{backgroundImage: `url(${(list.otherProfileImg === null) ? profile : list.otherProfileImg})`}}/>
           {list.isRead && <Unread>!</Unread>}
           <ChatContainer>
             <Nickname>{list.otherNickname}</Nickname>

@@ -98,37 +98,35 @@ function Chatting(props) {
   }), shallowEqual);
 
   const messages = props.value;
-  const length = messages.length;
 
   //date 값 변경 확인
   const handleChangeDate = (index) => {
-
-    console.log(index + " : " + messages[index].date);
-      if(index===messages.length-1) {
+    if (index < messages.length) {
+      if (index === 0) {
         return true;
       } else {
-        if(messages[index].date===messages[index+1].date) return false;
+        if (messages[index].date === messages[index - 1].date) return false;
         else return true;
       }
+    }
+    return false;
   }
 
   //date 값 변경 확인
   const handleChangeTime = (index) => { 
-
-    console.log(index + " : " + messages[index].time);
-    return true;
-
-    /*
-    console.log(index);
-    if(index===length-1) {
+    if (index < messages.length) {
+      if(index===messages.length-1) {
       return true;
-    } else {
-      if(messages[index].date===messages[index+1].date) {
-        if(messages[index].senderId===messages[index+1].senderId) {
-          if(messages[index].time===messages[index+1].time) return false;
+      } else {
+        if(messages[index].date===messages[index+1].date) {
+          if(messages[index].senderId===messages[index+1].senderId) {
+            if(messages[index].time===messages[index+1].time) return false;
+          }
         }
       }
-    }*/
+      return true;
+    }
+    
   }
 
     // 페이지 스크롤 맨 아래로 이동
@@ -147,21 +145,20 @@ function Chatting(props) {
       props.setModal(true);
       props.setImg(img);
     }
+  
 
     return (
       <Chat ref={scrollRef}>
         {msgArr.map((message, index) => {
-          const reversedIndex = msgArr.length - 1 - index;
-          const reversedMessage = msgArr[reversedIndex];
           return (
-            <Container className="full" key={reversedIndex}>
-              {handleChangeDate(reversedIndex) && <Date>{reversedMessage.date}</Date>}
-              <Container isuser={String(reversedMessage.senderId) === id ? true : false}>
-                <Bubble isuser={String(reversedMessage.senderId) === id ? true : false}>
-                  <Tail isuser={String(reversedMessage.senderId) === id ? true : false} />
-                  {reversedMessage.message !== null ? reversedMessage.message : <Image onClick={() => handleExpand(reversedMessage.img)} src={reversedMessage.img} alt="전송이미지" />}
+            <Container className="full" key={index}>
+              {handleChangeDate(index) && <Date>{message.date}</Date>}
+              <Container isuser={String(message.senderId) === id ? true : false}>
+                <Bubble isuser={String(message.senderId) === id ? true : false}>
+                  <Tail isuser={String(message.senderId) === id ? true : false} />
+                  {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}
                 </Bubble>
-                {handleChangeTime(reversedIndex) && <Time>{reversedMessage.time}</Time>}
+                {handleChangeTime(index) && <Time>{message.time}</Time>}
               </Container>
             </Container>
           );

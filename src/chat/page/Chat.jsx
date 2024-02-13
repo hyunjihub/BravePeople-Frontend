@@ -7,9 +7,8 @@ import axios from "axios";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
-import testImg from "../resources/testImg.jpg";
 
-import Chatting from "../components/Chatting"; //자꾸 오류표시 나는데 껏다키면 오류없고, 작동 문제없음 무시
+import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
 import Modal from "../components/Modal";
 
@@ -241,6 +240,23 @@ const NullContainer = styled.div`
 function Chat(props) {
 
     const navigate = useNavigate();
+    const today = new Date();
+
+    //시간 앞에 0 붙이기 위함
+    function addZero(num) {
+        return num < 10 ? `0${num}` : num;
+    }
+
+    //시간 변환
+    function formatAMPM(date) {
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // 0시는 12시로 표시로 해놓음
+        minutes = addZero(minutes);
+        return `${hours}:${minutes} ${ampm}`;
+    }
 
     // redux 변수, 함수 연결하기
     const { id, isLog } = useSelector((state)=>({
@@ -331,13 +347,12 @@ function Chat(props) {
 
     
     useEffect(()=>{
-        console.log(`nowRoomId : ${nowRoomId}`);
         if(nowRoomId!==null) getPrevChat();
     }, [nowRoomId]);
 
     // 채팅방 리스트
     const getChatList = async () => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
         axios.get(`http://13.209.77.50:8080/chats`,
@@ -357,7 +372,7 @@ function Chat(props) {
 
     // 채팅내역 불러오기
     const getPrevChat = async () => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
         axios.get(`http://13.209.77.50:8080/chats/${nowRoomId}`,
@@ -367,7 +382,6 @@ function Chat(props) {
             }
         })
         .then(function(response){
-            console.log(response);
             setUserInfo({
                 profileImage: response.data.otherProfileImg,
                 nickname: response.data.otherNickname,
@@ -393,6 +407,7 @@ function Chat(props) {
             ()=>{
                 client.current.subscribe(`/sub/${nowRoomId}`,
                     (message)=>{
+                        console.log("수신된 메시지 : " + message);
                         setChatMessage(prevChat=>
                             [...prevChat, message]
                         );
@@ -408,9 +423,7 @@ function Chat(props) {
     }
 
     useEffect(()=>{
-        if(nowRoomId !== null){
-            connectHandler();
-        }
+        if(nowRoomId!==null) connectHandler();
     }, [nowRoomId]);
 
     // 메시지 전송
@@ -427,12 +440,12 @@ function Chat(props) {
             chatId: null, // 실제로는 백엔드에서 할당 됨
             senderId: id,
             message: msg,
-            date: '2월 10일', 
-            time: '오후 3:35', //현재 시간 고정 (임시)
+            date: `${addZero(today.getMonth() + 1)}월 ${addZero(today.getDate())}일`,
+            time: formatAMPM(today),
             img: null 
         };
 
-        setChatMessage([newMessage, ...chatMessage]);
+        setChatMessage([...chatMessage, newMessage]);
 
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
@@ -454,7 +467,7 @@ function Chat(props) {
         setMsg(e.target.value);
     }
 
-    //클릭시 프로필 페이지 이동 오류방지 위해 주석처리 함
+    //클릭시 프로필 페이지 이동
     const handlePage = (id) => {
         sessionStorage.setItem('savedUserInfo', JSON.stringify({
             profileImage: null,
@@ -474,7 +487,7 @@ function Chat(props) {
 
     const fileInput = React.createRef();
     const handleProfile = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
         fileInput.current.click();
@@ -483,7 +496,7 @@ function Chat(props) {
 
     //이미지 전송
     const handleImage = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
 
@@ -518,8 +531,8 @@ function Chat(props) {
                     chatId: null, // 실제로는 백엔드에서 할당해야 함
                     senderId: id, 
                     message: null,
-                    date: '2월 10일', 
-                    time: '오후 4:35', //현재 시간 고정
+                    date: `${addZero(today.getMonth() + 1)}월 ${addZero(today.getDate())}일`,
+                    time: formatAMPM(today),
                     img: response.data.imgUrl
                 };
         
@@ -562,7 +575,7 @@ function Chat(props) {
 
     return(
         <Container>
-            {(false)?<NullContainer>
+            {(chatList===null)?<NullContainer>
                 <Null>대화중인 채팅방이 없습니다.</Null>
                 <Null className="detail">의뢰/원정을 통해 새로운 채팅을 시작하세요.</Null>
             </NullContainer>:

@@ -296,7 +296,7 @@ function ViewPost(props) {
 
     //삭제 버튼 클릭시 삭제 API
     const handleDelete = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
         Swal.fire({
@@ -371,7 +371,7 @@ function ViewPost(props) {
             });
             return;
         }
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()){
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
         axios.get(`http://13.209.77.50:8080/posts/${postid}/request`,

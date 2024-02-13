@@ -53,6 +53,7 @@ const ProfileButton = styled.button`
     overflow: hidden;
     margin: 10% 20% 3%;
     border: none;
+    background-position: center;
 `;
 
 const ModifyProfile = styled.button`
@@ -333,7 +334,7 @@ function MyPage(props) {
                 return;
             }
             else{
-                if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+                if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                     if (!await ReissueToken()) return;
                 }
                 {(id===memberid)? setMySelf(true) : setMySelf(false)};
@@ -434,7 +435,7 @@ function MyPage(props) {
 
     // 수정 완료 버튼
     const handleModify = async (e) => {       
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
         if((currentName === userInfo.nickname) && (currentIntro === userInfo.intro) && (currentImg === userInfo.profileImage)){
@@ -517,7 +518,7 @@ function MyPage(props) {
 
     const fileInput = React.createRef();
     const handleProfile = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
         fileInput.current.click();
@@ -526,7 +527,7 @@ function MyPage(props) {
 
     //프로필 이미지 불러오기
     const handleChange = async (e) => {
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
 
@@ -590,7 +591,7 @@ function MyPage(props) {
 
     const SetLocation = async () => {
         const handleSuccess = async (pos) => {
-            if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
             axios.patch("http://13.209.77.50:8080/member/location", {

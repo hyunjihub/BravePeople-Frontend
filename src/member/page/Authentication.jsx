@@ -111,7 +111,7 @@ function Authentication(props) {
     }
 
     const handleAuth = async (e) =>{
-        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
 

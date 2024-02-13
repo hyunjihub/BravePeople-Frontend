@@ -172,7 +172,7 @@ function ResetPw(props) {
                     }
                     // 회원일 때 비밀번호 재설정 
                     else {
-                        if((sessionStorage.getItem('jwt').expirationTime)-60000 <= Date.now()) {
+                        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                             if (!await ReissueToken()) return;
                         }
 
