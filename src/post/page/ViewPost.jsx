@@ -151,7 +151,7 @@ const Content = styled.div`
     hyphens: auto; 
     min-height: 55%;
     padding-bottom: 10%;
-
+    white-space: pre-wrap;
 `;
 
 const StickyBox = styled.div`
@@ -234,7 +234,7 @@ function ViewPost(props) {
 
     // 데이터 불러오기
     useEffect(()=>{
-        axios.get(`http://13.209.77.50:8080/posts/${postid}`)
+        axios.get(`https://bravepeople.site:8080/posts/${postid}`)
         .then(function(response){
             setPostData(response.data);
             if(id === null) { setIsActivate(false); }
@@ -257,7 +257,7 @@ function ViewPost(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -310,7 +310,7 @@ function ViewPost(props) {
             cancelButtonText: '취소',
         }).then(result => {
             if (result.isConfirmed) {
-                axios.delete(`http://13.209.77.50:8080/posts/${postid}`, {
+                axios.delete(`https://bravepeople.site:8080/posts/${postid}`, {
                     headers:{
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }})
@@ -374,7 +374,7 @@ function ViewPost(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
-        axios.get(`http://13.209.77.50:8080/posts/${postid}/request`,
+        axios.get(`https://bravepeople.site:8080/posts/${postid}/request`,
         {
             headers :{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -389,6 +389,10 @@ function ViewPost(props) {
         })
         sessionStorage.setItem('nowRoomId', 1);
         navigate("/chat");
+    }
+
+    const test = () => {
+        console.log(postData.contents);
     }
 
     return(

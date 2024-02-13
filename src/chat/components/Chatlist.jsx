@@ -16,6 +16,7 @@ const Container = styled.div`
     width: 100%;
     height: 60%;
     overflow-y: auto;
+    overflow-x: hidden;
     margin-bottom: 1%;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
@@ -35,10 +36,10 @@ const LastChat = styled.div`
 `;
 
 const Profile = styled.div`
-    width: 50px;
+    width: 55px;
     height: 50px;
     cursor: pointer;
-    margin: 2% 1% 2% 2%;
+    margin: 2%;
     border-radius: 50%;
     background-size: cover;
     background-repeat: no-repeat;
@@ -47,10 +48,11 @@ const Profile = styled.div`
 `;
 
 const Time = styled.div`
-  width: 10%;
-  font-size: 12px;
+  width: 15%;
+  font-size: 75%;
   color: #808080;
   text-align: right;
+  margin: 0 3% 0 0;
 `;
 
 const ChatContainer = styled.div`
@@ -63,14 +65,14 @@ const ChatContainer = styled.div`
 
 const Unread = styled.div`
   position: absolute;
-  left: 9%;
-  top: 15%;
+  left: 11%;
+  top: 10%;
   border-radius: 50%;
   background-color: #f8332f;
-  width: 3.5%;
-  height: 25%;
+  width: 4.5%;
+  height: 28%;
   color: #fff;
-  padding: 0% 1.3%;
+  padding: 0% 1.8%;
   box-sizing: border-box;
   font-size: 15px;
 `;
@@ -90,7 +92,7 @@ function Chatlist(props) {
   // 토큰 재발급 요청 api
   const ReissueToken = async () => {
     try {
-        const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+        const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
             refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
         })
@@ -149,7 +151,7 @@ function Chatlist(props) {
   }
 
   //클릭시 채팅방id 전달
-  const handleChat = async (roomId) => {
+  const handleChat = async (roomId, read) => {
     if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
       if(!await ReissueToken()) return;
     }
@@ -169,7 +171,7 @@ function Chatlist(props) {
       .map(list => (
         <Container key={uuid()} onClick={() => handleChat(list.roomId)}>
           <Profile onClick={handlePage} value={list.otherId} style={{backgroundImage: `url(${(list.otherProfileImg === null) ? profile : list.otherProfileImg})`}}/>
-          {list.isRead && <Unread>!</Unread>}
+          {(!list.read)?<Unread>!</Unread>:null}
           <ChatContainer>
             <Nickname>{list.otherNickname}</Nickname>
             <LastChat>{truncate(list.lastChat, 30)}</LastChat>

@@ -81,7 +81,7 @@ function ResetPw(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -133,7 +133,7 @@ function ResetPw(props) {
                 if(e.target[0].value === e.target[1].value) {
                     // 비회원일 때 비밀번호 재설정
                     if(JSON.parse(sessionStorage.getItem('jwt')).access === null) {
-                        axios.patch('http://13.209.77.50:8080/member/pw', {
+                        axios.patch('https://bravepeople.site:8080/member/pw', {
                             newPassword: e.target[0].value,
                             emailId: parseInt(query.get('emailid'), 10),
                             authCode: parseInt(query.get('code'), 10),
@@ -176,7 +176,7 @@ function ResetPw(props) {
                             if (!await ReissueToken()) return;
                         }
 
-                        axios.patch('http://13.209.77.50:8080/member/pw', {
+                        axios.patch('https://bravepeople.site:8080/member/pw', {
                             newPassword: e.target[0].value},
                             {headers:{
                                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`

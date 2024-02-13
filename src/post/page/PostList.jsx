@@ -133,7 +133,7 @@ function PostList(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -209,7 +209,7 @@ function PostList(props) {
             if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
                 if (!await ReissueToken()) return;
             }
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
+            axios.get(`https://bravepeople.site:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
             {
                 headers:{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -229,7 +229,7 @@ function PostList(props) {
         }
         else{
             // 비로그인 상태일 때 게시글 조회
-            axios.get(`http://13.209.77.50:8080/posts?type=${type}&page=${page}&amount=5`)
+            axios.get(`https://bravepeople.site:8080/posts?type=${type}&page=${page}&amount=5`)
             .then(function(response){
                 setPostItems(postItems => [...postItems, ...response.data.data]);
                 setHasNext(response.data.hasNext);

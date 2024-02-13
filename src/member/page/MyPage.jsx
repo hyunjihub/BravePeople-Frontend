@@ -279,7 +279,7 @@ function MyPage(props) {
      // 토큰 재발급 요청 api
      const ReissueToken = async () => {
         try {
-            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -340,7 +340,7 @@ function MyPage(props) {
                 {(id===memberid)? setMySelf(true) : setMySelf(false)};
                 //마이페이지에 처음 접근할 때
                 if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
-                    axios.get(`http://13.209.77.50:8080/member/profile/${memberid}`,{
+                    axios.get(`https://bravepeople.site:8080/member/profile/${memberid}`,{
                         headers:{
                             Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                         }
@@ -450,7 +450,7 @@ function MyPage(props) {
                     confirmButtonText: "확인",
                 });
             }else{
-                axios.patch("http://13.209.77.50:8080/member/profile", {
+                axios.patch("https://bravepeople.site:8080/member/profile", {
                     nickname: currentName,
                     introduction: currentIntro,
                     profileImg: currentImg
@@ -594,7 +594,7 @@ function MyPage(props) {
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
-            axios.patch("http://13.209.77.50:8080/member/location", {
+            axios.patch("https://bravepeople.site:8080/member/location", {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
             }, {

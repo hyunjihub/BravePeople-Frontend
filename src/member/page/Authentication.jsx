@@ -73,7 +73,7 @@ function Authentication(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -116,7 +116,7 @@ function Authentication(props) {
         }
 
         if(e.target[0].value !== "") {
-            axios.post('http://13.209.77.50:8080/member/pw', {
+            axios.post('https://bravepeople.site:8080/member/pw', {
             nowPassword: e.target[0].value,
             }, {headers:{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`

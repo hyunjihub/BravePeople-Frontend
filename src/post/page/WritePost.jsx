@@ -254,7 +254,7 @@ function WritePost(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -308,7 +308,7 @@ function WritePost(props) {
                 if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                     if (!await ReissueToken()) return;
                 }
-                axios.get(`http://13.209.77.50:8080/posts/${postid}`)
+                axios.get(`https://bravepeople.site:8080/posts/${postid}`)
                 .then(function(response){
                     setContent(response.data.contents);
                     setCurrentImg(response.data.postImg);
@@ -392,6 +392,19 @@ function WritePost(props) {
         else setContent(e.target.value);
     };
 
+    const handleTab = (e) => {
+        if (e.keyCode === 9) {
+          e.preventDefault();
+          let val = e.target.value;
+          let start = e.target.selectionStart;
+          let end = e.target.selectionEnd;
+          e.target.value = val.substring(0, start) + "\t" + val.substring(end);
+          e.target.selectionStart = e.target.selectionEnd = start + 1;
+          handleContent(e);
+          return false; //  prevent focus
+        }
+      };
+
     //이미지 업로드
     const [currentImg, setCurrentImg] = useState("");
     const [uploading, setUploading] = useState(false);
@@ -436,7 +449,7 @@ function WritePost(props) {
         } else if (files && files.length === 1) {
             const frm = new FormData();
             frm.append('file', files[0]);
-            axios.post("http://13.209.77.50:8080/image", frm, {
+            axios.post("https://bravepeople.site:8080/image", frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
@@ -474,7 +487,7 @@ function WritePost(props) {
         }
         if((title !== "") && (number !== "") && (content !== "")){
             if(postid==='-1') {
-                axios.post('http://13.209.77.50:8080/posts',{
+                axios.post('https://bravepeople.site:8080/posts',{
                     type: type,
                     category: selectedCategory,
                     title: title,
@@ -485,7 +498,13 @@ function WritePost(props) {
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                     }})
                     .then(function(response){
-                        alert("게시글 작성이 완료되었습니다.");
+                        Swal.fire({
+                            title: "게시글 작성 완료",
+                            text: "작성하신 게시글이 등록되었습니다.",
+                            icon: "success",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
                         navigate(-1);
                     })
                     .catch(function(err){
@@ -510,7 +529,7 @@ function WritePost(props) {
                         } else console.log(err);
                     })
             } else {
-                axios.patch(`http://13.209.77.50:8080/posts/${postid}`, {
+                axios.patch(`https://bravepeople.site:8080/posts/${postid}`, {
                     type: type,
                     title: title,
                     contents: content,
@@ -599,6 +618,7 @@ function WritePost(props) {
                     name="content"
                     cols="30" rows="5"
                     value={content || ""}
+                    onKeyDown={handleTab}
                     onChange={handleContent}
                     placeholder="내용을 입력해주세요. 최대 1,000자"/>
                     <Length>{content.length}/1000</Length>

@@ -81,7 +81,7 @@ function FindId(props) {
     const idFind = (e) => {
         if(emailCheck(e.target[0].value)) {
             if (e.target[0].value !== "") {
-                axios.get('http://13.209.77.50:8080/auth/username', {
+                axios.get('https://bravepeople.site:8080/auth/username', {
                     params: {
                         email: e.target[0].value
                     }
@@ -133,7 +133,7 @@ function FindId(props) {
         if(e.target[0].value !== "" && e.target[1].value !== "") {
             if(e.target[0].value.length>6) {
                 if(emailCheck(e.target[1].value)) {
-                    axios.get('http://13.209.77.50:8080/auth/pw', {
+                    axios.get('https://bravepeople.site:8080/auth/pw', {
                         params: {
                             username: e.target[0].value,
                             email: e.target[1].value,

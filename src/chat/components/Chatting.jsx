@@ -12,6 +12,7 @@ const Bubble = styled.div`
   border-radius: 15px;
   padding: 2%;
   position: relative; 
+  white-space: pre-line;
 `;
 
 const Tail = styled.div`
@@ -153,9 +154,9 @@ function Chatting(props) {
           return (
             <Container className="full" key={index}>
               {handleChangeDate(index) && <Date>{message.date}</Date>}
-              <Container isuser={String(message.senderId) === id ? true : false}>
-                <Bubble isuser={String(message.senderId) === id ? true : false}>
-                  <Tail isuser={String(message.senderId) === id ? true : false} />
+              <Container isuser={String(message.senderId) === id}>
+                <Bubble isuser={String(message.senderId) === id}>
+                  <Tail isuser={String(message.senderId) === id} />
                   {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}
                 </Bubble>
                 {handleChangeTime(index) && <Time>{message.time}</Time>}

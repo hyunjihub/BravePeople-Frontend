@@ -190,7 +190,7 @@ export default function Header(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("http://13.209.77.50:8080/auth/reissue",{
+            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -247,7 +247,7 @@ export default function Header(props) {
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
-            axios.post("http://13.209.77.50:8080/member/logout", {}, {
+            axios.post("https://bravepeople.site:8080/member/logout", {}, {
                 headers: {
                     'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
@@ -319,7 +319,7 @@ export default function Header(props) {
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
-            axios.patch("http://13.209.77.50:8080/member/location", {
+            axios.patch("https://bravepeople.site:8080/member/location", {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
             }, {

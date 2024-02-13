@@ -92,7 +92,7 @@ export default function LogIn(props) {
     const handleLogin = (e) => {
         e.preventDefault();
         if(e.target[0].value !== "" && e.target[1].value !== ""){
-            axios.post('http://13.209.77.50:8080/auth/login', {
+            axios.post('https://bravepeople.site:8080/auth/login', {
                 username: e.target[0].value,
                 pw: e.target[1].value
             })

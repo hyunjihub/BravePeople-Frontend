@@ -133,7 +133,7 @@ function SignUp(props) {
                 if(e.target[4].value === e.target[5].value) {
                     if (isPassword(e.target[4].value)) {
                         if (e.target[8].value.length>=2 && e.target[8].value.length<7) {
-                            axios.post('http://13.209.77.50:8080/auth/signup', {
+                            axios.post('https://bravepeople.site:8080/auth/signup', {
                                 name: e.target[0].value,
                                 gender: gender,
                                 username: e.target[3].value,
@@ -277,7 +277,7 @@ function SignUp(props) {
             }).then(result => {
                 if (result.isConfirmed) {
                     setIsDisabled(true);
-                    axios.get('http://13.209.77.50:8080/auth/email', {
+                    axios.get('https://bravepeople.site:8080/auth/email', {
                         params: {
                             address: email
                         }
