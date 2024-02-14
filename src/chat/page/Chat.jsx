@@ -13,7 +13,7 @@ import List from "../components/Chatlist";
 import Modal from "../components/Modal";
 
 // 채팅
-import { Stomp, StompJs } from "@stomp/stompjs";
+import { Stomp } from "@stomp/stompjs";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -339,7 +339,6 @@ function Chat(props) {
             navigate("/main");
         }else if((JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog)
         || (JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog)){
-            connectHandler();
             if(sessionStorage.getItem('nowRoomId'))  { 
                 setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId')));
             }else{
@@ -412,25 +411,14 @@ function Chat(props) {
         })
     }
 
-    // 소켓 연결
-    const connectHandler = () => {
-        client.current = new StompJs.Client({
-            brokerURL: 'wss://bravepeople.site:8080/ws-stomp',
-            debug: function(){},
-            reconnectDelay: 5000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
-        });
-        client.current.onConnect = () => {
-            
-        }
-    }
-
-    // 구독
+    // 소켓연결 & 구독
     const subHandler = async() => {
         setPreRoomId(nowRoomId);
         getPrevChat();
         getChatList();
+        const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
+        client.current = Stomp.over(()=>{ return socket });
+        client.current.debug = () => {};
         client.current.activate();
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
