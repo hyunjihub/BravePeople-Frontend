@@ -387,7 +387,6 @@ function ViewPost(props) {
         .catch(function(error){
             console.log(error);
         })
-        sessionStorage.setItem('nowRoomId', 1);
         navigate("/chat");
     }
 

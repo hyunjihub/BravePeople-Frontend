@@ -348,17 +348,20 @@ function Chat(props) {
         
         return async() => {
             sessionStorage.removeItem('nowRoomId');
-            client.current = null;
+            if(preRoomId !== null && client !== null && client.current.connected)
+                {
+                    client.current.disconnect();
+                }
         }
     }, []);
 
-    
+    // 우측 채팅방 설정하기
     useEffect(()=>{
         const setNowRoom = async() => {
             if(nowRoomId !== null){
-                if(preRoomId !== null)
+                if(preRoomId !== null && client !== null && client.current.connected)
                 {
-                    await client.current.disconnect();
+                    client.current.disconnect();
                 }
                 subHandler();
             }
@@ -414,8 +417,8 @@ function Chat(props) {
     // 소켓연결 & 구독
     const subHandler = async() => {
         setPreRoomId(nowRoomId);
-        getPrevChat();
         getChatList();
+        getPrevChat();
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
         client.current.debug = () => {};
