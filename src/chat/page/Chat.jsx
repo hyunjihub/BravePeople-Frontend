@@ -11,7 +11,9 @@ import { BsCameraFill } from "react-icons/bs";
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
 import Modal from "../components/Modal";
-import { Stomp } from "@stomp/stompjs";
+
+// 채팅
+import { Stomp, StompJs } from "@stomp/stompjs";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -347,10 +349,7 @@ function Chat(props) {
         
         return async() => {
             sessionStorage.removeItem('nowRoomId');
-            //await client.current.disconnect();
-            //await client.current.deactivate();
             client.current = null;
-            console.log(client.current);
         }
     }, []);
 
@@ -360,7 +359,7 @@ function Chat(props) {
             if(nowRoomId !== null){
                 if(preRoomId !== null)
                 {
-                    await client.current.unsubscribe(preRoomId);
+                    await client.current.disconnect();
                 }
                 subHandler();
             }
@@ -415,11 +414,16 @@ function Chat(props) {
 
     // 소켓 연결
     const connectHandler = () => {
-        const socket = new WebSocket(`wss://bravepeople.site:8080/ws-stomp`);
-        
-        client.current = Stomp.over(()=>{ return socket });
-        client.current.debug = () => {};
-        client.current.activate();
+        client.current = new StompJs.Client({
+            brokerURL: 'wss://bravepeople.site:8080/ws-stomp',
+            debug: function(){},
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+        });
+        client.current.onConnect = () => {
+            
+        }
     }
 
     // 구독
@@ -427,6 +431,7 @@ function Chat(props) {
         setPreRoomId(nowRoomId);
         getPrevChat();
         getChatList();
+        client.current.activate();
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
@@ -439,46 +444,50 @@ function Chat(props) {
                 img: null
             }));
         }
-        client.current.connect({
-            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-            'Content-Type' : 'application/json'
-        },
-            ()=>{
-                client.current.subscribe(`/sub/${nowRoomId}`,
-                    (message)=>{
-                        console.log(message);
-                        if(String(JSON.parse(message.body).senderId)!==id) {
-                            if(JSON.parse(message.body).message!==null) {
-                                const newMessage = {
-                                    chatId: JSON.parse(message.body).chatId,
-                                    senderId: JSON.parse(message.body).senderId,
-                                    message: JSON.parse(message.body).message,
-                                    date: JSON.parse(message.body).date,
-                                    time: JSON.parse(message.body).time,
-                                    img: null 
-                                };
-                                setChatMessage([...chatMessage, newMessage]);
-                            } else if (JSON.parse(message.body).img!==null) {
-                                const newMessage = {
-                                    chatId: JSON.parse(message.body).chatId,
-                                    senderId: JSON.parse(message.body).senderId,
-                                    message: null,
-                                    date: JSON.parse(message.body).date,
-                                    time: JSON.parse(message.body).time,
-                                    img: JSON.parse(message.body).img
-                                };
-                                setChatMessage(...chatMessage, newMessage);
+        if(client){
+            console.log("들어옴1");
+            client.current.connect({
+                Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                'Content-Type' : 'application/json'
+            },
+                ()=>{
+                    console.log("들어옴2");
+                    client.current.subscribe(`/sub/${nowRoomId}`,
+                        (message)=>{
+                            console.log(message);
+                            if(String(JSON.parse(message.body).senderId)!==id) {
+                                if(JSON.parse(message.body).message!==null) {
+                                    const newMessage = {
+                                        chatId: JSON.parse(message.body).chatId,
+                                        senderId: JSON.parse(message.body).senderId,
+                                        message: JSON.parse(message.body).message,
+                                        date: JSON.parse(message.body).date,
+                                        time: JSON.parse(message.body).time,
+                                        img: null 
+                                    };
+                                    setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
+                                } else if (JSON.parse(message.body).img!==null) {
+                                    const newMessage = {
+                                        chatId: JSON.parse(message.body).chatId,
+                                        senderId: JSON.parse(message.body).senderId,
+                                        message: null,
+                                        date: JSON.parse(message.body).date,
+                                        time: JSON.parse(message.body).time,
+                                        img: JSON.parse(message.body).img
+                                    };
+                                    setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
+                                }
                             }
                             getChatList();
+                        },
+                        {
+                            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                            'Content-Type' : 'application/json'
                         }
-                    },
-                    {
-                        Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-                        'Content-Type' : 'application/json'
-                    }
-                );
-            }     
-        );
+                    );
+                }     
+            );
+        }
     }
 
     // enter키 : 전송 / shift+enter키 : 줄바꿈
