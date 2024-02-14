@@ -90,7 +90,7 @@ const User = styled.div`
 `;
 
 const Nickname = styled.div`
-    width: 40%;
+    width: 50%;
     font-size: 22px;
     color: #000;
     font-weight: 700;
@@ -433,38 +433,23 @@ function Chat(props) {
             }));
         }
         if(client){
-            console.log("들어옴1");
             client.current.connect({
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
                 'Content-Type' : 'application/json'
             },
                 ()=>{
-                    console.log("들어옴2");
                     client.current.subscribe(`/sub/${nowRoomId}`,
                         (message)=>{
-                            console.log(message);
                             if(String(JSON.parse(message.body).senderId)!==id) {
-                                if(JSON.parse(message.body).message!==null) {
-                                    const newMessage = {
-                                        chatId: JSON.parse(message.body).chatId,
-                                        senderId: JSON.parse(message.body).senderId,
-                                        message: JSON.parse(message.body).message,
-                                        date: JSON.parse(message.body).date,
-                                        time: JSON.parse(message.body).time,
-                                        img: null 
-                                    };
-                                    setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
-                                } else if (JSON.parse(message.body).img!==null) {
-                                    const newMessage = {
-                                        chatId: JSON.parse(message.body).chatId,
-                                        senderId: JSON.parse(message.body).senderId,
-                                        message: null,
-                                        date: JSON.parse(message.body).date,
-                                        time: JSON.parse(message.body).time,
-                                        img: JSON.parse(message.body).img
-                                    };
-                                    setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
-                                }
+                                const newMessage = {
+                                    chatId: JSON.parse(message.body).chatId,
+                                    senderId: JSON.parse(message.body).senderId,
+                                    message: ((JSON.parse(message.body).message===null)?null:JSON.parse(message.body).message),
+                                    date: JSON.parse(message.body).date,
+                                    time: JSON.parse(message.body).time,
+                                    img: ((JSON.parse(message.body).img===null)?null:JSON.parse(message.body).img)
+                                };
+                                setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
                             }
                             getChatList();
                         },
@@ -607,6 +592,7 @@ function Chat(props) {
                         'Content-Type' : 'application/json'
                     },
                     JSON.stringify({
+                        type: "TALK",
                         senderId: id,
                         message: null,
                         img: response.data.imgUrl

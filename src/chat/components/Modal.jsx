@@ -3,16 +3,16 @@ import React, { useEffect, useRef, useState } from "react";
 
 const Content = styled.div`
     width: 65%;
-    height: 90%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
 `;
 
 const ImageWrapper = styled.div`
-    width: 80%;
+    width: 60%;
     max-height: 70%;
-    margin: 2% auto 2%;
+    margin: 5% auto 2%;
     overflow-y : auto;
     &::-webkit-scrollbar {
         width: 7px;

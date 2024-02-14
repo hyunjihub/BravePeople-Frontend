@@ -131,7 +131,6 @@ export default function LogIn(props) {
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
-                console.log(error);
             });
         }else{
             Swal.fire({

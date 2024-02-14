@@ -80,7 +80,6 @@ const Unread = styled.div`
 function Chatlist(props) {
 
   const list = props.value;
-
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
