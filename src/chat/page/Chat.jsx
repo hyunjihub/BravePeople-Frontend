@@ -11,9 +11,7 @@ import { BsCameraFill } from "react-icons/bs";
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
 import Modal from "../components/Modal";
-
-import SockJS from "sockjs-client";
-import { Stomp, CompatClient } from "@stomp/stompjs";
+import { Stomp } from "@stomp/stompjs";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -282,6 +280,9 @@ function Chat(props) {
     // 이전 채팅 내역
     const [chatMessage, setChatMessage] = useState([]);
 
+    // 이전 채팅방 id(구독해제용)
+    const [preRoomId, setPreRoomId] = useState(null);
+
     const [userInfo, setUserInfo] = useState({
         profileImage: null,
         nickname: null,
@@ -336,19 +337,37 @@ function Chat(props) {
             navigate("/main");
         }else if((JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog)
         || (JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog)){
-            if(sessionStorage.getItem('nowRoomId'))  { setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId'))); }
-            getChatList();
+            connectHandler();
+            if(sessionStorage.getItem('nowRoomId'))  { 
+                setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId')));
+            }else{
+                getChatList();
+            }
         }
         
-        return() => {
+        return async() => {
             sessionStorage.removeItem('nowRoomId');
+            //await client.current.disconnect();
+            //await client.current.deactivate();
+            client.current = null;
+            console.log(client.current);
         }
     }, []);
 
     
     useEffect(()=>{
-        if(nowRoomId!==null) getPrevChat();
+        const setNowRoom = async() => {
+            if(nowRoomId !== null){
+                if(preRoomId !== null)
+                {
+                    await client.current.unsubscribe(preRoomId);
+                }
+                subHandler();
+            }
+        }
+        setNowRoom();
     }, [nowRoomId]);
+    
 
     // 채팅방 리스트
     const getChatList = async () => {
@@ -396,10 +415,30 @@ function Chat(props) {
 
     // 소켓 연결
     const connectHandler = () => {
-        const socket = new WebSocket(`ws://13.209.77.50:8080/ws-stomp`);
+        const socket = new WebSocket(`wss://bravepeople.site:8080/ws-stomp`);
         
-        client.current = Stomp.over(socket);
+        client.current = Stomp.over(()=>{ return socket });
         client.current.debug = () => {};
+        client.current.activate();
+    }
+
+    // 구독
+    const subHandler = async() => {
+        setPreRoomId(nowRoomId);
+        getPrevChat();
+        getChatList();
+        if(client.current !== null && client.current.connected){
+            await client.current.send(`/pub/${nowRoomId}`,{
+                Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                'Content-Type' : 'application/json'
+            },
+            JSON.stringify({
+                type: "ENTER",
+                senderId: id,
+                message: null,
+                img: null
+            }));
+        }
         client.current.connect({
             Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
             'Content-Type' : 'application/json'
@@ -407,6 +446,7 @@ function Chat(props) {
             ()=>{
                 client.current.subscribe(`/sub/${nowRoomId}`,
                     (message)=>{
+                        console.log(message);
                         if(String(JSON.parse(message.body).senderId)!==id) {
                             if(JSON.parse(message.body).message!==null) {
                                 const newMessage = {
@@ -427,7 +467,7 @@ function Chat(props) {
                                     time: JSON.parse(message.body).time,
                                     img: JSON.parse(message.body).img
                                 };
-                                setChatMessage([...chatMessage, newMessage]);
+                                setChatMessage(...chatMessage, newMessage);
                             }
                             getChatList();
                         }
@@ -441,17 +481,13 @@ function Chat(props) {
         );
     }
 
-    useEffect(()=>{
-        if(nowRoomId!==null) connectHandler();
-    }, [nowRoomId]);
-
-    //enter키 : 전송 / shift+enter키 : 줄바꿈
+    // enter키 : 전송 / shift+enter키 : 줄바꿈
     const onCheckEnter = (e) => {
         if (e.key === 'Enter' && e.shiftKey) {
             return;
         } else if(e.key === 'Enter') {
+            e.preventDefault();
             sendHandler();
-            setMsg("");
         } 
     }
 
@@ -482,6 +518,7 @@ function Chat(props) {
                 'Content-Type' : 'application/json'
             },
             JSON.stringify({
+                type: "TALK",
                 senderId: id,
                 message: msg,
                 img: null
