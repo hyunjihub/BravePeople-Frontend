@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import logo from "../resources/img/logo.png";
@@ -13,6 +13,7 @@ import axios from 'axios';
 import HeaderButton from "../components/HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { setLogin, setMemberId, setLocation, setProfileImg, setIsNew } from "../../member/redux/modules/login"
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 
 const Wrapper = styled.div`
@@ -184,6 +185,9 @@ export default function Header(props) {
                 });
                 setProfile(JSON.parse(sessionStorage.getItem('savedData')).profileImg);
             }
+            else if(JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog){
+                fetchSSE();
+            }
         }
     },[isLog]);
 
@@ -194,7 +198,6 @@ export default function Header(props) {
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
-            console.log(response);
             sessionStorage.setItem('jwt',JSON.stringify({
                 access: response.data.accessToken,
                 expirationTime: response.data.accessTokenExpiresIn,
@@ -232,6 +235,49 @@ export default function Header(props) {
         };
     }
 
+    // SSE 연결 함수
+    const eventSource = useRef();
+
+    const fetchSSE = async() => {
+        eventSource.current = new EventSourcePolyfill(`https://bravepeople.site:8080/stream/${id}`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            });
+        setupSSE();
+    }
+    
+    const setupSSE = async() => {
+        eventSource.current.onopen = () => {
+            // 연결 시 할 일
+            console.log("SSE 연결 완료");
+        };
+      
+        eventSource.current.onmessage = async (e) => {
+            const res = await e.data;
+            const parsedData = JSON.parse(res);
+        
+            // 받아오는 data로 할 일
+            console.log(parsedData);
+        };
+    
+        eventSource.current.onerror = (e) => {
+            // 종료 또는 에러 발생 시 할 일
+            eventSource.current.close();
+    
+        if (e.error) {
+            // 에러 발생 시 할 일
+            console.log(e.error);
+        }
+    
+        if (e.target.readyState === EventSource.CLOSED) {
+            // 종료 시 할 일
+            console.log("SSE 연결 종료");
+        }
+        }
+    }
+
     //로그아웃 -> 리프레쉬 만료 때 alert없이 로그아웃 하기 위한 변수
     //isLogOut이 true일 때는, refresh 만료 시 alert가 출력 안 되게 함
     const [isLogOut, setIsLogOut] = useState(false);
@@ -244,6 +290,7 @@ export default function Header(props) {
     const handleLogOut = async (e) => {
         handleIsLogOut();
         if(isLog) {
+            eventSource.current.close();
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
@@ -406,6 +453,7 @@ export default function Header(props) {
 
     return (
         <Wrapper>
+            <button onClick={()=>{console.log(eventSource.current)}}>test</button>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
