@@ -163,6 +163,9 @@ const SendBox = styled.textarea`
     margin: 3% 2%;
     cursor: pointer;
     font-size: 14px;
+    &:focus{
+        outline: none;
+    }
 `;
 
 const Dialogue = styled.div`
@@ -461,6 +464,7 @@ function Chat(props) {
                             'Content-Type' : 'application/json'
                         }
                     );
+                    getPrevChat();
                 }     
             );
         }

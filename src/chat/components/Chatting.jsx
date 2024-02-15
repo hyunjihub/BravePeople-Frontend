@@ -1,29 +1,43 @@
 import styled from "styled-components";
 import React, { useEffect, useRef, useState } from "react";
 
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useSelector } from "react-redux";
 
 const Bubble = styled.div`
   max-width: 50%;
-  color: ${({ isuser }) => (isuser ? '#fff' : '#000')};
+  color: #000;
   font-size: 15px;
-  background-color: ${({ isuser }) => (isuser ? '#f8332f' : '#f3f0f5')};
-  margin: 0% ${({ isuser }) => (isuser ? '5%' : '2%')} 0% ${({ isuser }) => (isuser ? '2%' : '5%')};
+  background-color: #f3f0f5;
+  margin: 0% 2% 0% 5%;
   border-radius: 15px;
   padding: 2%;
   position: relative; 
   white-space: pre-line;
+
+  &.sender {
+    color: #fff;
+    background-color: #f8332f;
+    margin: 0% 5% 0% 2%;
+    z-index: 0;
+  }
+
 `;
 
 const Tail = styled.div`
-  border-top: 15px solid ${({ isuser }) => (isuser ? '#f8332f' : '#f3f0f5')};
-  border-left: ${({ isuser }) => (isuser ?  '0' : '15px solid transparent')};
-  border-right: ${({ isuser }) => (isuser ? '15px solid transparent' : '0')};
-  border-bottom: ${({ isuser }) => (isuser ? '15px solid transparent' : '0')};
+  border-top: 15px solid #f3f0f5;
+  border-left: 15px solid transparent;
   content: "";
   position: absolute;
   top: 10px;
-  ${({ isuser }) => (isuser ? 'right: -12px;' : 'left: -12px;')};
+  left: -12px;
+
+  &.sender {
+    border-top: 15px solid #f8332f;
+    border-right: 15px solid transparent;
+    right: -12px;
+    left: 0;
+    z-index: -2;
+  }
 `;
 
 const Time = styled.div`
@@ -33,8 +47,8 @@ const Time = styled.div`
 
 const Container = styled.div`
   display: flex;
-  flex-direction: ${({ isuser }) => (isuser ? 'row-reverse' : 'row')};
-  float: ${({ isuser }) => (isuser ? 'right' : 'left')};
+  flex-direction: row;
+  float: left;
   clear: both;
   width: 100%;
   margin: 0.5%;
@@ -42,6 +56,11 @@ const Container = styled.div`
 
   &.full {
     flex-direction: column;
+  }
+
+  &.sender {
+    flex-direction: row-reverse;
+    float: right;
   }
 `;
 
@@ -154,13 +173,19 @@ function Chatting(props) {
           return (
             <Container className="full" key={index}>
               {handleChangeDate(index) && <Date>{message.date}</Date>}
-              <Container isuser={String(message.senderId) === id}>
+              {(String(message.senderId) === id)?<Container className="sender">
+                <Bubble className="sender">
+                  <Tail className="sender"/>
+                    {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}
+                  </Bubble>
+                  {handleChangeTime(index) && <Time>{message.time}</Time>}
+              </Container>:<Container>
                 <Bubble isuser={String(message.senderId) === id}>
-                  <Tail isuser={String(message.senderId) === id} />
-                  {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}
-                </Bubble>
-                {handleChangeTime(index) && <Time>{message.time}</Time>}
-              </Container>
+                    <Tail isuser={String(message.senderId) === id} />
+                    {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}
+                  </Bubble>
+                  {handleChangeTime(index) && <Time>{message.time}</Time>}
+              </Container>}
             </Container>
           );
         })}

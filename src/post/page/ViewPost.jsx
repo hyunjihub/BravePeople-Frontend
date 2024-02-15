@@ -387,11 +387,6 @@ function ViewPost(props) {
         .catch(function(error){
             console.log(error);
         })
-        navigate("/chat");
-    }
-
-    const test = () => {
-        console.log(postData.contents);
     }
 
     return(
