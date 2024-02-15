@@ -180,8 +180,8 @@ function Chatting(props) {
                   </Bubble>
                   {handleChangeTime(index) && <Time>{message.time}</Time>}
               </Container>:<Container>
-                <Bubble isuser={String(message.senderId) === id}>
-                    <Tail isuser={String(message.senderId) === id} />
+                <Bubble>
+                    <Tail/>
                     {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}
                   </Bubble>
                   {handleChangeTime(index) && <Time>{message.time}</Time>}
