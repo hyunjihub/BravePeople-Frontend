@@ -69,8 +69,8 @@ const Unread = styled.div`
   top: 10%;
   border-radius: 50%;
   background-color: #f8332f;
-  width: 4.5%;
-  height: 28%;
+  width: 4%;
+  height: 23%;
   color: #fff;
   padding: 0% 1.8%;
   box-sizing: border-box;
@@ -170,7 +170,7 @@ function Chatlist(props) {
       .map(list => (
         <Container key={uuid()} onClick={() => handleChat(list.roomId)}>
           <Profile onClick={handlePage} value={list.otherId} style={{backgroundImage: `url(${(list.otherProfileImg === null) ? profile : list.otherProfileImg})`}}/>
-          {(!list.read)?<Unread>!</Unread>:null}
+          {(!list.read)?<Unread></Unread>:null}
           <ChatContainer>
             <Nickname>{list.otherNickname}</Nickname>
             <LastChat>{truncate(list.lastChat, 30)}</LastChat>

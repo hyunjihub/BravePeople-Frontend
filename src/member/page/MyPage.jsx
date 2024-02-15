@@ -337,7 +337,7 @@ function MyPage(props) {
                 if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                     if (!await ReissueToken()) return;
                 }
-                {(id===memberid)? setMySelf(true) : setMySelf(false)};
+                
                 //마이페이지에 처음 접근할 때
                 if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
                     axios.get(`https://bravepeople.site:8080/member/profile/${memberid}`,{
@@ -396,6 +396,12 @@ function MyPage(props) {
         }
         loadMypage();
     }, [memberid]);
+
+    useEffect(()=>{
+        if(id !== null){
+            {(id===memberid)? setMySelf(true) : setMySelf(false)};
+        }
+    }, [id]);
 
     const [currentName, setCurrentName] = useState(null);
 

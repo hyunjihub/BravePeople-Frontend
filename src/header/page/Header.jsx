@@ -453,7 +453,6 @@ export default function Header(props) {
 
     return (
         <Wrapper>
-            <button onClick={()=>{console.log(eventSource.current)}}>test</button>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>

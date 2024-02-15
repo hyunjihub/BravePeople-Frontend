@@ -274,7 +274,7 @@ function Chat(props) {
     const setLog = (bool) => dispatch(setLogin(bool));
 
     // client
-    const client = useRef(null);
+    const client = useRef();
 
     // 현재 active된 채팅방 id
     const [nowRoomId, setNowRoomId] = useState(null);
@@ -424,8 +424,9 @@ function Chat(props) {
         getPrevChat();
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
-        client.current.debug = () => {};
+        //client.current.debug = () => {};
         client.current.activate();
+        client.current.onWebsocketClose = () => {console.log("소켓 닫힘")};
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,

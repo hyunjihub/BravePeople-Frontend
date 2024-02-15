@@ -82,7 +82,7 @@ function Main(props) {
     return(
         <Wrapper>
             <Landing>
-                <MainTxt>메인으로 들어갈 문구 <br /> 흥미로운 문구로 보이는 문구</MainTxt>
+                <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 불러주세요!</MainTxt>
                 <Button>원정대 시작하기</Button>
             </Landing>
             <Landing className="introduction">
