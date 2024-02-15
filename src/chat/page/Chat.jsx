@@ -351,21 +351,21 @@ function Chat(props) {
         
         return async() => {
             sessionStorage.removeItem('nowRoomId');
-            if(preRoomId !== null && client !== null && client.current.connected)
-                {
-                    client.current.disconnect();
-                }
+            if(client !== null && client.current.connected)
+            {
+                client.current.disconnect();
+            }
         }
     }, []);
 
     // 우측 채팅방 설정하기
     useEffect(()=>{
         const setNowRoom = async() => {
+            if(preRoomId !== null && client !== null && client.current.connected)
+            {
+                client.current.disconnect();
+            }  
             if(nowRoomId !== null){
-                if(preRoomId !== null && client !== null && client.current.connected)
-                {
-                    client.current.disconnect();
-                }
                 subHandler();
             }
         }
@@ -424,31 +424,62 @@ function Chat(props) {
         getPrevChat();
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
-        //client.current.debug = () => {};
-        client.current.activate();
-        client.current.onWebsocketClose = () => {console.log("소켓 닫힘")};
-        if(client.current !== null && client.current.connected){
-            await client.current.send(`/pub/${nowRoomId}`,{
-                Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-                'Content-Type' : 'application/json'
-            },
-            JSON.stringify({
-                type: "ENTER",
-                senderId: id,
-                message: null,
-                img: null
-            }));
-        }
+        console.log("연결 성공");
         if(client){
+            // client 세부 설정
+            client.current.debug = () => {};
+            client.current.onDisconnect = (e) => { 
+                if(client.current.active){
+                    console.log("재연결");
+                    try{client.current.subscribe(`/sub/${nowRoomId}`,
+                        (message)=>{
+                            const newMessage = {
+                                    chatId: JSON.parse(message.body).chatId,
+                                    senderId: JSON.parse(message.body).senderId,
+                                    message: ((JSON.parse(message.body).message===null)?null:JSON.parse(message.body).message),
+                                    date: JSON.parse(message.body).date,
+                                    time: JSON.parse(message.body).time,
+                                    img: ((JSON.parse(message.body).img===null)?null:JSON.parse(message.body).img)
+                            };
+                            setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
+                            getChatList();
+                        },
+                        {
+                            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                            'Content-Type' : 'application/json'
+                        }
+                    )
+                    }catch(e){
+                        //console.log(e);
+                    };
+                }else{
+                    console.log("연결해제");
+                    client.current = null;
+                }
+            }
+
+            // client 소켓 연결
             client.current.connect({
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
                 'Content-Type' : 'application/json'
             },
                 ()=>{
+                    // 입장 메세지 보내기
+                    client.current.send(`/pub/${nowRoomId}`,{
+                        Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                        'Content-Type' : 'application/json'
+                    },
+                    JSON.stringify({
+                        type: "ENTER",
+                        senderId: id,
+                        message: null,
+                        img: null
+                    }));
+
+                    // 구독받은 메세지 받기
                     client.current.subscribe(`/sub/${nowRoomId}`,
                         (message)=>{
-                            if(String(JSON.parse(message.body).senderId)!==id) {
-                                const newMessage = {
+                            const newMessage = {
                                     chatId: JSON.parse(message.body).chatId,
                                     senderId: JSON.parse(message.body).senderId,
                                     message: ((JSON.parse(message.body).message===null)?null:JSON.parse(message.body).message),
@@ -456,8 +487,7 @@ function Chat(props) {
                                     time: JSON.parse(message.body).time,
                                     img: ((JSON.parse(message.body).img===null)?null:JSON.parse(message.body).img)
                                 };
-                                setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
-                            }
+                            setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
                             getChatList();
                         },
                         {
@@ -465,7 +495,6 @@ function Chat(props) {
                             'Content-Type' : 'application/json'
                         }
                     );
-                    getPrevChat();
                 }     
             );
         }
@@ -490,17 +519,6 @@ function Chat(props) {
         if (msg.trim() === "") {
             return;
         }
-
-        const newMessage = {
-            chatId: null, // 실제로는 백엔드에서 할당 됨
-            senderId: id,
-            message: msg,
-            date: `${addZero(today.getMonth() + 1)}월 ${addZero(today.getDate())}일`,
-            time: formatAMPM(today),
-            img: null 
-        };
-
-        setChatMessage([...chatMessage, newMessage]);
 
         if(client.current !== null && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
