@@ -292,9 +292,6 @@ function Chat(props) {
     // 이전 채팅 내역
     const [chatMessage, setChatMessage] = useState([]);
 
-    // 이전 채팅방 id(구독해제용)
-    const [preRoomId, setPreRoomId] = useState(null);
-
     const [userInfo, setUserInfo] = useState({
         profileImage: null,
         nickname: null,
@@ -368,13 +365,13 @@ function Chat(props) {
     // 우측 채팅방 설정하기
     useEffect(()=>{
         const setNowRoom = async() => {
-            if(preRoomId !== null && client.current && client.current.connected)
+            if(nowRoomId)
             {
-                client.current.disconnect();
-            }  
-            if(nowRoomId !== null){
+                if(client.current && client.current.connected) { await client.current.disconnect(); }
+                await getChatList();
+                await getPrevChat();
                 subHandler();
-            }
+            }  
         }
         setNowRoom();
     }, [nowRoomId]);
@@ -426,43 +423,43 @@ function Chat(props) {
 
     // 소켓연결 & 구독
     const subHandler = async() => {
-        setPreRoomId(nowRoomId);
-        getChatList();
-        getPrevChat();
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
-        console.log("연결 성공");
+
+        // client 세부 설정
         if(client.current){
-            // client 세부 설정
             client.current.debug = () => {};
             client.current.onDisconnect = (e) => { 
-                if(client.current.active){
-                    console.log("재연결");
-                    try{client.current.subscribe(`/sub/${nowRoomId}`,
-                        (message)=>{
-                            const newMessage = {
-                                    chatId: JSON.parse(message.body).chatId,
-                                    senderId: JSON.parse(message.body).senderId,
-                                    message: JSON.parse(message.body).message,
-                                    date: JSON.parse(message.body).date,
-                                    time: JSON.parse(message.body).time,
-                                    img: JSON.parse(message.body).img
-                            };
-                            setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
-                            getChatList();
-                        },
-                        {
-                            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-                            'Content-Type' : 'application/json'
-                        }
-                    )
-                    }catch(e){
-                        //console.log(e);
-                    };
-                }else{
-                    console.log("연결해제");
-                    client.current = null;
-                }
+                console.log(client.current);
+                console.log(client.current.active);
+                console.log(client.current.connected);
+                // if(client.current.active && client.current.connected){
+                //     console.log("재연결");
+
+                //     try{client.current.subscribe(`/sub/${nowRoomId}`,
+                //         (message)=>{
+                //             const newMessage = {
+                //                     chatId: JSON.parse(message.body).chatId,
+                //                     senderId: JSON.parse(message.body).senderId,
+                //                     message: JSON.parse(message.body).message,
+                //                     date: JSON.parse(message.body).date,
+                //                     time: JSON.parse(message.body).time,
+                //                     img: JSON.parse(message.body).img
+                //             };
+                //             setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
+                //             getChatList();
+                //         },
+                //         {
+                //             Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                //             'Content-Type' : 'application/json'
+                //         }
+                //     )
+                //     }catch(e){
+                //         //console.log(e);
+                //     };
+                // }else{
+                //     client.current = null;
+                // }
             }
 
             // client 소켓 연결
@@ -471,6 +468,7 @@ function Chat(props) {
                 'Content-Type' : 'application/json'
             },
                 ()=>{
+                    console.log("들어옴");
                     // 입장 메세지 보내기
                     client.current.send(`/pub/${nowRoomId}`,{
                         Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
@@ -502,7 +500,6 @@ function Chat(props) {
                             'Content-Type' : 'application/json'
                         }
                     );
-                    getPrevChat();
                 }     
             );
         }
@@ -608,16 +605,6 @@ function Chat(props) {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
-                console.log(response);
-                const newMessage = {
-                    chatId: null, // 실제로는 백엔드에서 할당해야 함
-                    senderId: id, 
-                    message: null,
-                    date: `${addZero(today.getMonth() + 1)}월 ${addZero(today.getDate())}일`,
-                    time: formatAMPM(today),
-                    img: response.data.imgUrl
-                };
-
                 if(client.current && client.current.connected){
                     client.current.send(`/pub/${nowRoomId}`,{
                         Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
@@ -656,6 +643,7 @@ function Chat(props) {
     
     return(
         <Container>
+        <button onClick={()=>{console.log(client.current)}}>test</button>
             {(chatList===null)?<NullContainer>
                 <Null>대화중인 채팅방이 없습니다.</Null>
                 <Null className="detail">의뢰/원정을 통해 새로운 채팅을 시작하세요.</Null>
