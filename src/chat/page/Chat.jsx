@@ -351,7 +351,7 @@ function Chat(props) {
         
         return async() => {
             sessionStorage.removeItem('nowRoomId');
-            if(client !== null && client.current.connected)
+            if(client.current && client.current.connected)
             {
                 client.current.disconnect();
             }
@@ -361,7 +361,7 @@ function Chat(props) {
     // 우측 채팅방 설정하기
     useEffect(()=>{
         const setNowRoom = async() => {
-            if(preRoomId !== null && client !== null && client.current.connected)
+            if(preRoomId !== null && client.current && client.current.connected)
             {
                 client.current.disconnect();
             }  
@@ -425,7 +425,7 @@ function Chat(props) {
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
         console.log("연결 성공");
-        if(client){
+        if(client.current){
             // client 세부 설정
             client.current.debug = () => {};
             client.current.onDisconnect = (e) => { 
@@ -436,10 +436,10 @@ function Chat(props) {
                             const newMessage = {
                                     chatId: JSON.parse(message.body).chatId,
                                     senderId: JSON.parse(message.body).senderId,
-                                    message: ((JSON.parse(message.body).message===null)?null:JSON.parse(message.body).message),
+                                    message: JSON.parse(message.body).message,
                                     date: JSON.parse(message.body).date,
                                     time: JSON.parse(message.body).time,
-                                    img: ((JSON.parse(message.body).img===null)?null:JSON.parse(message.body).img)
+                                    img: JSON.parse(message.body).img
                             };
                             setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
                             getChatList();
@@ -482,10 +482,10 @@ function Chat(props) {
                             const newMessage = {
                                     chatId: JSON.parse(message.body).chatId,
                                     senderId: JSON.parse(message.body).senderId,
-                                    message: ((JSON.parse(message.body).message===null)?null:JSON.parse(message.body).message),
+                                    message: JSON.parse(message.body).message,
                                     date: JSON.parse(message.body).date,
                                     time: JSON.parse(message.body).time,
-                                    img: ((JSON.parse(message.body).img===null)?null:JSON.parse(message.body).img)
+                                    img: JSON.parse(message.body).img
                                 };
                             setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
                             getChatList();
@@ -520,7 +520,7 @@ function Chat(props) {
             return;
         }
 
-        if(client.current !== null && client.current.connected){
+        if(client.current && client.current.connected){
             await client.current.send(`/pub/${nowRoomId}`,{
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
                 'Content-Type' : 'application/json'
@@ -609,8 +609,6 @@ function Chat(props) {
                     time: formatAMPM(today),
                     img: response.data.imgUrl
                 };
-        
-                setChatMessage([...chatMessage, newMessage]);
 
                 if(client.current && client.current.connected){
                     client.current.send(`/pub/${nowRoomId}`,{
