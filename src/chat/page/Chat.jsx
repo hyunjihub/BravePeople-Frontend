@@ -7,6 +7,7 @@ import axios from "axios";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
+import { TbDoorExit } from "react-icons/tb";
 
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
@@ -83,7 +84,7 @@ const Profile = styled.img`
 `;
 
 const User = styled.div`
-    width: 400px;
+    width: 430px;
     height: 65%;
     display: flex;
     flex-direction: row;
@@ -114,7 +115,6 @@ const DisableButton = styled.button`
     width: 45%;
     height: 100%;
     background-color: #EB9F9C;
-    opacity: 0.7;
     font-size: 15px;
     color: #fff;
     border: none;
@@ -239,6 +239,13 @@ const NullContainer = styled.div`
     flex-direction: column;
 `;
 
+const ExitBox = styled.div`
+    width: 2%;
+    height: 80%;
+    margin-top: 7%;
+    margin-left: 10%;
+    cursor: pointer;
+`;
 
 function Chat(props) {
 
@@ -495,6 +502,7 @@ function Chat(props) {
                             'Content-Type' : 'application/json'
                         }
                     );
+                    getPrevChat();
                 }     
             );
         }
@@ -668,10 +676,13 @@ function Chat(props) {
                             <ButtonList className="user">
                                 <Nickname>{userInfo.nickname}</Nickname>
                                 <ButtonList className="request">                    
-                                    <DisableButton disabled="disabled">의뢰취소</DisableButton>
-                                    <Button>의뢰완료</Button>
+                                    <DisableButton disabled="disabled">의뢰 취소</DisableButton>
+                                    <Button>의뢰 완료</Button>
                                 </ButtonList>
                             </ButtonList>
+                            <ExitBox>
+                                <TbDoorExit size="40" color="f8332f"/>
+                            </ExitBox>
                         </User>
                     </Header>
                     <Dialogue>
