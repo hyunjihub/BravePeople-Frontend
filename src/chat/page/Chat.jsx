@@ -15,6 +15,7 @@ import Modal from "../components/Modal";
 
 // 채팅
 import { Stomp } from "@stomp/stompjs";
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -351,6 +352,7 @@ function Chat(props) {
             }else{
                 getChatList();
             }
+            fetchSSE();
         }
         
         return async() => {
@@ -358,6 +360,12 @@ function Chat(props) {
             if(client.current && client.current.connected)
             {
                 client.current.disconnect();
+                client.current = null;
+            }
+            // SSE 연결 종료
+            if(eventSource.current){
+                eventSource.current.close();
+                eventSource.current = null;
             }
         }
     }, []);
@@ -421,9 +429,61 @@ function Chat(props) {
         })
     }
 
+    // SSE 연결 함수
+    const eventSource = useRef();
+
+    const fetchSSE = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
+        eventSource.current = new EventSourcePolyfill(`https://bravepeople.site:8080/stream/${id}`,
+            {
+                headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            });
+        setupSSE();
+    }
+    
+    const setupSSE = async() => {
+        eventSource.current.onopen = () => {
+            // 연결 시 할 일
+            console.log("CHAT SSE 연결 완료");
+        };
+      
+        eventSource.current.onmessage = async (e) => {
+            const res = await e.data;
+            const parsedData = JSON.parse(res);
+        
+            // 받아오는 data로 할 일
+            console.log("채팅 페이지 데이터 수신")
+            if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CHAT_ROOM') { getChatList(); }
+        };
+    
+        eventSource.current.onerror = (e) => {
+            // 종료 또는 에러 발생 시 할 일
+            eventSource.current.close();
+    
+        if (e.error) {
+            // 에러 발생 시 할 일
+            console.log(e.error);
+        }
+    
+        if (e.target.readyState === EventSource.CLOSED) {
+            // 종료 시 할 일
+            console.log("CHAT SSE 연결 종료");
+            if(isLog){
+                fetchSSE();
+            }
+        }
+        }
+    }
 
     // 소켓 연결 & 구독
     const subHandler = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
         client.current.debug = () => {};

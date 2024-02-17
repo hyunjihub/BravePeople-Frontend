@@ -239,6 +239,9 @@ export default function Header(props) {
     const eventSource = useRef();
 
     const fetchSSE = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
         eventSource.current = new EventSourcePolyfill(`https://bravepeople.site:8080/stream/${id}`,
             {
                 headers:{
@@ -251,7 +254,7 @@ export default function Header(props) {
     const setupSSE = async() => {
         eventSource.current.onopen = () => {
             // 연결 시 할 일
-            console.log("SSE 연결 완료");
+            console.log("HEADER SSE 연결 완료");
         };
       
         eventSource.current.onmessage = async (e) => {
@@ -259,7 +262,7 @@ export default function Header(props) {
             const parsedData = JSON.parse(res);
         
             // 받아오는 data로 할 일
-            console.log(parsedData);
+            console.log("헤더 페이지 데이터 수신")
         };
     
         eventSource.current.onerror = (e) => {
@@ -273,7 +276,10 @@ export default function Header(props) {
     
         if (e.target.readyState === EventSource.CLOSED) {
             // 종료 시 할 일
-            console.log("SSE 연결 종료");
+            console.log("HEADER SSE 연결 종료");
+            if(isLog){
+                fetchSSE();
+            }
         }
         }
     }
@@ -290,7 +296,11 @@ export default function Header(props) {
     const handleLogOut = async (e) => {
         handleIsLogOut();
         if(isLog) {
-            eventSource.current.close();
+            // SSE 연결 종료
+            if(eventSource.current){
+                eventSource.current.close();
+                eventSource.current = null;
+            }
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
@@ -453,6 +463,7 @@ export default function Header(props) {
 
     return (
         <Wrapper>
+            <button onClick={()=>{console.log(eventSource.current);}}>test</button>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
