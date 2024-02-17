@@ -4,7 +4,7 @@ import profile from "../../common/resources/img/profile.png";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
+import { setLocation, setProfileImg, setLogin, setMemberId, setIsNew } from "../../member/redux/modules/login";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 import { TbDoorExit } from "react-icons/tb";
@@ -15,7 +15,6 @@ import Modal from "../components/Modal";
 
 // 채팅
 import { Stomp } from "@stomp/stompjs";
-import { EventSourcePolyfill } from "event-source-polyfill";
 
 const ChatPage = styled.div`
     width: 480px;
@@ -270,9 +269,10 @@ function Chat(props) {
     }
 
     // redux 변수, 함수 연결하기
-    const { id, isLog } = useSelector((state)=>({
+    const { id, isLog, isNewChat } = useSelector((state)=>({
         isLog: state.login.isLogin,
-        id: state.login.memberId
+        id: state.login.memberId,
+        isNewChat: state.login.isNew
     }), shallowEqual);
 
     const dispatch = useDispatch();
@@ -280,6 +280,7 @@ function Chat(props) {
     const setId = (id) => dispatch(setMemberId(id));
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
+    const setIsNewChat = (bool) => dispatch(setIsNew(bool));
 
     // client
     const client = useRef();
@@ -352,7 +353,6 @@ function Chat(props) {
             }else{
                 getChatList();
             }
-            fetchSSE();
         }
         
         return async() => {
@@ -361,11 +361,6 @@ function Chat(props) {
             {
                 client.current.disconnect();
                 client.current = null;
-            }
-            // SSE 연결 종료
-            if(eventSource.current){
-                eventSource.current.close();
-                eventSource.current = null;
             }
         }
     }, []);
@@ -384,6 +379,13 @@ function Chat(props) {
         setNowRoom();
     }, [nowRoomId]);
     
+    // SSE 통신으로 새로운 채팅이 있을 때 채팅방 리스트 불러오기 api 호출
+    useEffect(()=>{
+        if(isNewChat){
+            getChatList();
+            setIsNewChat(false);
+        }
+    }, [isNewChat]);
 
     // 채팅방 리스트
     const getChatList = async () => {
@@ -427,56 +429,6 @@ function Chat(props) {
         .catch(function(error){
             console.log(error);
         })
-    }
-
-    // SSE 연결 함수
-    const eventSource = useRef();
-
-    const fetchSSE = async() => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
-        eventSource.current = new EventSourcePolyfill(`https://bravepeople.site:8080/stream/${id}`,
-            {
-                headers:{
-                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            });
-        setupSSE();
-    }
-    
-    const setupSSE = async() => {
-        eventSource.current.onopen = () => {
-            // 연결 시 할 일
-            console.log("CHAT SSE 연결 완료");
-        };
-      
-        eventSource.current.onmessage = async (e) => {
-            const res = await e.data;
-            const parsedData = JSON.parse(res);
-        
-            // 받아오는 data로 할 일
-            console.log("채팅 페이지 데이터 수신")
-            if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CHAT_ROOM') { getChatList(); }
-        };
-    
-        eventSource.current.onerror = (e) => {
-            // 종료 또는 에러 발생 시 할 일
-            eventSource.current.close();
-    
-        if (e.error) {
-            // 에러 발생 시 할 일
-            console.log(e.error);
-        }
-    
-        if (e.target.readyState === EventSource.CLOSED) {
-            // 종료 시 할 일
-            console.log("CHAT SSE 연결 종료");
-            if(isLog){
-                fetchSSE();
-            }
-        }
-        }
     }
 
     // 소켓 연결 & 구독

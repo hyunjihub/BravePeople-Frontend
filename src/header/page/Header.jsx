@@ -150,6 +150,7 @@ export default function Header(props) {
     const setId = (memberId) => dispatch(setMemberId(memberId));
     const setLoc = (loc) => dispatch(setLocation(loc)); 
     const setProfile = (profile) => dispatch(setProfileImg(profile));
+    const setIsNewChat = (bool) => dispatch(setIsNew(bool));
 
     // 웹 스토리지에 데이터 생성 및 초기값 설정
     // sessionStorage - JWT
@@ -254,7 +255,6 @@ export default function Header(props) {
     const setupSSE = async() => {
         eventSource.current.onopen = () => {
             // 연결 시 할 일
-            console.log("HEADER SSE 연결 완료");
         };
       
         eventSource.current.onmessage = async (e) => {
@@ -262,7 +262,9 @@ export default function Header(props) {
             const parsedData = JSON.parse(res);
         
             // 받아오는 data로 할 일
-            console.log("헤더 페이지 데이터 수신")
+            if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CHAT_ROOM') { 
+                setIsNewChat(true); 
+            }
         };
     
         eventSource.current.onerror = (e) => {
@@ -276,7 +278,6 @@ export default function Header(props) {
     
         if (e.target.readyState === EventSource.CLOSED) {
             // 종료 시 할 일
-            console.log("HEADER SSE 연결 종료");
             if(isLog){
                 fetchSSE();
             }
@@ -463,7 +464,6 @@ export default function Header(props) {
 
     return (
         <Wrapper>
-            <button onClick={()=>{console.log(eventSource.current);}}>test</button>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>

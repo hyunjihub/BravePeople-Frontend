@@ -1,7 +1,7 @@
 const SET_LOGIN = 'login/SET_LOGIN';
 const SET_MEMBER_ID = 'login/SET_MEMBER_ID';
 const SET_LOCATION = 'login/SET_LOC';
-const SET_PROFILEIMG = 'login/SET_PROFILEIMG'
+const SET_PROFILEIMG = 'login/SET_PROFILEIMG';
 const SET_ISNEW = 'login/SET_ISNEW';
 
 export const setLogin = (isLogin) => ({ type:SET_LOGIN, isLogin });
