@@ -609,7 +609,6 @@ function Chat(props) {
     
     return(
         <Container>
-        <button onClick={()=>{console.log(client.current)}}>test</button>
             {(chatList===null)?<NullContainer>
                 <Null>대화중인 채팅방이 없습니다.</Null>
                 <Null className="detail">의뢰/원정을 통해 새로운 채팅을 시작하세요.</Null>
