@@ -53,6 +53,10 @@ const WriteButton = styled.button`
     font-weight: 600;
     font-size: 100%;
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const ButtonContainer = styled.div`

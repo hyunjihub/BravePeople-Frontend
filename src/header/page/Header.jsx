@@ -134,6 +134,16 @@ const HiddenChat = styled.div`
     background-color: #fff;
 `;
 
+const Notify = styled.div`
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    color: #f8332f;
+    float: left;
+    margin-top: 26px;
+    margin-left: 250px;
+`;
+
 export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -238,6 +248,7 @@ export default function Header(props) {
 
     // SSE 연결 함수
     const eventSource = useRef();
+    const [alram, setAlram] = useState("");
 
     const fetchSSE = async() => {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
@@ -260,6 +271,12 @@ export default function Header(props) {
         eventSource.current.onmessage = async (e) => {
             const res = await e.data;
             const parsedData = JSON.parse(res);
+
+            if (parsedData.type==="NEW_CHAT") {
+                setAlram(parsedData.message);
+            } else if (parsedData.type==="NEW_CHAT") {
+                setAlram(parsedData.message);
+            }
         
             // 받아오는 data로 할 일
             if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CHAT_ROOM') { 
@@ -284,6 +301,14 @@ export default function Header(props) {
         }
         }
     }
+
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            setAlram("");
+        }, 10000); // 10초
+    
+        return () => clearTimeout(timeout);
+      }, [alram]);
 
     //로그아웃 -> 리프레쉬 만료 때 alert없이 로그아웃 하기 위한 변수
     //isLogOut이 true일 때는, refresh 만료 시 alert가 출력 안 되게 함
@@ -469,7 +494,7 @@ export default function Header(props) {
             </Logo>
             <PostListMenu onClick={()=>navigate("/postlist/helping")}>원정대</PostListMenu>
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
-            
+            {(alram!=="")?<Notify>현지테스트님이 새로운 메시지를 보냈습니다.</Notify>:null}
             <RightContainer>
                 {isLog ? <LocationBox onClick={SetLocation}><IoLocationSharp size="30" color="#f8332f"/> <Location>{sigudong}</Location></LocationBox>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}

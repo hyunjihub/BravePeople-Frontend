@@ -105,7 +105,15 @@ const Date = styled.div`
   text-align: center;
   margin-right: 40%;
   margin-top: 1%;
-  margin-bottom: 4%;
+  margin-bottom: 3%;
+`;
+
+const System = styled.div`
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  color: #808080;
 `;
 
 
@@ -179,7 +187,7 @@ function Chatting(props) {
                     {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}
                   </Bubble>
                   {handleChangeTime(index) && <Time>{message.time}</Time>}
-              </Container>:<Container>
+              </Container>:(message.senderId === -1)?<System>{message.message}</System>:<Container>
                 <Bubble>
                     <Tail/>
                     {message.message !== null ? message.message : <Image onClick={() => handleExpand(message.img)} src={message.img} alt="전송이미지" />}

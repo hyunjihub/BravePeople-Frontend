@@ -51,6 +51,10 @@ const Button = styled.button`
     font-size: 18px;
     margin: 20px 0;
     font-family: 'SUITE';
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const Title = styled.div`

@@ -109,12 +109,16 @@ const Button = styled.button`
     font-family: 'SUITE';
     margin-right: 5px;
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const DisableButton = styled.button`
     width: 45%;
     height: 100%;
-    background-color: #EB9F9C;
+    background-color: #ff8f8f;
     font-size: 15px;
     color: #fff;
     border: none;
@@ -203,6 +207,10 @@ const SendButton = styled.button`
     border-radius: 15px;
     margin: 7% 0;
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const Filter = styled.button`
@@ -242,8 +250,8 @@ const NullContainer = styled.div`
 const ExitBox = styled.div`
     width: 2%;
     height: 80%;
-    margin-top: 7%;
-    margin-left: 10%;
+    margin-top: 6%;
+    margin-left: 9%;
     cursor: pointer;
 `;
 
@@ -438,10 +446,45 @@ function Chat(props) {
         }
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
+<<<<<<< Updated upstream
         client.current.debug = () => {};
         client.current.onWebSocketClose = (e) => { 
             if(!e.wasClean && e.code === 1006){
                 subHandler();
+=======
+        console.log("연결 성공");
+        if(client){
+            // client 세부 설정
+            client.current.debug = () => {};
+            client.current.onDisconnect = (e) => { 
+                if(client.current.active){
+                    console.log("재연결");
+                    try{client.current.subscribe(`/sub/${nowRoomId}`,
+                        (message)=>{
+                            const newMessage = {
+                                    chatId: JSON.parse(message.body).chatId,
+                                    senderId: JSON.parse(message.body).senderId,
+                                    message: JSON.parse(message.body).message,
+                                    date: JSON.parse(message.body).date,
+                                    time: JSON.parse(message.body).time,
+                                    img: JSON.parse(message.body).img
+                            };
+                            setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
+                            getChatList();
+                        },
+                        {
+                            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                            'Content-Type' : 'application/json'
+                        }
+                    )
+                    }catch(e){
+                        //console.log(e);
+                    };
+                }else{
+                    console.log("연결해제");
+                    client.current = null;
+                }
+>>>>>>> Stashed changes
             }
             };
         client.current.connect({
@@ -618,6 +661,12 @@ function Chat(props) {
     // 이미지 클릭 시, 모달 창
     const [modalOpen, setModalOpen] = useState(false);
     const [clickImg, setClickImg] = useState(null);
+
+    // 채팅방 나가기
+    const handleExit = () => {
+        setNowRoomId(null);
+        getChatList();
+    }
     
     return(
         <Container>
@@ -645,7 +694,7 @@ function Chat(props) {
                                     <Button>의뢰 완료</Button>
                                 </ButtonList>
                             </ButtonList>
-                            <ExitBox>
+                            <ExitBox onClick={handleExit}>
                                 <TbDoorExit size="40" color="f8332f"/>
                             </ExitBox>
                         </User>
@@ -656,7 +705,7 @@ function Chat(props) {
                     <Footer>
                         <SendBox placeholder="메시지를 입력해주세요" onChange={handleTextbox} value={msg} onKeyDown={onCheckEnter}></SendBox>
                         <ButtonList>
-                            <BsCameraFill onClick={handleProfile} size="30" color="f8332f"/>
+                            <BsCameraFill onClick={handleProfile} size="30" color="f8332f" cursor="pointer"/>
                             <input type="file" ref={fileInput} onChange={handleImage} style={{ display: "none" }}/>
                             <SendButton onClick={sendHandler}>전송</SendButton>
                         </ButtonList>       

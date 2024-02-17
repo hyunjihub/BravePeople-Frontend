@@ -60,6 +60,10 @@ const Button = styled.button`
     padding: 0px;
     font-family: 'SUITE';
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const Container = styled.div`

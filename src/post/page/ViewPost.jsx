@@ -117,6 +117,10 @@ const Button = styled.button`
     font-size: 16px;
     cursor: pointer;
     margin: 5% 2% 0;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const HiddenButton = styled.div`
@@ -385,7 +389,25 @@ function ViewPost(props) {
             navigate("/chat");
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                ReissueToken();
+            } else if(error.response.status === 400 && error.response.data.errorMessage === "진행중인 의뢰 존재") {
+                Swal.fire({
+                    title: "진행 중인 의뢰 존재",
+                    html: "게시글 작성자와 사용자 간의 의뢰가 존재하고 있습니다.<br>진행 중인 의뢰를 먼저 완료 해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+            } else if(error.response.status === 400 && error.response.data.errorMessage === "의뢰 중복") {
+                Swal.fire({
+                    title: "중복된 의뢰",
+                    text: "중복",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+            }
         })
     }
 

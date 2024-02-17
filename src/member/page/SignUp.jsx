@@ -6,6 +6,11 @@ import Swal from "sweetalert2";
 // restapi
 import axios from 'axios';
 
+const Wrapper = styled.div`
+    height: 115vh;
+    position: relative;
+`;
+
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
@@ -55,6 +60,10 @@ const UniqueButton = styled.button`
     top: 10px;
     font-family: 'SUITE';
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const ForInset = styled.div`
@@ -69,7 +78,7 @@ const Button = styled.button`
     border-radius: 18px;
     color: #fff;
     width: 100%;
-    height: 40px;
+    height: 45px;
     box-sizing: border-box;
     padding: 15px;
     font-size: 15px;
@@ -77,6 +86,10 @@ const Button = styled.button`
     padding: 0px;
     font-family: 'SUITE';
     cursor: pointer;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const RadioButton = styled.input`
@@ -376,75 +389,75 @@ function SignUp(props) {
     }
 
     return(
-        <div>
+        <Wrapper>
             <Form onSubmit={handleSignUp}>
-            <Title>회원가입</Title>
-            <Label>성함 *</Label>
-            <Input
-                name="username"
-                type="text"
-                placeholder="성함" 
-            />
-            <Label>성별 *</Label>
-            <RadioBox>
-                <RadioButton type="radio" value="0" checked={gender==="남성"} onChange={handleGender}></RadioButton>
-                <RadioLabel>남성</RadioLabel>
-                <RadioButton type="radio" value="1" checked={gender==="여성"} onChange={handleGender}></RadioButton>
-                <RadioLabel>여성</RadioLabel>
-            </RadioBox>
-            <Label>아이디 *</Label>
-            <Detail>6글자 이상</Detail>           
-            <Input
-            name="userid"
-            type="text"
-            placeholder="아이디" 
-            />
-            <Label>비밀번호 *</Label>
-            <Detail>영문과 숫자를 조합한 8글자 이상</Detail>
-            <Input
-                name="password"
-                type="password"
-                placeholder="비밀번호"
-            /> 
-            <Label>비밀번호 확인 *</Label>
-            <Input
-                name="password"
-                type="password"
-                placeholder="비밀번호"
-            /> 
-            <Label>이메일 *</Label>
-            <Detail>본인 인증을 위해 사용하시는 이메일 주소로 입력해주세요</Detail>
-            <ForInset>            
+                <Title>회원가입</Title>
+                <Label>성함 *</Label>
                 <Input
-                    name="useremail"
+                    name="username"
                     type="text"
-                    placeholder="이메일 주소 (ex : brave@naver.com)"
-                    disabled={isDisabled}
-                    onChange={(e)=>setEmail(e.target.value)}
-                /> 
-                <UniqueButton type="button" onClick={handleAuth} disabled={isDisabled}>인증</UniqueButton>
-            </ForInset>
-            <Label>닉네임 *</Label>          
-            <Input
-                name="nickname"
-                type="text"
-                placeholder="닉네임"
-            /> 
-            <Label>내 위치 *</Label>
-            <ForInset>            
+                    placeholder="성함" 
+                />
+                <Label>성별 *</Label>
+                <RadioBox>
+                    <RadioButton type="radio" value="0" checked={gender==="남성"} onChange={handleGender}></RadioButton>
+                    <RadioLabel>남성</RadioLabel>
+                    <RadioButton type="radio" value="1" checked={gender==="여성"} onChange={handleGender}></RadioButton>
+                    <RadioLabel>여성</RadioLabel>
+                </RadioBox>
+                <Label>아이디 *</Label>
+                <Detail>6글자 이상</Detail>           
                 <Input
-                    name="location"
-                    type="text"
-                    placeholder="위치확인 버튼을 눌러주세요"
-                    value={sigudong}
-                    disabled
+                name="userid"
+                type="text"
+                placeholder="아이디" 
+                />
+                <Label>비밀번호 *</Label>
+                <Detail>영문과 숫자를 조합한 8글자 이상</Detail>
+                <Input
+                    name="password"
+                    type="password"
+                    placeholder="비밀번호"
                 /> 
-                <UniqueButton type="button" onClick={SetLocation}>위치확인</UniqueButton>
-            </ForInset>
-            <Button type="submit">회원가입</Button>
-        </Form>
-        <Button onClick={handleCancel} style={{"width":"400px", "margin":"0px auto 50px auto"}} >취소</Button>
-        </div>
+                <Label>비밀번호 확인 *</Label>
+                <Input
+                    name="password"
+                    type="password"
+                    placeholder="비밀번호"
+                /> 
+                <Label>이메일 *</Label>
+                <Detail>본인 인증을 위해 사용하시는 이메일 주소로 입력해주세요</Detail>
+                <ForInset>            
+                    <Input
+                        name="useremail"
+                        type="text"
+                        placeholder="이메일 주소 (ex : brave@naver.com)"
+                        disabled={isDisabled}
+                        onChange={(e)=>setEmail(e.target.value)}
+                    /> 
+                    <UniqueButton type="button" onClick={handleAuth} disabled={isDisabled}>인증</UniqueButton>
+                </ForInset>
+                <Label>닉네임 *</Label>          
+                <Input
+                    name="nickname"
+                    type="text"
+                    placeholder="닉네임"
+                /> 
+                <Label>내 위치 *</Label>
+                <ForInset>            
+                    <Input
+                        name="location"
+                        type="text"
+                        placeholder="위치확인 버튼을 눌러주세요"
+                        value={sigudong}
+                        disabled
+                    /> 
+                    <UniqueButton type="button" onClick={SetLocation}>위치확인</UniqueButton>
+                </ForInset>
+                <Button type="submit">회원가입</Button>
+            </Form>
+            <Button className="cancel" onClick={handleCancel} style={{"width":"400px", "margin":"0px auto 50px auto"}} >취소</Button>
+        </Wrapper>
         
     );
 }

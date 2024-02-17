@@ -1,7 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
-
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 const Wrapper = styled.div`
     width: 100vw;
@@ -24,7 +26,7 @@ const Button = styled.button`
     font-weight: 800;
     letter-spacing:0.5em;
     font-family: 'SUITE';
-    margin: auto;
+    margin: 0 auto 12%;
 `;
 
 const Landing = styled.div`
@@ -74,17 +76,53 @@ const Circle = styled.div`
     margin: auto;
 `;
 
+const CustomSlider = styled(Slider)`
+  .slick-prev,
+  .slick-next {
+    z-index: 1;
+  }
+
+  .slick-prev:before,
+  .slick-next:before {
+    color: #000;
+}
+  
+  .slick-prev {
+    left: 20px;
+  }
+  
+  .slick-next {
+    right: 20px;
+  }
+`;
+
+
 function Main(props) {
 
     const navigate = useNavigate();
 
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        centerPadding: '20px',
+    };
 
     return(
         <Wrapper>
-            <Landing>
-                <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 불러주세요!</MainTxt>
-                <Button>원정대 시작하기</Button>
-            </Landing>
+            <CustomSlider {...settings}>
+                <Landing>
+                    <MainTxt>도움이 필요한 이웃에게 <br /> 용감한 원정대가 되어주세요!</MainTxt>
+                    <Button>원정대 시작하기</Button>
+                </Landing>
+                <Landing>
+                    <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 불러주세요!</MainTxt>
+                    <Button>의뢰인 시작하기</Button>
+                </Landing>
+            </CustomSlider>
+            
             <Landing className="introduction">
                 <MainTxt className="introduction">용감한원정대</MainTxt>
                 <DetailTxt>용감한 원정대는 일상의 사소하지만 꼭 필요한 일들을 내 근처 '원정대'에게 부탁할 수 있습니다. <br />

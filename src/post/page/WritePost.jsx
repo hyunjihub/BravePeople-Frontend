@@ -70,6 +70,10 @@ const Button = styled.button`
     font-size: 16px;
     cursor: pointer;
     margin: 0px 2%;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const ButtonContainer = styled.div`
@@ -380,10 +384,10 @@ function WritePost(props) {
     //내용
     const [content, setContent] = useState("")
     const handleContent = (e) => {
-        if(e.target.value.length>1000) {
+        if(e.target.value.length>500) {
             Swal.fire({
                 title: "내용 최대 글자수",
-                text: "내용의 최대 글자수는 1,000자 입니다. 내용 글자수를 확인해주세요.",
+                text: "내용의 최대 글자수는 500자 입니다. 내용 글자수를 확인해주세요.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
@@ -620,8 +624,8 @@ function WritePost(props) {
                     value={content || ""}
                     onKeyDown={handleTab}
                     onChange={handleContent}
-                    placeholder="내용을 입력해주세요. 최대 1,000자"/>
-                    <Length>{content.length}/1000</Length>
+                    placeholder="내용을 입력해주세요. 최대 500자"/>
+                    <Length>{content.length}/500</Length>
                     <ImageContainer>
                         <FileInput onClick={handleImg}>
                             {(currentImg === "") ? <FaCamera className="icon" size="45" color="ccc"/> : 

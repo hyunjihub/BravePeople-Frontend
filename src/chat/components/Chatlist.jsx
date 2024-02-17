@@ -170,7 +170,7 @@ function Chatlist(props) {
       .map(list => (
         <Container key={uuid()} onClick={() => handleChat(list.roomId)}>
           <Profile onClick={handlePage} value={list.otherId} style={{backgroundImage: `url(${(list.otherProfileImg === null) ? profile : list.otherProfileImg})`}}/>
-          {(!list.read)?<Unread></Unread>:null}
+          {(!list.isRead)?<Unread></Unread>:null}
           <ChatContainer>
             <Nickname>{list.otherNickname}</Nickname>
             <LastChat>{truncate(list.lastChat, 30)}</LastChat>
