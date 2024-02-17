@@ -421,88 +421,54 @@ function Chat(props) {
         })
     }
 
-    // 소켓연결 & 구독
+
+    // 소켓 연결 & 구독
     const subHandler = async() => {
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
-
-        // client 세부 설정
-        if(client.current){
-            client.current.debug = () => {};
-            client.current.onDisconnect = (e) => { 
-                console.log(client.current);
-                console.log(client.current.active);
-                console.log(client.current.connected);
-                // if(client.current.active && client.current.connected){
-                //     console.log("재연결");
-
-                //     try{client.current.subscribe(`/sub/${nowRoomId}`,
-                //         (message)=>{
-                //             const newMessage = {
-                //                     chatId: JSON.parse(message.body).chatId,
-                //                     senderId: JSON.parse(message.body).senderId,
-                //                     message: JSON.parse(message.body).message,
-                //                     date: JSON.parse(message.body).date,
-                //                     time: JSON.parse(message.body).time,
-                //                     img: JSON.parse(message.body).img
-                //             };
-                //             setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
-                //             getChatList();
-                //         },
-                //         {
-                //             Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-                //             'Content-Type' : 'application/json'
-                //         }
-                //     )
-                //     }catch(e){
-                //         //console.log(e);
-                //     };
-                // }else{
-                //     client.current = null;
-                // }
+        client.current.debug = () => {};
+        client.current.onWebSocketClose = (e) => { 
+            if(!e.wasClean && e.code === 1006){
+                subHandler();
             }
-
-            // client 소켓 연결
-            client.current.connect({
+            };
+        client.current.connect({
+            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+            'Content-Type' : 'application/json'
+        },
+        ()=>{
+            // 입장 메세지 보내기
+            client.current.send(`/pub/${nowRoomId}`,{
                 Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
                 'Content-Type' : 'application/json'
             },
-                ()=>{
-                    console.log("들어옴");
-                    // 입장 메세지 보내기
-                    client.current.send(`/pub/${nowRoomId}`,{
-                        Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-                        'Content-Type' : 'application/json'
-                    },
-                    JSON.stringify({
-                        type: "ENTER",
-                        senderId: id,
-                        message: null,
-                        img: null
-                    }));
+            JSON.stringify({
+                type: "ENTER",
+                senderId: id,
+                message: null,
+                img: null
+            }));
 
-                    // 구독받은 메세지 받기
-                    client.current.subscribe(`/sub/${nowRoomId}`,
-                        (message)=>{
-                            const newMessage = {
-                                    chatId: JSON.parse(message.body).chatId,
-                                    senderId: JSON.parse(message.body).senderId,
-                                    message: JSON.parse(message.body).message,
-                                    date: JSON.parse(message.body).date,
-                                    time: JSON.parse(message.body).time,
-                                    img: JSON.parse(message.body).img
-                                };
-                            setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
-                            getChatList();
-                        },
-                        {
-                            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-                            'Content-Type' : 'application/json'
-                        }
-                    );
-                }     
+            // 구독받은 메세지 받기
+            client.current.subscribe(`/sub/${nowRoomId}`,
+                (message)=>{
+                    const newMessage = {
+                            chatId: JSON.parse(message.body).chatId,
+                            senderId: JSON.parse(message.body).senderId,
+                            message: JSON.parse(message.body).message,
+                            date: JSON.parse(message.body).date,
+                            time: JSON.parse(message.body).time,
+                            img: JSON.parse(message.body).img
+                        };
+                    setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
+                    getChatList();
+                },
+                {
+                    Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
+                    'Content-Type' : 'application/json'
+                }
             );
-        }
+        });
     }
 
     // enter키 : 전송 / shift+enter키 : 줄바꿈
