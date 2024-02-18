@@ -644,6 +644,97 @@ function Chat(props) {
         getChatList();
     }
     
+    // 의뢰 수락
+    const acceptContact = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
+        }
+        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}`,
+        {
+            headers :{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+        })
+        .then(function(response){
+            console.log(response)
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+    }
+
+    // 의뢰 취소
+    const cancelContact = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
+        }
+        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}/cancel`,
+        {
+            headers :{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+        })
+        .then(function(response){
+            console.log(response)
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+    }
+
+    // 의뢰 완료
+    const finishContact = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
+        }
+        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}/finish`,
+        {
+            headers :{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+        })
+        .then(function(response){
+            console.log(response)
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+    }
+
+    // 후기 작성
+    // 후기 담는 변수
+    const review = useState({
+        score: null,
+        contents: null
+    });
+
+    // 후기 전송 api
+    const sendReview = async() => {
+        if(score === null){
+            alert("별점을 정해주세요!");
+        }
+        else{
+            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+                if(!await ReissueToken()) return;
+            }
+            axios.post(`https://bravepeople.site:8080/contact/${nowRoomId}/review`,
+            {
+                score: review.score,
+                contents: review.contents
+            }, 
+            {
+                headers: {
+                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }})
+            .then(function(response){
+                console.log(response);
+            })
+            .catch(function(error){
+                console.log(error);
+            })                      
+        }
+    };
+
     return(
         <Container>
             {(chatList===null)?<NullContainer>
