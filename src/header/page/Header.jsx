@@ -271,16 +271,11 @@ export default function Header(props) {
         eventSource.current.onmessage = async (e) => {
             const res = await e.data;
             const parsedData = JSON.parse(res);
-
-            if (parsedData.type==="NEW_CHAT") {
-                setAlram(parsedData.message);
-            } else if (parsedData.type==="NEW_CHAT") {
-                setAlram(parsedData.message);
-            }
         
             // 받아오는 data로 할 일
             if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CHAT_ROOM') { 
                 setIsNewChat(true); 
+                setAlram(parsedData.message);
             }
         };
     
