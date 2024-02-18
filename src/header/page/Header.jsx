@@ -286,18 +286,15 @@ export default function Header(props) {
     
         eventSource.current.onerror = (e) => {
             // 종료 또는 에러 발생 시 할 일
-            eventSource.current.close();
     
         if (e.error) {
             // 에러 발생 시 할 일
-            console.log(e.error);
+            console.log("에러 발생");
         }
     
         if (e.target.readyState === EventSource.CLOSED) {
             // 종료 시 할 일
-            if(isLog){
-                fetchSSE();
-            }
+            console.log("연결 종료");
         }
         }
     }
