@@ -626,7 +626,20 @@ function Chat(props) {
     const [clickImg, setClickImg] = useState(null);
 
     // 채팅방 나가기
-    const handleExit = () => {
+    const handleExit = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
+        // await axios.patch(`https://bravepeople.site:8080/chats/${nowRoomId}`,
+        //     {headers:{
+        //         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+        //     }})
+        // .then(function(response){
+        //     console.log(response);
+        // })
+        // .catch(function(response){
+        //     console.log(response);
+        // })
         setNowRoomId(null);
         getChatList();
     }
