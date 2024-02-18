@@ -6,12 +6,15 @@ import { useNavigate, useParams } from "react-router";
 import { FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
 import { FcRules } from "react-icons/fc";
+import document from "../resources/img/document.png";
+import reviewIcon from "../resources/img/review.png";
 import uuid from 'react-uuid';
 import Swal from "sweetalert2";
 
 import StarRating from "../components/Rating";
 import BadgeCount from "../components/Badge";
 import Modal from "../../chat/components/Modal";
+import Review from "../components/DetailReview";
 
 import axios from "axios";
 
@@ -220,15 +223,17 @@ const ButtonContainer = styled.div`
 `;
 
 const Post = styled.div`
+    width: 80%;
     font-size: 19px;
     font-weight: 500;
     color: #000;
-    margin: 2% 0% 0% 5%;
+    margin: 2.5% 0% 0.7% 0%;
     cursor: pointer;
 
-    &.first {
-        margin-top: 1.5%;
-    }
+    &.review {
+        width: 78%;
+        margin-bottom: 0%;
+    } 
 `;
 
 const NullPost = styled.div`
@@ -240,11 +245,29 @@ const NullPost = styled.div`
 `;
 
 const PostBox = styled.div`
-    width: 95%;
+    width: 96%;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    box-sizing: border-box;
 `;
+
+const Icon = styled.img`
+    width: 4%;
+    height: 60%;
+    margin: 2% 2% 0 4%;
+
+    &.review {
+        width: 4.5%;
+    }
+`;
+
+const RatingBox = styled.div`
+    width: 18%;
+    margin-top: 2.8%;
+    margin-left: 5%;
+`;
+
 
 function MyPage(props) {
 
@@ -668,6 +691,11 @@ function MyPage(props) {
         }
     }
 
+    const [reviewOpen, setReviewOpen] = useState(false);
+    const handleDetail = () => {
+        setReviewOpen(true);
+    }
+
     return(
         <Container>
             <Profile>
@@ -703,21 +731,33 @@ function MyPage(props) {
                 {userInfo.posts.length === 0 ? (<NullPost>게시글 없음</NullPost>) : (
                 userInfo.posts.map((post) => (
                 <PostBox key={uuid()}>
-                    <Post onClick={() => handleView(post.postId)}><FcRules size="23"/> {truncate(post.title, 30)}</Post>
+                    <Icon src={document} alt="게시글" />
+                    <Post onClick={() => handleView(post.postId)}> {truncate(post.title, 30)}</Post>
                     <Introduce className="time">{post.createdAt}</Introduce>
                 </PostBox>)))}
                     
                 </Box>
                 <BoardName>후기</BoardName>
                 <Box>
-                    <Post className="first"><FcRules size="23"/> 제목으로 들어갑니다.</Post>
-                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
-                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
-                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
-                    <Post><FcRules size="23"/> 제목으로 들어갑니다.</Post>
+                    <PostBox>
+                        <Icon className="review" src={reviewIcon} alt="리뷰" />
+                        <Post className="review" onClick={handleDetail}>{truncate("정말 너무너무너무너무너무너무너무너문머누머누머누머누머누머너무너무너무 친절해요", 25)}</Post>
+                        <RatingBox><StarRating value="4.5" size="20" /></RatingBox>
+                    </PostBox>
+                    <PostBox>
+                        <Icon className="review" src={reviewIcon} alt="리뷰" />
+                        <Post className="review">{truncate("정말 너무너무너무너무너무너무너무너문머누머누머누머누머누머너무너무너무 친절해요", 25)}</Post>
+                        <RatingBox><StarRating value="4.5" size="20" /></RatingBox>
+                    </PostBox>
+                    <PostBox>
+                        <Icon className="review" src={reviewIcon} alt="리뷰" />
+                        <Post className="review">{truncate("정말 너무너무너무너무너무너무너무너문머누머누머누머누머누머너무너무너무 친절해요", 25)}</Post>
+                        <RatingBox><StarRating value="4.5" size="20" /></RatingBox>
+                    </PostBox>
                 </Box>
             </Board>
             {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
+            {(reviewOpen===true)&&<Review setModal={setReviewOpen} />}
         </Container>
     );
 }

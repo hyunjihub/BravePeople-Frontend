@@ -27,6 +27,10 @@ const Button = styled.button`
     letter-spacing:0.5em;
     font-family: 'SUITE';
     margin: 0 auto 12%;
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
 `;
 
 const Landing = styled.div`
@@ -126,8 +130,7 @@ function Main(props) {
             <Landing className="introduction">
                 <MainTxt className="introduction">용감한원정대</MainTxt>
                 <DetailTxt>용감한 원정대는 일상의 사소하지만 꼭 필요한 일들을 내 근처 '원정대'에게 부탁할 수 있습니다. <br />
-                용감한 원정대 설명 문구 용감한 원정대 설명 문구 용감한 원정대 설명 문구 용감한 원정대 설명 문구 <br />
-                용감한 원정대 설명 문구 용감한 원정대 설명 문구 용감한 원정대 설명 문구</DetailTxt>
+                무서운 벌레 잡기, 불편한 전화 걸기, 어려운 환불 등 일상 속의 어려운 일들을 속 시원하게 해결해 보세요!</DetailTxt>
                 <CircleBox>
                     <Circle></Circle>
                     <Circle></Circle>

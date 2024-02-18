@@ -11,7 +11,9 @@ import { TbDoorExit } from "react-icons/tb";
 
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
-import Modal from "../components/Modal";
+import ImageModal from "../components/Modal";
+import Review from "../components/Review";
+import RequestButton from "../components/RequestButton";
 
 // 채팅
 import { Stomp } from "@stomp/stompjs";
@@ -56,7 +58,7 @@ const Header = styled.div`
     position: sticky;
     border-radius: 18px;
     top: 0;
-    z-index: 999;
+    z-index: 90;
     display: flex;
     flex-direction: row;
 `;
@@ -67,7 +69,7 @@ const Footer = styled.div`
     box-shadow: 0 -4px 4px -4px rgba(0, 0, 0, 0.3);
     position: sticky;
     bottom: 0;
-    z-index: 999;
+    z-index: 90;
     display: flex;
     flex-direction: row;
 `;
@@ -76,7 +78,7 @@ const Profile = styled.img`
     width: 15%;
     height: 100%;
     margin: 5% 2.5% 0 5%;
-    z-index: 999;
+    z-index: 90;
     cursor: pointer;
     border-radius : 50%;
     background-repeat: no-repeat;
@@ -308,6 +310,8 @@ function Chat(props) {
         memberId: null,
     });
 
+    const [contact, setContact] = useState([]);
+
 
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
@@ -432,6 +436,7 @@ function Chat(props) {
                 nickname: response.data.otherNickname,
                 memberId: response.data.otherId,
             });
+            setContact(response.data.contact);
             setChatMessage(response.data.messages);
         })
         .catch(function(error){
@@ -468,6 +473,7 @@ function Chat(props) {
                 message: null,
                 img: null
             }));
+            getChatList();
             // 구독받은 메세지 받기
             client.current.subscribe(`/sub/${nowRoomId}`,
                 (message)=>{
@@ -643,100 +649,16 @@ function Chat(props) {
         setNowRoomId(null);
         getChatList();
     }
-    
-    // 의뢰 수락
-    const acceptContact = async() => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if(!await ReissueToken()) return;
-        }
-        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}`,
-        {
-            headers :{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }
-        })
-        .then(function(response){
-            console.log(response)
-        })
-        .catch(function(error){
-            console.log(error);
-        })
+
+    const [reviewOpen, setReviewOpen] = useState(false);
+
+    const test = () => {
+        console.log(chatList);
     }
-
-    // 의뢰 취소
-    const cancelContact = async() => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if(!await ReissueToken()) return;
-        }
-        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}/cancel`,
-        {
-            headers :{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }
-        })
-        .then(function(response){
-            console.log(response)
-        })
-        .catch(function(error){
-            console.log(error);
-        })
-    }
-
-    // 의뢰 완료
-    const finishContact = async() => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if(!await ReissueToken()) return;
-        }
-        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}/finish`,
-        {
-            headers :{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }
-        })
-        .then(function(response){
-            console.log(response)
-        })
-        .catch(function(error){
-            console.log(error);
-        })
-    }
-
-    // 후기 작성
-    // 후기 담는 변수
-    const review = useState({
-        score: null,
-        contents: null
-    });
-
-    // 후기 전송 api
-    const sendReview = async() => {
-        if(score === null){
-            alert("별점을 정해주세요!");
-        }
-        else{
-            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                if(!await ReissueToken()) return;
-            }
-            axios.post(`https://bravepeople.site:8080/contact/${nowRoomId}/review`,
-            {
-                score: review.score,
-                contents: review.contents
-            }, 
-            {
-                headers: {
-                'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }})
-            .then(function(response){
-                console.log(response);
-            })
-            .catch(function(error){
-                console.log(error);
-            })                      
-        }
-    };
 
     return(
         <Container>
+            <button onClick={test}>test</button>
             {(chatList===null)?<NullContainer>
                 <Null>대화중인 채팅방이 없습니다.</Null>
                 <Null className="detail">의뢰/원정을 통해 새로운 채팅을 시작하세요.</Null>
@@ -756,10 +678,7 @@ function Chat(props) {
                             <Profile onClick={()=>handlePage(userInfo.memberId)} src={(userInfo.profileImage===null)?profile:userInfo.profileImage} alt="프로필" />
                             <ButtonList className="user">
                                 <Nickname>{userInfo.nickname}</Nickname>
-                                <ButtonList className="request">                    
-                                    <DisableButton disabled="disabled">의뢰 취소</DisableButton>
-                                    <Button>의뢰 완료</Button>
-                                </ButtonList>
+                                <RequestButton value={contact} setReviewOpen={setReviewOpen} roomId={nowRoomId}/>
                             </ButtonList>
                             <ExitBox onClick={handleExit}>
                                 <TbDoorExit size="40" color="f8332f"/>
@@ -779,7 +698,8 @@ function Chat(props) {
                     </Footer>
                 </ChatPage>
             }
-            {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
+            {(modalOpen===true)&&<ImageModal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
+            {(reviewOpen===true)&&<Review setModal={setReviewOpen}/>}
             </>
         }
         </Container>

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 
 const Content = styled.div`
     width: 65%;
