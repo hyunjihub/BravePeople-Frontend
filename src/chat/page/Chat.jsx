@@ -446,47 +446,12 @@ function Chat(props) {
         }
         const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
-<<<<<<< Updated upstream
         client.current.debug = () => {};
         client.current.onWebSocketClose = (e) => { 
             if(!e.wasClean && e.code === 1006){
                 subHandler();
-=======
-        console.log("연결 성공");
-        if(client){
-            // client 세부 설정
-            client.current.debug = () => {};
-            client.current.onDisconnect = (e) => { 
-                if(client.current.active){
-                    console.log("재연결");
-                    try{client.current.subscribe(`/sub/${nowRoomId}`,
-                        (message)=>{
-                            const newMessage = {
-                                    chatId: JSON.parse(message.body).chatId,
-                                    senderId: JSON.parse(message.body).senderId,
-                                    message: JSON.parse(message.body).message,
-                                    date: JSON.parse(message.body).date,
-                                    time: JSON.parse(message.body).time,
-                                    img: JSON.parse(message.body).img
-                            };
-                            setChatMessage(prevChatMessage => [...prevChatMessage, newMessage]);
-                            getChatList();
-                        },
-                        {
-                            Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
-                            'Content-Type' : 'application/json'
-                        }
-                    )
-                    }catch(e){
-                        //console.log(e);
-                    };
-                }else{
-                    console.log("연결해제");
-                    client.current = null;
-                }
->>>>>>> Stashed changes
             }
-            };
+        };
         client.current.connect({
             Authorization :  `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`,
             'Content-Type' : 'application/json'
@@ -503,7 +468,6 @@ function Chat(props) {
                 message: null,
                 img: null
             }));
-
             // 구독받은 메세지 받기
             client.current.subscribe(`/sub/${nowRoomId}`,
                 (message)=>{
@@ -525,7 +489,6 @@ function Chat(props) {
             );
         });
     }
-
     // enter키 : 전송 / shift+enter키 : 줄바꿈
     const onCheckEnter = (e) => {
         if (e.key === 'Enter' && e.shiftKey) {
