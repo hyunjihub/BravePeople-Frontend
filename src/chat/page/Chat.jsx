@@ -653,12 +653,12 @@ function Chat(props) {
     const [reviewOpen, setReviewOpen] = useState(false);
 
     const test = () => {
-        console.log(chatList);
+        chatList.status="진행중";
+        console.log(contact);
     }
 
     return(
         <Container>
-            <button onClick={test}>test</button>
             {(chatList===null)?<NullContainer>
                 <Null>대화중인 채팅방이 없습니다.</Null>
                 <Null className="detail">의뢰/원정을 통해 새로운 채팅을 시작하세요.</Null>
@@ -678,7 +678,7 @@ function Chat(props) {
                             <Profile onClick={()=>handlePage(userInfo.memberId)} src={(userInfo.profileImage===null)?profile:userInfo.profileImage} alt="프로필" />
                             <ButtonList className="user">
                                 <Nickname>{userInfo.nickname}</Nickname>
-                                <RequestButton value={contact} setReviewOpen={setReviewOpen} roomId={nowRoomId}/>
+                                <RequestButton status={contact.status} isActive={contact.isActive} setReviewOpen={setReviewOpen} roomId={nowRoomId}/>
                             </ButtonList>
                             <ExitBox onClick={handleExit}>
                                 <TbDoorExit size="40" color="f8332f"/>

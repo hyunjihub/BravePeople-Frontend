@@ -119,11 +119,11 @@ function Main(props) {
             <CustomSlider {...settings}>
                 <Landing>
                     <MainTxt>도움이 필요한 이웃에게 <br /> 용감한 원정대가 되어주세요!</MainTxt>
-                    <Button>원정대 시작하기</Button>
+                    <Button onClick={()=>navigate("/login")}>원정대 시작하기</Button>
                 </Landing>
                 <Landing>
                     <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 불러주세요!</MainTxt>
-                    <Button>의뢰인 시작하기</Button>
+                    <Button onClick={()=>navigate("/login")}>의뢰인 시작하기</Button>
                 </Landing>
             </CustomSlider>
             

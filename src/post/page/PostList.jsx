@@ -93,6 +93,12 @@ const DropdownMenu = styled.ul`
     box-shadow: 0px 0px 3px 1px rgba(190, 190, 190, 0.3);
 `;
 
+const Current = styled.div`
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 1%;
+`;
+
 const DropdownOption = styled.li`
     margin : 0% 5% 17% 0%;
     font-size: 17px;
@@ -271,6 +277,7 @@ function PostList(props) {
         <Wrapper>
             <Title>{type}</Title>
             <ButtonContainer>
+                {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ?<Current>{(selectedOption==="0")? "모든 게시글" : selectedOption + "km 내 게시글"}</Current>:null}
                 {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ? 
                 <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu> : <div></div>}
                 {isOpen&& (<DropdownMenu>

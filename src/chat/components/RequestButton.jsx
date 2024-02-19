@@ -63,9 +63,15 @@ const ButtonList = styled.div`
 
 function RequestButton(props) {
 
-    const contact = props.value;
+    const [isActive, setIsActive] = useState(props.isActive);
+    const [status, setStatus] = useState(props.status);
     const nowRoomId = props.roomId;
     //대기중 && true -> 수락 대기중 && false -> 수락 진행중 && true -> 진행 외 전부 null
+
+    useEffect(() => {
+        setIsActive(props.isActive);
+        setStatus(props.status);
+    }, [props.isActive, props.status]);
 
     const navigate = useNavigate();
 
@@ -117,25 +123,34 @@ function RequestButton(props) {
 
     const [buttonText, setButtonText] = useState("");
     const [buttonNull, setButtonNull] = useState(false);
-
-    useEffect(() => {
-        buttonChoice();
-    }, [contact]);
     
+    // 상태에 맞는 버튼 출력 결정
     const buttonChoice = () => {
-        console.log("호출됨");
-        console.log(contact);
-        if (contact.status==="대기중") {
+        console.log("호출");
+        if (status==="대기중") {
             setButtonText("의뢰 수락");
+            setButtonNull(false);
             return;
         }
-        else if (contact.status==="진행중") {
-            if (contact.isActive) {
+        else if (status==="진행중") {
+            if (isActive) {
                 setButtonText("의뢰 취소");
+                setButtonNull(false);
                 return;
             }
         }
         setButtonNull(true);
+    }
+
+    const buttonCall = () => {
+        if (status==="대기중") {
+            acceptContact();
+            return;
+        }
+        else if (status==="진행중") {
+            cancelContact();
+            return;
+        }
     }
 
     // 의뢰 수락
@@ -150,7 +165,8 @@ function RequestButton(props) {
             }
         })
         .then(function(response){
-            console.log(response)
+            console.log(response);
+            buttonChoice();
         })
         .catch(function(error){
             console.log(error);
@@ -169,7 +185,8 @@ function RequestButton(props) {
             }
         })
         .then(function(response){
-            console.log(response)
+            console.log(response);
+            buttonChoice();
         })
         .catch(function(error){
             console.log(error);
@@ -200,7 +217,8 @@ function RequestButton(props) {
                 })
                 .then(function(response){
                     props.setReviewOpen(true);
-                    console.log(response)
+                    console.log(response);
+                    buttonChoice();
                 })
                 .catch(function(error){
                     console.log(error);
@@ -209,16 +227,10 @@ function RequestButton(props) {
         })
     }
 
-    //임시로 후기버튼 활성화 용도로 사용
-    const test = () => {
-        contact.status = "진행중";
-        props.setReviewOpen(true);
-    }
-
     return (
-        <ButtonList className="request">           
-            {(!contact.isActive && !buttonNull)?<DisableButton disabled="disabled">{buttonText}</DisableButton>:<Button onClick={test}>{buttonText}</Button>}
-            {(contact.status==="진행중" && contact.isActive)?<Button onClick={finishContact}>의뢰 완료</Button>:null}
+        <ButtonList className="request">
+            {(!isActive && !buttonNull)?<DisableButton disabled="disabled">{buttonText}</DisableButton>:(!buttonNull)?<Button onClick={buttonCall()}>{buttonText}</Button>:null}
+            {(status==="진행중" && isActive)?<Button onClick={finishContact}>의뢰 완료</Button>:null}
         </ButtonList>
     );
 
