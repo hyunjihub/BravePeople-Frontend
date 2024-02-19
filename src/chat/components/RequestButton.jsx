@@ -3,6 +3,7 @@ import styled from "styled-components";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { BASE_URL } from "../../common/components/Util";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
@@ -84,7 +85,7 @@ function RequestButton(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -158,7 +159,7 @@ function RequestButton(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
-        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}`,
+        axios.get(`${BASE_URL}/contact/${nowRoomId}`,
         {
             headers :{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -178,7 +179,7 @@ function RequestButton(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
-        axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}/cancel`,
+        axios.get(`${BASE_URL}/contact/${nowRoomId}/cancel`,
         {
             headers :{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -209,7 +210,7 @@ function RequestButton(props) {
                 if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                     if(!await ReissueToken()) return;
                 }
-                axios.get(`https://bravepeople.site:8080/contact/${nowRoomId}/finish`,
+                axios.get(`${BASE_URL}/contact/${nowRoomId}/finish`,
                 {
                     headers :{
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`

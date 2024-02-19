@@ -7,6 +7,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { BASE_URL } from "../../common/components/Util";
 
 const Chat = styled.div`
   margin: 2% 0;
@@ -91,7 +92,7 @@ function Chatlist(props) {
   // 토큰 재발급 요청 api
   const ReissueToken = async () => {
     try {
-        const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+        const response = await axios.post(`${BASE_URL}/auth/reissue`,{
             accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
             refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
         })

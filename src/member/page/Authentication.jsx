@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import { BASE_URL } from "../../common/components/Util";
 
 // restapi
 import axios from 'axios';
@@ -77,7 +78,7 @@ function Authentication(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -120,7 +121,7 @@ function Authentication(props) {
         }
 
         if(e.target[0].value !== "") {
-            axios.post('https://bravepeople.site:8080/member/pw', {
+            axios.post(`${BASE_URL}/member/pw`, {
             nowPassword: e.target[0].value,
             }, {headers:{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`

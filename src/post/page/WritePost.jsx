@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { FaCamera } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import Swal from "sweetalert2";
+import { BASE_URL } from "../../common/components/Util";
 
 import axios from "axios";
 //redux
@@ -258,7 +259,7 @@ function WritePost(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -312,7 +313,7 @@ function WritePost(props) {
                 if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                     if (!await ReissueToken()) return;
                 }
-                axios.get(`https://bravepeople.site:8080/posts/${postid}`)
+                axios.get(`${BASE_URL}/posts/${postid}`)
                 .then(function(response){
                     setContent(response.data.contents);
                     setCurrentImg(response.data.postImg);
@@ -453,7 +454,7 @@ function WritePost(props) {
         } else if (files && files.length === 1) {
             const frm = new FormData();
             frm.append('file', files[0]);
-            axios.post("https://bravepeople.site:8080/image", frm, {
+            axios.post(`${BASE_URL}`, frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
@@ -491,7 +492,7 @@ function WritePost(props) {
         }
         if((title !== "") && (number !== "") && (content !== "")){
             if(postid==='-1') {
-                axios.post('https://bravepeople.site:8080/posts',{
+                axios.post(`${BASE_URL}/posts`,{
                     type: type,
                     category: selectedCategory,
                     title: title,
@@ -533,7 +534,7 @@ function WritePost(props) {
                         } else console.log(err);
                     })
             } else {
-                axios.patch(`https://bravepeople.site:8080/posts/${postid}`, {
+                axios.patch(`${BASE_URL}/posts/${postid}`, {
                     type: type,
                     title: title,
                     contents: content,

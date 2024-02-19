@@ -11,6 +11,7 @@ import Rating from "../../member/components/Rating";
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
+import { BASE_URL } from "../../common/components/Util";
 
 
 const Content = styled.div`
@@ -148,7 +149,7 @@ function Review(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -216,7 +217,7 @@ function Review(props) {
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if(!await ReissueToken()) return;
             }
-            axios.post(`https://bravepeople.site:8080/contact/${nowRoomId}/review`,
+            axios.post(`${BASE_URL}/contact/${nowRoomId}/review`,
             {
                 score: review.score,
                 contents: review.contents

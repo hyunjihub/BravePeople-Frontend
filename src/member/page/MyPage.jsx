@@ -10,6 +10,7 @@ import document from "../resources/img/document.png";
 import reviewIcon from "../resources/img/review.png";
 import uuid from 'react-uuid';
 import Swal from "sweetalert2";
+import { BASE_URL } from "../../common/components/Util";
 
 import StarRating from "../components/Rating";
 import BadgeCount from "../components/Badge";
@@ -302,7 +303,7 @@ function MyPage(props) {
      // 토큰 재발급 요청 api
      const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -363,7 +364,7 @@ function MyPage(props) {
                 
                 //마이페이지에 처음 접근할 때
                 if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
-                    axios.get(`https://bravepeople.site:8080/member/profile/${memberid}`,{
+                    axios.get(`${BASE_URL}/member/profile/${memberid}`,{
                         headers:{
                             Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                         }
@@ -479,7 +480,7 @@ function MyPage(props) {
                     confirmButtonText: "확인",
                 });
             }else{
-                axios.patch("https://bravepeople.site:8080/member/profile", {
+                axios.patch(`${BASE_URL}/member/profile`, {
                     nickname: currentName,
                     introduction: currentIntro,
                     profileImg: currentImg
@@ -582,7 +583,7 @@ function MyPage(props) {
             });
         } else if (files && files.length === 1) {
             frm.append('file', files[0]);
-            axios.post("http://13.209.77.50:8080/image", frm, {
+            axios.post(`${BASE_URL}/image`, frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
@@ -623,7 +624,7 @@ function MyPage(props) {
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
-            axios.patch("https://bravepeople.site:8080/member/location", {
+            axios.patch(`${BASE_URL}/member/location`, {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
             }, {

@@ -8,6 +8,7 @@ import { setLocation, setProfileImg, setLogin, setMemberId, setIsNew } from "../
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 import { TbDoorExit } from "react-icons/tb";
+import { BASE_URL } from "../../common/components/Util";
 
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
@@ -316,7 +317,7 @@ function Chat(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -404,7 +405,7 @@ function Chat(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
-        axios.get(`https://bravepeople.site:8080/chats`,
+        axios.get(`${BASE_URL}/chats`,
         {
             headers :{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -424,7 +425,7 @@ function Chat(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
-        axios.get(`https://bravepeople.site:8080/chats/${nowRoomId}`,
+        axios.get(`${BASE_URL}/chats/${nowRoomId}`,
         {
             headers :{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -591,7 +592,7 @@ function Chat(props) {
             });
         } else if (files && files.length === 1) {
             frm.append('file', files[0]);
-            axios.post("https://bravepeople.site:8080/image", frm, {
+            axios.post(`${BASE_URL}/image`, frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
@@ -636,7 +637,7 @@ function Chat(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
-        // await axios.patch(`https://bravepeople.site:8080/chats/${nowRoomId}`,
+        // await axios.patch(`${BASE_URL}/chats/${nowRoomId}`,
         //     {headers:{
         //         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
         //     }})

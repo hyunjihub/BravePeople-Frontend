@@ -7,6 +7,7 @@ import { PiGenderFemaleBold } from "react-icons/pi";
 import profile from '../../common/resources/img/profile.png';
 import StarRating from '../../member/components/Rating';
 import Swal from "sweetalert2";
+import { BASE_URL } from "../../common/components/Util";
 
 // axios
 import axios from "axios";
@@ -238,7 +239,7 @@ function ViewPost(props) {
 
     // 데이터 불러오기
     useEffect(()=>{
-        axios.get(`https://bravepeople.site:8080/posts/${postid}`)
+        axios.get(`${BASE_URL}/posts/${postid}`)
         .then(function(response){
             setPostData(response.data);
             if(id === null) { setIsActivate(false); }
@@ -261,7 +262,7 @@ function ViewPost(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -314,7 +315,7 @@ function ViewPost(props) {
             cancelButtonText: '취소',
         }).then(result => {
             if (result.isConfirmed) {
-                axios.delete(`https://bravepeople.site:8080/posts/${postid}`, {
+                axios.delete(`${BASE_URL}/posts/${postid}`, {
                     headers:{
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }})
@@ -378,7 +379,7 @@ function ViewPost(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
-        axios.get(`https://bravepeople.site:8080/posts/${postid}/request`,
+        axios.get(`${BASE_URL}/posts/${postid}/request`,
         {
             headers :{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`

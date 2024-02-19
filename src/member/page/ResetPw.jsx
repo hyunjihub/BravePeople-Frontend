@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { useSearchParams } from 'react-router-dom';
+import { BASE_URL } from "../../common/components/Util";
 
 // restapi
 import axios from 'axios';
@@ -85,7 +86,7 @@ function ResetPw(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -137,7 +138,7 @@ function ResetPw(props) {
                 if(e.target[0].value === e.target[1].value) {
                     // 비회원일 때 비밀번호 재설정
                     if(JSON.parse(sessionStorage.getItem('jwt')).access === null) {
-                        axios.patch('https://bravepeople.site:8080/member/pw', {
+                        axios.patch(`${BASE_URL}/member/pw`, {
                             newPassword: e.target[0].value,
                             emailId: parseInt(query.get('emailid'), 10),
                             authCode: parseInt(query.get('code'), 10),
@@ -180,7 +181,7 @@ function ResetPw(props) {
                             if (!await ReissueToken()) return;
                         }
 
-                        axios.patch('https://bravepeople.site:8080/member/pw', {
+                        axios.patch(`${BASE_URL}/member/pw`, {
                             newPassword: e.target[0].value},
                             {headers:{
                                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`

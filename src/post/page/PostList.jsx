@@ -7,6 +7,7 @@ import { useNavigate } from "react-router";
 import uuid from 'react-uuid';
 import Swal from "sweetalert2";
 import axios from "axios";
+import { BASE_URL } from "../../common/components/Util";
 
 //redux
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
@@ -143,7 +144,7 @@ function PostList(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -219,7 +220,7 @@ function PostList(props) {
             if(JSON.parse(sessionStorage.getItem('jwt')).expirationTime <= Date.now()) {
                 if (!await ReissueToken()) return;
             }
-            axios.get(`https://bravepeople.site:8080/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
+            axios.get(`${BASE_URL}/posts?type=${type}&distance=${selectedOption}&page=${page}&amount=5`,
             {
                 headers:{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -239,7 +240,7 @@ function PostList(props) {
         }
         else{
             // 비로그인 상태일 때 게시글 조회
-            axios.get(`https://bravepeople.site:8080/posts?type=${type}&page=${page}&amount=5`)
+            axios.get(`${BASE_URL}/posts?type=${type}&page=${page}&amount=5`)
             .then(function(response){
                 setPostItems(postItems => [...postItems, ...response.data.data]);
                 setHasNext(response.data.hasNext);

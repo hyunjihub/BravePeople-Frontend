@@ -1,0 +1,1 @@
+export const BASE_URL = 'https://bravepeople.site:8080';

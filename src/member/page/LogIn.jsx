@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Link } from 'react-router-dom';
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import { BASE_URL } from "../../common/components/Util";
 
 // restapi
 import axios from 'axios';
@@ -96,7 +97,7 @@ export default function LogIn(props) {
     const handleLogin = (e) => {
         e.preventDefault();
         if(e.target[0].value !== "" && e.target[1].value !== ""){
-            axios.post('https://bravepeople.site:8080/auth/login', {
+            axios.post(`${BASE_URL}/auth/login`, {
                 username: e.target[0].value,
                 pw: e.target[1].value
             })

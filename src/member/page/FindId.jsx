@@ -2,6 +2,7 @@ import React from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
+import { BASE_URL } from "../../common/components/Util";
 
 // restapi
 import axios from 'axios';
@@ -85,7 +86,7 @@ function FindId(props) {
     const idFind = (e) => {
         if(emailCheck(e.target[0].value)) {
             if (e.target[0].value !== "") {
-                axios.get('https://bravepeople.site:8080/auth/username', {
+                axios.get(`${BASE_URL}/auth/username`, {
                     params: {
                         email: e.target[0].value
                     }
@@ -137,7 +138,7 @@ function FindId(props) {
         if(e.target[0].value !== "" && e.target[1].value !== "") {
             if(e.target[0].value.length>6) {
                 if(emailCheck(e.target[1].value)) {
-                    axios.get('https://bravepeople.site:8080/auth/pw', {
+                    axios.get(`${BASE_URL}/auth/pw`, {
                         params: {
                             username: e.target[0].value,
                             email: e.target[1].value,

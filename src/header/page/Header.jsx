@@ -6,6 +6,7 @@ import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
 import Nullprofile from "../../common/resources/img/profile.png"
+import { BASE_URL } from "../../common/components/Util";
 // axios
 import axios from 'axios';
 // redux
@@ -198,7 +199,7 @@ export default function Header(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            const response = await axios.post("https://bravepeople.site:8080/auth/reissue",{
+            const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
             })
@@ -246,7 +247,7 @@ export default function Header(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
-        eventSource.current = new EventSourcePolyfill(`https://bravepeople.site:8080/stream/${id}`,
+        eventSource.current = new EventSourcePolyfill(`${BASE_URL}/stream/${id}`,
             {
                 headers:{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -306,7 +307,7 @@ export default function Header(props) {
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
-            axios.post("https://bravepeople.site:8080/member/logout", {}, {
+            axios.post(`${BASE_URL}/member/logout`, {}, {
                 headers: {
                     'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }
@@ -378,7 +379,7 @@ export default function Header(props) {
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
-            axios.patch("https://bravepeople.site:8080/member/location", {
+            axios.patch(`${BASE_URL}/member/location`, {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
             }, {
