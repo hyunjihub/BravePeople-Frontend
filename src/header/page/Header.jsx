@@ -6,14 +6,17 @@ import { MdChat } from "react-icons/md";
 import { IoLocationSharp } from "react-icons/io5";
 import Swal from "sweetalert2";
 import Nullprofile from "../../common/resources/img/profile.png"
-
+// axios
 import axios from 'axios';
-
 // redux
 import HeaderButton from "../components/HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { setLogin, setMemberId, setLocation, setProfileImg, setIsNew } from "../../member/redux/modules/login"
+// sse
 import { EventSourcePolyfill } from "event-source-polyfill";
+// toastify
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const Wrapper = styled.div`
@@ -134,16 +137,6 @@ const HiddenChat = styled.div`
     background-color: #fff;
 `;
 
-const Notify = styled.div`
-    font-size: 18px;
-    font-weight: 700;
-    text-align: center;
-    color: #f8332f;
-    float: left;
-    margin-top: 26px;
-    margin-left: 250px;
-`;
-
 export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -248,7 +241,6 @@ export default function Header(props) {
 
     // SSE 연결 함수
     const eventSource = useRef();
-    const [alram, setAlram] = useState("");
 
     const fetchSSE = async() => {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
@@ -266,6 +258,7 @@ export default function Header(props) {
     const setupSSE = async() => {
         eventSource.current.onopen = () => {
             // 연결 시 할 일
+            console.log("연결 완료");
         };
       
         eventSource.current.onmessage = async (e) => {
@@ -275,7 +268,7 @@ export default function Header(props) {
             // 받아오는 data로 할 일
             if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CHAT_ROOM') { 
                 setIsNewChat(true); 
-                setAlram(parsedData.message);
+                toast(parsedData.message);
             }
         };
     
@@ -284,7 +277,6 @@ export default function Header(props) {
     
         if (e.error) {
             // 에러 발생 시 할 일
-            console.log("에러 발생");
         }
     
         if (e.target.readyState === EventSource.CLOSED) {
@@ -293,14 +285,6 @@ export default function Header(props) {
         }
         }
     }
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setAlram("");
-        }, 10000); // 10초
-    
-        return () => clearTimeout(timeout);
-      }, [alram]);
 
     //로그아웃 -> 리프레쉬 만료 때 alert없이 로그아웃 하기 위한 변수
     //isLogOut이 true일 때는, refresh 만료 시 alert가 출력 안 되게 함
@@ -481,12 +465,14 @@ export default function Header(props) {
 
     return (
         <Wrapper>
+            <ToastContainer 
+            style={{marginTop:"60px"}}
+            limit={3}/>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>
             </Logo>
             <PostListMenu onClick={()=>navigate("/postlist/helping")}>원정대</PostListMenu>
             <PostListMenu onClick={()=>navigate("/postlist/helped")}>의뢰인</PostListMenu>
-            {(alram!=="")?<Notify>현지테스트님이 새로운 메시지를 보냈습니다.</Notify>:null}
             <RightContainer>
                 {isLog ? <LocationBox onClick={SetLocation}><IoLocationSharp size="30" color="#f8332f"/> <Location>{sigudong}</Location></LocationBox>: <HiddenLocation />}
                 {isLog ? <Chat onClick={()=>navigate("/chat")}><MdChat size="30" color="#f8332f"/></Chat>: <HiddenChat />}
