@@ -11,11 +11,12 @@ const Content = styled.div`
     box-sizing: border-box;
     border-radius: 18px;
     border : 2px dashed #F3D7CA;
-    background-color: #FCF5ED;
+    background-color: #FFF;
     padding: 1%;
     justify-content: center;
     align-items: center;
     margin-top: 5%;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
 `;
 
 const Background = styled.div`

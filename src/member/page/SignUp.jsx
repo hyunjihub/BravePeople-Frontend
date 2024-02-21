@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../common/components/Util";
+import Loading from "../../common/components/Loading";
 // restapi
 import axios from 'axios';
 
@@ -127,6 +128,9 @@ function SignUp(props) {
         lng: ""
     });
 
+    //로딩 중 표시
+    const [loading, setLoading] = useState(false);
+
     const handleGender = (e) => {
         if(e.target.value === "1") setGender("여성");
         else setGender("남성");
@@ -141,6 +145,7 @@ function SignUp(props) {
 
     // 모든 입력 들어갔는지 체크
     const handleSignUp = (e) => {
+        setLoading(true);
         if(e.target[0].value!=="" && e.target[3].value!=="" && e.target[4].value!=="" && e.target[5].value!==""){
             if(e.target[3].value.length>=6) {
                 if(e.target[4].value === e.target[5].value) {
@@ -165,10 +170,11 @@ function SignUp(props) {
                                         confirmButtonColor: "#d33",
                                         confirmButtonText: "확인",
                                     });
+                                    setLoading(false);
                                     navigate("/main");
                                 })
                                 .catch(function(error){
-                                    console.log(error);
+                                    setLoading(false);
                                     if(error.response.data.errorMessage ==="이메일 미인증" && error.response.status === 400) {
                                         Swal.fire({
                                             title: "이메일 미인증",
@@ -254,7 +260,7 @@ function SignUp(props) {
 
 
     const handleAuth = (e) => {
-
+        setLoading(true);
         const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
         const emailCheck = (email) => {
             return emailRegEx.test(email);
@@ -297,6 +303,7 @@ function SignUp(props) {
                     }).then(function(response){
                         Swal.fire('본인인증 메일이 전송되었습니다.', '입력하신 이메일주소로 본인인증을 진행하셔야 회원가입이 완료됩니다.', 'success');
                         setEmailId(response.data.emailId);
+                        setLoading(false);
                     })
                     .catch(function(error){
                         if (error.response.data.errorMessage ==="이메일 중복" && error.response.status === 400) {
@@ -323,10 +330,9 @@ function SignUp(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
-                        } else {
-                            console.error(error);
                         }
                         setIsDisabled(false);
+                        setLoading(false);
                     });
                     e.preventDefault();
                 }
@@ -457,6 +463,7 @@ function SignUp(props) {
                 <Button type="submit">회원가입</Button>
             </Form>
             <Button className="cancel" onClick={handleCancel} style={{"width":"400px", "margin":"0px auto 50px auto"}} >취소</Button>
+            {(loading)&&<Loading />}
         </Wrapper>
         
     );

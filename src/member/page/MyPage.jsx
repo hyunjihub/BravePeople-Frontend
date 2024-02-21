@@ -16,6 +16,7 @@ import StarRating from "../components/Rating";
 import BadgeCount from "../components/Badge";
 import Modal from "../../chat/components/Modal";
 import Review from "../components/DetailReview";
+import Loading from "../../common/components/Loading";
 
 import axios from "axios";
 
@@ -278,6 +279,9 @@ function MyPage(props) {
     const [isClicked, setIsClicked] = useState(false);
     const [myself, setMySelf] = useState(false);
 
+    //로딩 중 표시
+    const [loading, setLoading] = useState(false);
+
     const [userInfo, setUserInfo] = useState({
         profileImage: null,
         nickname: null,
@@ -349,7 +353,7 @@ function MyPage(props) {
             if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
                 Swal.fire({
                     title: "비정상적인 접속",
-                    text: "비회원은 마이페이지에 접속하실 수 없습니다.",
+                    text: "비회원은 프로필 페이지에 접속하실 수 없습니다.",
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
@@ -364,6 +368,7 @@ function MyPage(props) {
                 
                 //마이페이지에 처음 접근할 때
                 if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
+                    setLoading(true);
                     axios.get(`${BASE_URL}/member/profile/${memberid}`,{
                         headers:{
                             Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -401,10 +406,8 @@ function MyPage(props) {
                             });
                             navigate("/main");
                         }
-                        else {
-                            console.log(error);
-                        }
                     });
+                    setLoading(false);
                 }else{
                     // 마이페이지에 처음 접근하는 것이 아닐 때
                     setUserInfo({
@@ -465,6 +468,7 @@ function MyPage(props) {
 
     // 수정 완료 버튼
     const handleModify = async (e) => {       
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
@@ -544,6 +548,7 @@ function MyPage(props) {
                 })
             }
         }
+        setLoading(false);
     }
 
     const fileInput = React.createRef();
@@ -582,6 +587,7 @@ function MyPage(props) {
                 confirmButtonText: "확인",
             });
         } else if (files && files.length === 1) {
+            setLoading(true);
             frm.append('file', files[0]);
             axios.post(`${BASE_URL}/image`, frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
@@ -599,10 +605,9 @@ function MyPage(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                } else {
-                    console.log(err);
                 }
             })
+            setLoading(false);
         }
     }
 
@@ -621,6 +626,7 @@ function MyPage(props) {
 
     const SetLocation = async () => {
         const handleSuccess = async (pos) => {
+            setLoading(true);
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if (!await ReissueToken()) return;
             }
@@ -657,6 +663,7 @@ function MyPage(props) {
                     });
                 }
             });
+            setLoading(false);
         }
         const handleError = (err) => {
             console.log(err);
@@ -670,6 +677,7 @@ function MyPage(props) {
         }else{
             console.log("위치 정보 저장 취소");
         }
+        
     }
 
     //글자수 over시 ...처리
@@ -759,6 +767,7 @@ function MyPage(props) {
             </Board>
             {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
             {(reviewOpen===true)&&<Review setModal={setReviewOpen} />}
+            {(loading)&&<Loading />}
         </Container>
     );
 }

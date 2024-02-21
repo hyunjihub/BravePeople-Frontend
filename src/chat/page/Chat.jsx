@@ -9,11 +9,13 @@ import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 import { TbDoorExit } from "react-icons/tb";
 import { BASE_URL } from "../../common/components/Util";
+import check from "../resources/img/check.png";
 
 import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
 import ImageModal from "../components/Modal";
 import Review from "../components/Review";
+import Loading from "../../common/components/Loading";
 
 // 채팅
 import { Stomp } from "@stomp/stompjs";
@@ -98,36 +100,6 @@ const Nickname = styled.div`
     color: #000;
     font-weight: 700;
     margin-top: 6%;
-`;
-
-const Button = styled.button`
-    width: 45%;
-    height: 100%;
-    background-color: #f8332f;
-    font-size: 15px;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-family: 'SUITE';
-    margin-right: 5px;
-    cursor: pointer;
-
-    &:hover {
-        background-color: #ff8f8f;
-    }
-`;
-
-const DisableButton = styled.button`
-    width: 45%;
-    height: 100%;
-    background-color: #ff8f8f;
-    font-size: 15px;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-family: 'SUITE';
-    margin-right: 5px;
-    cursor: pointer;
 `;
 
 const ButtonList = styled.div`
@@ -257,6 +229,31 @@ const ExitBox = styled.div`
     cursor: pointer;
 `;
 
+const Button = styled.button`
+    width: 45%;
+    height: 100%;
+    background-color: #f8332f;
+    font-size: 15px;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-family: 'SUITE';
+    margin-right: 5px;
+    cursor: pointer;
+
+    &:disabled {
+        background-color: #ff8f8f;
+    }
+
+    &:hover {
+        background-color: #ff8f8f;
+    }
+`;
+
+const Icon = styled.img`
+    width: 10%;
+`;
+
 function Chat(props) {
 
     const navigate = useNavigate();
@@ -266,6 +263,9 @@ function Chat(props) {
     function addZero(num) {
         return num < 10 ? `0${num}` : num;
     }
+
+    //로딩 중 표시
+    const [loading, setLoading] = useState(false);
 
     //시간 변환
     function formatAMPM(date) {
@@ -359,7 +359,13 @@ function Chat(props) {
     // 페이지 처음 접속할 때
     useEffect(()=>{
         if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog){
-            alert("로그인 후 이용해주세요.");
+            Swal.fire({
+                title: "비정상적인 접속",
+                text: "비회원은 채팅페이지에 접속하실 수 없습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
             navigate("/main");
         }else if((JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog)
         || (JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog)){
@@ -405,6 +411,7 @@ function Chat(props) {
 
     // 채팅방 리스트
     const getChatList = async () => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
@@ -427,11 +434,12 @@ function Chat(props) {
         .catch(function(error){
             console.log(error);
         })
-
+        setLoading(false);
     }
 
     // 의뢰 status 불러오기
     const getContactInfo = async() => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
@@ -450,10 +458,12 @@ function Chat(props) {
         .catch(function(error){
             console.log(error);
         })
+        setLoading(false);
     }
 
     // 채팅내역 불러오기
     const getPrevChat = async () => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
@@ -464,6 +474,7 @@ function Chat(props) {
             }
         })
         .then(function(response){
+            console.log(response);
             setUserInfo({
                 profileImage: response.data.otherProfileImg,
                 nickname: response.data.otherNickname,
@@ -474,6 +485,7 @@ function Chat(props) {
         .catch(function(error){
             console.log(error);
         })
+        setLoading(false);
     }
 
     // 소켓 연결 & 구독
@@ -560,6 +572,7 @@ function Chat(props) {
             }));
         }
         setMsg("");
+        getChatList();
     }
 
     // 메시지 입력 박스
@@ -596,6 +609,7 @@ function Chat(props) {
 
     //이미지 전송
     const handleImage = async (e) => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
@@ -639,7 +653,6 @@ function Chat(props) {
                     }));
                 }
                 getChatList();
-                fileInput.current.value = "";
             }).catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();
@@ -656,6 +669,8 @@ function Chat(props) {
                 }
             })
         }
+        fileInput.current.value = "";
+        setLoading(false);
     }
 
     // 이미지 클릭 시, 모달 창
@@ -664,6 +679,7 @@ function Chat(props) {
 
     // 채팅방 나가기
     const handleExit = async() => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
@@ -679,67 +695,115 @@ function Chat(props) {
         // })
         setNowRoomId(null);
         getChatList();
+        setLoading(false);
     }
 
     // 의뢰 수락하기
     const acceptContact = async() => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
-        axios.get(`${BASE_URL}/contact/${nowRoomId}`,
-            {headers:{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }})
-        .then(function(response){
-            setContact({
-                status: response.data.status,
-                isActive: response.data.isActive
-            });
+
+        Swal.fire({
+            title: "의뢰 수락",
+            text: `${userInfo.nickname}의 의뢰 요청을 수락하시겠습니까?`,
+            icon: "info",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                axios.get(`${BASE_URL}/contact/${nowRoomId}`,
+                {headers:{
+                    Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }})
+                .then(function(response){
+                    setContact({
+                        status: response.data.status,
+                        isActive: response.data.isActive
+                    });
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+            }
         })
-        .catch(function(error){
-            console.log(error);
-        });
+        setLoading(false);
     }
 
     // 의뢰 취소하기
     const cancelContact = async() => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
-        axios.get(`${BASE_URL}/contact/${nowRoomId}/cancel`,
-            {headers:{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }})
-        .then(function(response){
-            setContact({
-                status: response.data.status,
-                isActive: response.data.isActive
-            });
+
+        Swal.fire({
+            title: "의뢰 취소",
+            text: `${userInfo.nickname}과의 의뢰를 취소하시겠습니까?`,
+            icon: "info",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                axios.get(`${BASE_URL}/contact/${nowRoomId}/cancel`,
+                    {headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }})
+                .then(function(response){
+                    setContact({
+                        status: response.data.status,
+                        isActive: response.data.isActive
+                    });
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+            }
         })
-        .catch(function(error){
-            console.log(error);
-        });
+        setLoading(false);
     }
 
     // 의뢰 완료하기
     const finishContact = async() => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
-        axios.get(`${BASE_URL}/contact/${nowRoomId}/finish`,
-            {headers:{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }})
-        .then(function(response){
-            setContact({
-                status: response.data.status,
-                isActive: response.data.isActive
-            });
-            setReviewOpen(true);
-        })
-        .catch(function(error){
-            console.log(error);
-        });
+
+        Swal.fire({
+            title: "의뢰 완료",
+            text: `${userInfo.nickname}과의 의뢰를 완료하시겠습니까? 완료된 의뢰는 취소할 수 없습니다.`,
+            icon: "info",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                axios.get(`${BASE_URL}/contact/${nowRoomId}/finish`,
+                    {headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }})
+                .then(function(response){
+                    setContact({
+                        status: response.data.status,
+                        isActive: response.data.isActive
+                    });
+                    setReviewOpen(true);
+                })
+                .catch(function(error){
+                    console.log(error);
+                });
+            }}) 
+        setLoading(false);
     }
 
     // 의뢰 수락 / 완료 버튼 onClick 함수 정하기
@@ -775,12 +839,14 @@ function Chat(props) {
                             <Profile onClick={()=>handlePage(userInfo.memberId)} src={(userInfo.profileImage===null)?profile:userInfo.profileImage} alt="프로필" />
                             <ButtonList className="user">
                                 <Nickname>{userInfo.nickname}</Nickname>
-                                {(contact.status === "대기중" || (contact.status === "진행중" && contact.isActive))
+                                {((contact.status === "진행중" && contact.isActive) || (contact.status === "대기중" && contact.isActive))
                                 &&
-                                <div style={{width:"100%"}}>
-                                {(contact.status === "진행중")&&<DisableButton onClick={cancelContact} disabled={!contact.isActive}>취소하기</DisableButton>}
-                                <Button disabled={!contact.isActive} onClick={progressContact}>{(contact.status === "진행중")?"완료하기":"수락하기"}</Button>
-                                </div>}
+                                <ButtonList className="request">
+                                {(contact.status === "진행중")&&<Button onClick={cancelContact} disabled={!contact.isActive}>의뢰 취소</Button>}
+                                <Button disabled={!contact.isActive} onClick={progressContact}>{(contact.status === "진행중")?"의뢰 완료":"의뢰 수락"}</Button>
+                                </ButtonList>}
+                                {(contact.status === "대기중" && !contact.isActive) && <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;의뢰 수락 대기중</ButtonList>}
+                                {(contact.status === "진행중" && !contact.isActive) && <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;의뢰 완료 대기중</ButtonList>}
                             </ButtonList>
                             <ExitBox onClick={handleExit}>
                                 <TbDoorExit size="40" color="f8332f"/>
@@ -800,8 +866,9 @@ function Chat(props) {
                     </Footer>
                 </ChatPage>
             }
-            {(modalOpen===true)&&<ImageModal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
-            {(reviewOpen===true)&&<Review setReviewOpen={setReviewOpen} nowRoomId={nowRoomId}/>}
+            {(modalOpen)&&<ImageModal img={clickImg} setModalOpen={setModalOpen} setImg={setClickImg}/>}
+            {(reviewOpen)&&<Review setReviewOpen={setReviewOpen} nowRoomId={nowRoomId} userInfo={userInfo}/>}
+            {(loading)&&<Loading />}
             </>
         }
         </Container>

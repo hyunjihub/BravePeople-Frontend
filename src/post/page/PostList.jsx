@@ -82,7 +82,7 @@ const DropdownMenu = styled.ul`
     height: 15%;
     list-style: none;
     position: absolute;
-    top: 28%;
+    top: 29%;
     left: 62%;
     z-index: 99;
     border: 1px solid #d1d1d1;
@@ -106,7 +106,8 @@ const DropdownOption = styled.li`
     cursor: pointer;
 
     &:hover {
-        background-color: #ced4da;
+        background-color: #f8332f;
+        color: #fff;
         font-weight: 800;
     }
 `;

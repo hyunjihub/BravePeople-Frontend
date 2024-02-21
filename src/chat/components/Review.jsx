@@ -210,7 +210,13 @@ function Review(props) {
     // 후기 전송 api
     const sendReview = async() => {
         if(review.score === null){
-            alert("별점을 정해주세요!");
+            Swal.fire({
+                title: "별점 미입력",
+                text: "별점이 입력되지 않았습니다. 별점은 드래그를 통해 결정할 수 있습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         }
         else{
             

@@ -138,6 +138,23 @@ const HiddenChat = styled.div`
     background-color: #fff;
 `;
 
+const CustomToastContainer = styled(ToastContainer)`
+  .Toastify__toast {
+    min-width: 280px;
+    font-family: 'SUITE';
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 15px;
+    padding: 15px 25px;
+    color: #000;
+    background: #fff;;
+  }
+
+  .Toastify__progress-bar-theme--light {
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(248,51,47,1) 35%, rgba(255,0,82,1) 100%);
+  }
+`;
+
 export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -466,8 +483,8 @@ export default function Header(props) {
 
     return (
         <Wrapper>
-            <ToastContainer 
-            style={{marginTop:"60px"}}
+            <CustomToastContainer 
+            style={{marginTop:"70px", marginRight:"20px"}}
             limit={3}/>
             <Logo onClick={()=>{navigate("/main");}}>
                 <img src={logo} alt="로고" style={{width:"100%"}}></img>

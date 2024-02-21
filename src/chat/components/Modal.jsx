@@ -68,7 +68,7 @@ const Background = styled.div`
 function Modal(props) {
 
     const close = () => {
-        props.setModal(false);
+        props.setModalOpen(false);
         props.setImg(null);
     }
 
