@@ -729,6 +729,7 @@ function Chat(props) {
                 status: response.data.status,
                 isActive: response.data.isActive
             });
+            setReviewOpen(true);
         })
         .catch(function(error){
             console.log(error);
@@ -768,7 +769,7 @@ function Chat(props) {
                             <Profile onClick={()=>handlePage(userInfo.memberId)} src={(userInfo.profileImage===null)?profile:userInfo.profileImage} alt="프로필" />
                             <ButtonList className="user">
                                 <Nickname>{userInfo.nickname}</Nickname>
-                                {(contact.status === "대기중" || contact.status === "진행중")
+                                {(contact.status === "대기중" || (contact.status === "진행중" && contact.isActive))
                                 &&
                                 <div style={{width:"100%"}}>
                                 {(contact.status === "진행중")&&<DisableButton onClick={cancelContact} disabled={!contact.isActive}>취소하기</DisableButton>}
@@ -794,7 +795,7 @@ function Chat(props) {
                 </ChatPage>
             }
             {(modalOpen===true)&&<ImageModal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
-            {(reviewOpen===true)&&<Review setModal={setReviewOpen}/>}
+            {(reviewOpen===true)&&<Review setReviewOpen={setReviewOpen} nowRoomId={nowRoomId}/>}
             </>
         }
         </Container>

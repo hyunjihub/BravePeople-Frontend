@@ -143,7 +143,7 @@ function Review(props) {
     const setLog = (bool) => dispatch(setLogin(bool));
 
     const reviewCancel = () => {
-        props.setModal(false);
+        props.setReviewOpen(false);
     }
 
     // 토큰 재발급 요청 api
@@ -213,11 +213,11 @@ function Review(props) {
             alert("별점을 정해주세요!");
         }
         else{
-            /*
+            
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if(!await ReissueToken()) return;
             }
-            axios.post(`${BASE_URL}/contact/${nowRoomId}/review`,
+            axios.post(`${BASE_URL}/contact/${props.nowRoomId}/review`,
             {
                 score: review.score,
                 contents: review.contents
@@ -227,13 +227,12 @@ function Review(props) {
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
             .then(function(response){
-                console.log(response);
+                reviewCancel();
             })
             .catch(function(error){
                 console.log(error);
-            })  */                    
+            })                   
         }
-        reviewCancel();
     };
 
     const [rating, setRating] = useState(null);

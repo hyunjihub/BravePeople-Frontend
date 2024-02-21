@@ -270,6 +270,7 @@ export default function Header(props) {
                 setIsNewChat(true); 
                 toast(parsedData.message);
             }
+            console.log(parsedData);
         };
     
         eventSource.current.onerror = (e) => {
