@@ -14,7 +14,6 @@ import Chatting from "../components/Chatting";
 import List from "../components/Chatlist";
 import ImageModal from "../components/Modal";
 import Review from "../components/Review";
-import RequestButton from "../components/RequestButton";
 
 // 채팅
 import { Stomp } from "@stomp/stompjs";
@@ -311,7 +310,10 @@ function Chat(props) {
         memberId: null,
     });
 
-    const [contact, setContact] = useState([]);
+    const [contact, setContact] = useState({
+        status: null,
+        isActive: false
+    });
 
 
     // 토큰 재발급 요청 api
@@ -386,6 +388,7 @@ function Chat(props) {
                 if(client.current && client.current.connected) { await client.current.disconnect(); }
                 await getChatList();
                 await getPrevChat();
+                await getContactInfo();
                 subHandler();
             }  
         }
@@ -420,6 +423,28 @@ function Chat(props) {
 
     }
 
+    // 의뢰 status 불러오기
+    const getContactInfo = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
+        }
+        axios.get(`${BASE_URL}/contact/${nowRoomId}/status`,
+        {
+            headers :{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }
+        })
+        .then(function(response){
+            setContact({
+                status: response.data.status,
+                isActive: response.data.isActive
+            })
+        })
+        .catch(function(error){
+            console.log(error);
+        })
+    }
+
     // 채팅내역 불러오기
     const getPrevChat = async () => {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
@@ -437,7 +462,6 @@ function Chat(props) {
                 nickname: response.data.otherNickname,
                 memberId: response.data.otherId,
             });
-            setContact(response.data.contact);
             setChatMessage(response.data.messages);
         })
         .catch(function(error){
@@ -651,12 +675,80 @@ function Chat(props) {
         getChatList();
     }
 
-    const [reviewOpen, setReviewOpen] = useState(false);
-
-    const test = () => {
-        chatList.status="진행중";
-        console.log(contact);
+    // 의뢰 수락하기
+    const acceptContact = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
+        axios.get(`${BASE_URL}/contact/${nowRoomId}`,
+            {headers:{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }})
+        .then(function(response){
+            console.log(response);
+            setContact({
+                status: response.data.status,
+                isActive: response.data.isActive
+            });
+        })
+        .catch(function(error){
+            console.log(error);
+        });
     }
+
+    // 의뢰 취소하기
+    const cancelContact = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
+        axios.get(`${BASE_URL}/contact/${nowRoomId}/cancel`,
+            {headers:{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }})
+        .then(function(response){
+            console.log(response);
+            setContact({
+                status: response.data.status,
+                isActive: response.data.isActive
+            });
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
+
+    // 의뢰 완료하기
+    const finishContact = async() => {
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
+        axios.get(`${BASE_URL}/contact/${nowRoomId}/finish`,
+            {headers:{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }})
+        .then(function(response){
+            console.log(response);
+            setContact({
+                status: response.data.status,
+                isActive: response.data.isActive
+            });
+        })
+        .catch(function(error){
+            console.log(error);
+        });
+    }
+
+    // 의뢰 수락 / 완료 버튼 onClick 함수 정하기
+    const progressContact = async() => {
+        if(contact.status === "대기중"){
+            return acceptContact;
+        }
+        else if(contact.status === "진행중"){
+            return finishContact;
+        }
+    }
+
+    const [reviewOpen, setReviewOpen] = useState(false);
 
     return(
         <Container>
@@ -679,7 +771,12 @@ function Chat(props) {
                             <Profile onClick={()=>handlePage(userInfo.memberId)} src={(userInfo.profileImage===null)?profile:userInfo.profileImage} alt="프로필" />
                             <ButtonList className="user">
                                 <Nickname>{userInfo.nickname}</Nickname>
-                                <RequestButton status={contact.status} isActive={contact.isActive} setReviewOpen={setReviewOpen} roomId={nowRoomId}/>
+                                {(contact.status === "대기중" || contact.status === "진행중")
+                                &&
+                                <div style={{width:"100%"}}>
+                                {(contact.status === "진행중")&&<DisableButton onClick={cancelContact}>취소하기</DisableButton>}
+                                <Button disabled={!contact.isActive} onClick={progressContact}>{(contact.status === "진행중")?"완료하기":"수락하기"}</Button>
+                                </div>}
                             </ButtonList>
                             <ExitBox onClick={handleExit}>
                                 <TbDoorExit size="40" color="f8332f"/>
