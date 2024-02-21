@@ -414,7 +414,14 @@ function Chat(props) {
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }
         })
-        .then(function(response){
+        .then(async function(response){
+            if(nowRoomId){
+                await response.data.map((item)=>{
+                    if(item.roomId === nowRoomId){
+                        item.isRead = true;
+                    }
+                })
+            }
             setChatList(response.data);
         })
         .catch(function(error){
@@ -553,7 +560,6 @@ function Chat(props) {
             }));
         }
         setMsg("");
-        getChatList();
     }
 
     // 메시지 입력 박스
