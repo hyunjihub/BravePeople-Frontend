@@ -685,7 +685,6 @@ function Chat(props) {
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
         .then(function(response){
-            console.log(response);
             setContact({
                 status: response.data.status,
                 isActive: response.data.isActive
@@ -706,7 +705,6 @@ function Chat(props) {
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
         .then(function(response){
-            console.log(response);
             setContact({
                 status: response.data.status,
                 isActive: response.data.isActive
@@ -727,7 +725,6 @@ function Chat(props) {
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
         .then(function(response){
-            console.log(response);
             setContact({
                 status: response.data.status,
                 isActive: response.data.isActive
@@ -741,10 +738,10 @@ function Chat(props) {
     // 의뢰 수락 / 완료 버튼 onClick 함수 정하기
     const progressContact = async() => {
         if(contact.status === "대기중"){
-            return acceptContact;
+            acceptContact();
         }
         else if(contact.status === "진행중"){
-            return finishContact;
+            finishContact();
         }
     }
 
@@ -774,7 +771,7 @@ function Chat(props) {
                                 {(contact.status === "대기중" || contact.status === "진행중")
                                 &&
                                 <div style={{width:"100%"}}>
-                                {(contact.status === "진행중")&&<DisableButton onClick={cancelContact}>취소하기</DisableButton>}
+                                {(contact.status === "진행중")&&<DisableButton onClick={cancelContact} disabled={!contact.isActive}>취소하기</DisableButton>}
                                 <Button disabled={!contact.isActive} onClick={progressContact}>{(contact.status === "진행중")?"완료하기":"수락하기"}</Button>
                                 </div>}
                             </ButtonList>

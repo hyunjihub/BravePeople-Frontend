@@ -259,7 +259,6 @@ export default function Header(props) {
     const setupSSE = async() => {
         eventSource.current.onopen = () => {
             // 연결 시 할 일
-            console.log("연결 완료");
         };
       
         eventSource.current.onmessage = async (e) => {
