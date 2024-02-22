@@ -413,7 +413,8 @@ function Chat(props) {
 
     // SSE 통신으로 새로운 의뢰 상태 변화가 있을 때 의뢰 상태 불러오기 api 호출
     useEffect(()=>{
-        if(isNewChanged && nowRoomId){
+        if(JSON.parse(sessionStorage.getItem('changedStatus'))) { console.log(JSON.parse(sessionStorage.getItem('changedStatus'))) }
+        if(isNewChanged && nowRoomId && (JSON.parse(sessionStorage.getItem('changedStatus')) === nowRoomId)){
             getContactInfo();
             setIsNewChanged(false);
             getChatList();
@@ -692,16 +693,16 @@ function Chat(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
-        // await axios.patch(`${BASE_URL}/chats/${nowRoomId}`,
-        //     {headers:{
-        //         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-        //     }})
-        // .then(function(response){
-        //     console.log(response);
-        // })
-        // .catch(function(response){
-        //     console.log(response);
-        // })
+        await axios.patch(`${BASE_URL}/chats/${nowRoomId}`,
+            {headers:{
+                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+            }})
+        .then(function(response){
+            console.log(response);
+        })
+        .catch(function(response){
+            console.log(response);
+        })
         setNowRoomId(null);
         getChatList();
         setLoading(false);

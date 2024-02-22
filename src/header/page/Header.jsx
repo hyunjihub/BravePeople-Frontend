@@ -283,28 +283,13 @@ export default function Header(props) {
             const parsedData = JSON.parse(res);
         
             // 받아오는 data로 할 일
-            switch(parsedData.type){
-                case 'NEW_CHAT':
-                {
-                    setIsNewChat(true); 
-                    toast(parsedData.message);
-                    break;
-                }
-                case 'NEW_CHAT_ROOM':
-                {
-                    setIsNewChat(true); 
-                    toast(parsedData.message);
-                    break;
-                }
-                case 'NEW_STATUS':
-                {
-                    setIsNewChanged(true);
-                    break;
-                }
-                default:
-                    break;
+            if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CONTACT'){
+                setIsNewChat(true); 
+                toast(parsedData.message);
+            }else if(parsedData.type === 'NEW_STATUS'){
+                setIsNewChanged(true);
+                sessionStorage.setItem('changedStatus', JSON.stringify(Number(parsedData.message)));
             }
-            console.log(parsedData);
         };
     
         eventSource.current.onerror = (e) => {
