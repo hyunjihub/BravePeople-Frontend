@@ -12,7 +12,7 @@ import axios from 'axios';
 // redux
 import HeaderButton from "../components/HeaderButton";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
-import { setLogin, setMemberId, setLocation, setProfileImg, setIsNew } from "../../member/redux/modules/login"
+import { setLogin, setMemberId, setLocation, setProfileImg, setIsNew, setIsChangedStatus } from "../../member/redux/modules/login"
 // sse
 import { EventSourcePolyfill } from "event-source-polyfill";
 // toastify
@@ -159,12 +159,11 @@ export default function Header(props) {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { isLog, id, loc, profile, isNewChat } = useSelector( state => ({
+    const { isLog, id, loc, profile } = useSelector( state => ({
         isLog: state.login.isLogin,
         id: state.login.memberId,
         loc: state.login.location,
-        profile: state.login.profileImg,
-        isNewChat: state.login.isNew
+        profile: state.login.profileImg
     }), shallowEqual);
 
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
@@ -172,6 +171,7 @@ export default function Header(props) {
     const setLoc = (loc) => dispatch(setLocation(loc)); 
     const setProfile = (profile) => dispatch(setProfileImg(profile));
     const setIsNewChat = (bool) => dispatch(setIsNew(bool));
+    const setIsNewChanged = (bool) => dispatch(setIsChangedStatus(bool));
 
     // 웹 스토리지에 데이터 생성 및 초기값 설정
     // sessionStorage - JWT
@@ -283,9 +283,26 @@ export default function Header(props) {
             const parsedData = JSON.parse(res);
         
             // 받아오는 data로 할 일
-            if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CHAT_ROOM') { 
-                setIsNewChat(true); 
-                toast(parsedData.message);
+            switch(parsedData.type){
+                case 'NEW_CHAT':
+                {
+                    setIsNewChat(true); 
+                    toast(parsedData.message);
+                    break;
+                }
+                case 'NEW_CHAT_ROOM':
+                {
+                    setIsNewChat(true); 
+                    toast(parsedData.message);
+                    break;
+                }
+                case 'NEW_STATUS':
+                {
+                    setIsNewChanged(true);
+                    break;
+                }
+                default:
+                    break;
             }
             console.log(parsedData);
         };

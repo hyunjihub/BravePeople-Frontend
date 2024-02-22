@@ -4,7 +4,7 @@ import profile from "../../common/resources/img/profile.png";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { setLocation, setProfileImg, setLogin, setMemberId, setIsNew } from "../../member/redux/modules/login";
+import { setLocation, setProfileImg, setLogin, setMemberId, setIsNew, setIsChangedStatus } from "../../member/redux/modules/login";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { BsCameraFill } from "react-icons/bs";
 import { TbDoorExit } from "react-icons/tb";
@@ -279,10 +279,11 @@ function Chat(props) {
     }
 
     // redux 변수, 함수 연결하기
-    const { id, isLog, isNewChat } = useSelector((state)=>({
+    const { id, isLog, isNewChat, isNewChanged } = useSelector((state)=>({
         isLog: state.login.isLogin,
         id: state.login.memberId,
-        isNewChat: state.login.isNew
+        isNewChat: state.login.isNew,
+        isNewChanged: state.login.changed
     }), shallowEqual);
 
     const dispatch = useDispatch();
@@ -291,6 +292,7 @@ function Chat(props) {
     const setProfile = (pro) => dispatch(setProfileImg(pro));
     const setLog = (bool) => dispatch(setLogin(bool));
     const setIsNewChat = (bool) => dispatch(setIsNew(bool));
+    const setIsNewChanged = (bool) => dispatch(setIsChangedStatus(bool));
 
     // client
     const client = useRef();
@@ -409,6 +411,15 @@ function Chat(props) {
         }
     }, [isNewChat]);
 
+    // SSE 통신으로 새로운 의뢰 상태 변화가 있을 때 의뢰 상태 불러오기 api 호출
+    useEffect(()=>{
+        if(isNewChanged && nowRoomId){
+            getContactInfo();
+            setIsNewChanged(false);
+            getChatList();
+        }
+    }, [isNewChanged]);
+
     // 채팅방 리스트
     const getChatList = async () => {
         setLoading(true);
@@ -450,6 +461,7 @@ function Chat(props) {
             }
         })
         .then(function(response){
+            console.log(response);
             setContact({
                 status: response.data.status,
                 isActive: response.data.isActive
@@ -474,7 +486,6 @@ function Chat(props) {
             }
         })
         .then(function(response){
-            console.log(response);
             setUserInfo({
                 profileImage: response.data.otherProfileImg,
                 nickname: response.data.otherNickname,
@@ -517,7 +528,6 @@ function Chat(props) {
                 message: null,
                 img: null
             }));
-            getChatList();
             // 구독받은 메세지 받기
             client.current.subscribe(`/sub/${nowRoomId}`,
                 (message)=>{
@@ -572,7 +582,6 @@ function Chat(props) {
             }));
         }
         setMsg("");
-        getChatList();
     }
 
     // 메시지 입력 박스
@@ -725,6 +734,7 @@ function Chat(props) {
                         status: response.data.status,
                         isActive: response.data.isActive
                     });
+                    getChatList();
                 })
                 .catch(function(error){
                     console.log(error);
@@ -761,6 +771,7 @@ function Chat(props) {
                         status: response.data.status,
                         isActive: response.data.isActive
                     });
+                    getChatList();
                 })
                 .catch(function(error){
                     console.log(error);
@@ -797,6 +808,7 @@ function Chat(props) {
                         status: response.data.status,
                         isActive: response.data.isActive
                     });
+                    getChatList();
                     setReviewOpen(true);
                 })
                 .catch(function(error){
@@ -839,14 +851,23 @@ function Chat(props) {
                             <Profile onClick={()=>handlePage(userInfo.memberId)} src={(userInfo.profileImage===null)?profile:userInfo.profileImage} alt="프로필" />
                             <ButtonList className="user">
                                 <Nickname>{userInfo.nickname}</Nickname>
-                                {((contact.status === "진행중" && contact.isActive) || (contact.status === "대기중" && contact.isActive))
-                                &&
-                                <ButtonList className="request">
-                                {(contact.status === "진행중")&&<Button onClick={cancelContact} disabled={!contact.isActive}>의뢰 취소</Button>}
-                                <Button disabled={!contact.isActive} onClick={progressContact}>{(contact.status === "진행중")?"의뢰 완료":"의뢰 수락"}</Button>
-                                </ButtonList>}
-                                {(contact.status === "대기중" && !contact.isActive) && <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;의뢰 수락 대기중</ButtonList>}
-                                {(contact.status === "진행중" && !contact.isActive) && <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;의뢰 완료 대기중</ButtonList>}
+                                {(contact.status === "진행중" || contact.status === "대기중")
+                                ?
+                                    (contact.isActive)
+                                    ?
+                                        <ButtonList className="request">
+                                            {(contact.status === "진행중")&&<Button onClick={cancelContact} disabled={!contact.isActive}>의뢰 취소</Button>}
+                                            <Button disabled={!contact.isActive} onClick={progressContact}>{(contact.status === "진행중")?"의뢰 완료":"의뢰 수락"}</Button>
+                                        </ButtonList>
+                                        :
+                                        (contact.status === "대기중")
+                                        ?
+                                            <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;의뢰 수락 대기중</ButtonList>
+                                            :
+                                            <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;의뢰 완료 대기중</ButtonList>
+                                    :
+                                    <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;진행중인 의뢰가 없음</ButtonList>
+                                }
                             </ButtonList>
                             <ExitBox onClick={handleExit}>
                                 <TbDoorExit size="40" color="f8332f"/>
