@@ -126,8 +126,10 @@ const Introduce = styled.div`
     margin-bottom: 5%;
 
     &.time {
+        width: 10%;
         margin-bottom: 0%;
         margin-top: 3%;
+        text-align: right;
     }
 `;
 
@@ -288,7 +290,8 @@ function MyPage(props) {
         intro: null,
         score: 0,
         medalCount: 0,
-        posts : []
+        posts : [],
+        reviews : []
     });
 
     // redux로 변수, 함수 가져오기
@@ -375,13 +378,15 @@ function MyPage(props) {
                         }
                     })
                     .then(function(response){
+                        console.log(response);
                             setUserInfo({
                                 profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
                                 nickname: response.data.nickname,
                                 intro: response.data.introduction,
                                 score: response.data.score,
                                 medalCount: response.data.medalCount,
-                                posts: response.data.postListVo
+                                posts: response.data.postListVo,
+                                reviews: response.data.reviews
                             });
                             sessionStorage.setItem('savedUserInfo', JSON.stringify({
                                 profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
@@ -389,7 +394,8 @@ function MyPage(props) {
                                 intro: response.data.introduction,
                                 score: response.data.score,
                                 medalCount: response.data.medalCount,
-                                posts: response.data.postListVo
+                                posts: response.data.postListVo,
+                                reviews: response.data.reviews
                             }));
                         }
                     )
@@ -417,6 +423,7 @@ function MyPage(props) {
                         score: JSON.parse(sessionStorage.getItem('savedUserInfo')).score,
                         medalCount: JSON.parse(sessionStorage.getItem('savedUserInfo')).medalCount,
                         posts: JSON.parse(sessionStorage.getItem('savedUserInfo')).posts,
+                        reviews: JSON.parse(sessionStorage.getItem('savedUserInfo')).reviews
                     });
                 }
             };
@@ -505,7 +512,8 @@ function MyPage(props) {
                         intro: response.data.introduction,
                         score: userInfo.score,
                         medalCount: userInfo.medalCount,
-                        posts: userInfo.posts
+                        posts: userInfo.posts,
+                        reviews: userInfo.reviews
                     }));
                     sessionStorage.setItem('savedData', JSON.stringify({
                         isLogin: isLog,
@@ -562,6 +570,7 @@ function MyPage(props) {
 
     //프로필 이미지 불러오기
     const handleChange = async (e) => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
@@ -587,13 +596,13 @@ function MyPage(props) {
                 confirmButtonText: "확인",
             });
         } else if (files && files.length === 1) {
-            setLoading(true);
             frm.append('file', files[0]);
             axios.post(`${BASE_URL}/image`, frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
                 handleCurrentImg(response.data.imgUrl);
+                setLoading(false);
             }).catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();
@@ -605,9 +614,8 @@ function MyPage(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                }
+                } setLoading(false);
             })
-            setLoading(false);
         }
     }
 
@@ -741,32 +749,24 @@ function MyPage(props) {
                 userInfo.posts.map((post) => (
                 <PostBox key={uuid()}>
                     <Icon src={document} alt="게시글" />
-                    <Post onClick={() => handleView(post.postId)}> {truncate(post.title, 30)}</Post>
+                    <Post onClick={() => handleView(post.postId)}>{truncate(post.title, 30)}</Post>
                     <Introduce className="time">{post.createdAt}</Introduce>
                 </PostBox>)))}
-                    
                 </Box>
+
                 <BoardName>후기</BoardName>
                 <Box>
-                    <PostBox>
+                    {userInfo.reviews.length === 0 ? (<NullPost>받은 후기 없음</NullPost>) : (
+                    userInfo.reviews.map((review) => (
+                    <PostBox key={uuid()}>
                         <Icon className="review" src={reviewIcon} alt="리뷰" />
-                        <Post className="review" onClick={handleDetail}>{truncate("정말 너무너무너무너무너무너무너무너문머누머누머누머누머누머너무너무너무 친절해요", 25)}</Post>
-                        <RatingBox><StarRating value="4.5" size="20" /></RatingBox>
-                    </PostBox>
-                    <PostBox>
-                        <Icon className="review" src={reviewIcon} alt="리뷰" />
-                        <Post className="review">{truncate("정말 너무너무너무너무너무너무너무너문머누머누머누머누머누머너무너무너무 친절해요", 25)}</Post>
-                        <RatingBox><StarRating value="4.5" size="20" /></RatingBox>
-                    </PostBox>
-                    <PostBox>
-                        <Icon className="review" src={reviewIcon} alt="리뷰" />
-                        <Post className="review">{truncate("정말 너무너무너무너무너무너무너무너문머누머누머누머누머누머너무너무너무 친절해요", 25)}</Post>
-                        <RatingBox><StarRating value="4.5" size="20" /></RatingBox>
-                    </PostBox>
+                        <Post className="review" onClick={handleDetail}>{(review.content===null)?"내용 없음":truncate(review.content, 30)}</Post>
+                        <RatingBox><StarRating value={review.score} size="20" /></RatingBox>
+                    </PostBox>)))}
                 </Box>
             </Board>
             {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
-            {(reviewOpen===true)&&<Review setModal={setReviewOpen} />}
+            {(reviewOpen===true)&&<Review setModal={setReviewOpen} reviews={userInfo.reviews}/>}
             {(loading)&&<Loading />}
         </Container>
     );

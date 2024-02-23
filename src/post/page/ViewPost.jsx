@@ -8,6 +8,7 @@ import profile from '../../common/resources/img/profile.png';
 import StarRating from '../../member/components/Rating';
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../common/components/Util";
+import Loading from "../../common/components/Loading";
 
 // axios
 import axios from "axios";
@@ -17,7 +18,7 @@ import { setLogin, setMemberId, setLocation, setProfileImg } from "../../member/
 
 const Wrapper = styled.div`
     width: 42%;
-    height: 100vh;
+    height: 750px;
     margin: 15px auto;
     position: relative;
 `;
@@ -41,7 +42,7 @@ const Line = styled.hr`
 
 const TitleBox = styled.div`
     width: 90%;
-    height: 3%;
+    height: 4%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -70,15 +71,15 @@ const Category = styled.div`
 
 const ProfileBox = styled.div`
     width: 90%;
-    height: 5%;
+    height: 7%;
     display: flex;
     flex-direction: row;
     align-items: center;
-    margin: 4% 6% 2%;
+    margin: 4% 6% 2% 5%;
 `;
 
 const Profile = styled.img`
-    width: 7%;
+    width: 8%;
     height: 100%;
     border-radius: 50%;
     border: none;
@@ -154,14 +155,14 @@ const Content = styled.div`
     flex-direction: column;
     overflow-wrap: break-word;
     hyphens: auto; 
-    min-height: 55%;
+    min-height: 80%;
     padding-bottom: 10%;
     white-space: pre-wrap;
 `;
 
 const StickyBox = styled.div`
     width: 75%;
-    height: 7%;
+    height: 8%;
     position: sticky;
     bottom: 0;
     background-color: #f8332f;
@@ -232,6 +233,9 @@ function ViewPost(props) {
         price: ""
     });
 
+    //로딩 중 표시
+    const [loading, setLoading] = useState(false);
+
     // 버튼(달려가기, 부탁하기) 활성화 여부
     const [isActivate, setIsActivate] = useState(false);
     // 버튼(수정하기, 삭제하기) 활성화 여부
@@ -239,9 +243,19 @@ function ViewPost(props) {
 
     // 데이터 불러오기
     useEffect(()=>{
+        setLoading(true);
         axios.get(`${BASE_URL}/posts/${postid}`)
         .then(function(response){
             setPostData(response.data);
+            if(response.data.disabled) {
+                Swal.fire({
+                    title: "비활성화 게시글",
+                    text: "현 게시글은 의뢰가 종료된 게시글입니다.",
+                    icon: "info",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+            }
             if(id === null) { setIsActivate(false); }
             else{
                 if(id === response.data.memberId.toString()) { 
@@ -257,6 +271,7 @@ function ViewPost(props) {
         .catch(function(error){
             console.log(error);
         });
+        setLoading(false);
     }, []);
 
     // 토큰 재발급 요청 api
@@ -301,6 +316,7 @@ function ViewPost(props) {
 
     //삭제 버튼 클릭시 삭제 API
     const handleDelete = async (e) => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
@@ -334,10 +350,19 @@ function ViewPost(props) {
                         ReissueToken();   
                     } else if(error.response.status === 404 && error.response.data.errorMessage === "게시글 없음"){
                         navigate("/error"); 
+                    } else if(error.response.status === 401 && error.response.data.errorMessage === "진행중인 의뢰 존재") {
+                        Swal.fire({
+                            title: "삭제 불가",
+                            text: "해당 게시글은 의뢰가 진행 중입니다. 의뢰 완료/취소 후 삭제해주세요.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
                     }
                 });
             }
         })
+        setLoading(false);
     } 
 
     //클릭시 프로필 페이지 이동
@@ -360,12 +385,11 @@ function ViewPost(props) {
 
     // 부탁하기/달려가기 버튼
     const handleRequestButton = async(e) => {
-
+        
         if(!isLog) {
             navigate("/login");
             return;
         }
-
         if(!isActivate) {
             Swal.fire({
                 title: "본인이 작성한 게시글",
@@ -376,6 +400,7 @@ function ViewPost(props) {
             });
             return;
         }
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if(!await ReissueToken()) return;
         }
@@ -392,24 +417,33 @@ function ViewPost(props) {
         .catch(function(error){
             if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
                 ReissueToken();
-            } else if(error.response.status === 400 && error.response.data.errorMessage === "진행중인 의뢰 존재") {
+            } else if(error.response.status === 400 && error.response.data.errorMessage === "글 작성자가 의뢰 진행 중") {
                 Swal.fire({
-                    title: "진행 중인 의뢰 존재",
-                    html: "게시글 작성자와 사용자 간의 의뢰가 존재하고 있습니다.<br>진행 중인 의뢰를 먼저 완료 해주세요.",
+                    title: "의뢰를 진행할 수 없습니다.",
+                    html: "작성자가 현 게시글에서 다른 사용자와 의뢰를 진행 중입니다.",
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
-            } else if(error.response.status === 400 && error.response.data.errorMessage === "의뢰 중복") {
+            } else if(error.response.status === 400 && error.response.data.errorMessage === "상대방과 진행중인 의뢰 존재") {
                 Swal.fire({
-                    title: "중복된 의뢰",
-                    text: "중복",
+                    title: "의뢰를 진행할 수 없습니다.",
+                    html: "작성자와 사용자 간의 의뢰가 진행 중입니다.<br>작성자와의 의뢰 완료 후, 다시 시도해주세요.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+            } else if(error.response.status === 400 && error.response.data.errorMessage === "이미 신청한 의뢰") {
+                Swal.fire({
+                    title: "의뢰를 진행할 수 없습니다.",
+                    html: "현 게시글로 의뢰를 진행했습니다. <br>한 게시글로 사용자가 의뢰를 요청할 수 있는 횟수는 1회입니다.",
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
             }
         })
+        setLoading(false);
     }
 
     return(
@@ -447,6 +481,7 @@ function ViewPost(props) {
                     {(postData.type==="원정대")? "의뢰하기" : "원정가기"}</ChatButton>
                 <Price>{postData.price!=="-1"?postData.price+"원":"가격협의"}</Price>
             </StickyBox>
+            {(loading)&&<Loading />} 
         </Wrapper>
     );
 }

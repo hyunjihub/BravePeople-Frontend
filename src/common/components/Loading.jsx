@@ -13,6 +13,7 @@ const Background = styled.div`
     justify-content: center;
     align-items: center;
     margin-top: 6%;
+    z-index: 999;
 `;
 
 const Image = styled.img`
