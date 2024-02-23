@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { useNavigate } from "react-router";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../common/components/Util";
+
+import Loading from "../../common/components/Loading";
 
 // restapi
 import axios from 'axios';
@@ -78,12 +80,16 @@ const Container = styled.div`
 function FindId(props) {
     const navigate = useNavigate();
 
+    //로딩 중 표시
+    const [loading, setLoading] = useState(false);
+
     const emailRegEx = /^[A-Za-z0-9]([-_.]?[A-Za-z0-9])*@[A-Za-z0-9]([-_.]?[A-Za-z0-9])*\.[A-Za-z]{2,3}$/i;
     const emailCheck = (email) => {
         return emailRegEx.test(email);
     }
 
     const idFind = (e) => {
+        setLoading(true);
         if(emailCheck(e.target[0].value)) {
             if (e.target[0].value !== "") {
                 axios.get(`${BASE_URL}/auth/username`, {
@@ -99,6 +105,7 @@ function FindId(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
+                    setLoading(false);
                 })
                 .catch(function(error){
                     if(error.response.status === 400 && error.response.data.errorMessage === "존재하지 않는 이메일") {
@@ -109,6 +116,7 @@ function FindId(props) {
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",
                         });
+                        setLoading(false);
                     }  
                 });
                 e.preventDefault();
@@ -120,6 +128,7 @@ function FindId(props) {
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
+                setLoading(false);
             }
         } else {
             Swal.fire({
@@ -129,12 +138,13 @@ function FindId(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         }
-        
         e.preventDefault();
     }
 
     const pwFind = (e) => {
+        setLoading(true);
         if(e.target[0].value !== "" && e.target[1].value !== "") {
             if(e.target[0].value.length>6) {
                 if(emailCheck(e.target[1].value)) {
@@ -153,10 +163,10 @@ function FindId(props) {
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",
                         });
+                        setLoading(false);
                         navigate("/main");
                     })
                     .catch(function(error){
-                        console.log(error);
                         if(error.response.status === 400 && error.response.data.errorMessage === "이메일 전송 오류") {
                             Swal.fire({
                                 title: "이메일 전송 오류",
@@ -206,6 +216,7 @@ function FindId(props) {
                                 confirmButtonText: "확인",
                             });
                         }
+                        setLoading(false);
                     });
                 } else {
                     Swal.fire({
@@ -215,6 +226,7 @@ function FindId(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
+                    setLoading(false);
                 } 
             } else {
                 Swal.fire({
@@ -224,6 +236,7 @@ function FindId(props) {
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
+                setLoading(false);
             }    
         } else {
             Swal.fire({
@@ -233,12 +246,14 @@ function FindId(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         }
         e.preventDefault();
     }
 
     return(
         <Container>
+            {(loading)&&<Loading />} 
             <IdForm onSubmit={idFind}>
                 <Title>아이디 찾기</Title>
                 <Label>아이디</Label>
@@ -263,9 +278,8 @@ function FindId(props) {
                     placeholder="이메일 (ex brave@naver.com)" 
                 />
                 <Button>비밀번호 찾기</Button>
-            </PasswordForm>  
+            </PasswordForm> 
         </Container>
-        
     );
 }
 

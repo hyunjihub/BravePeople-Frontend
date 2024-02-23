@@ -6,6 +6,7 @@ import { FaCamera } from "react-icons/fa";
 import { MdCancel } from "react-icons/md";
 import Swal from "sweetalert2";
 import { BASE_URL } from "../../common/components/Util";
+import Loading from "../../common/components/Loading";
 
 import axios from "axios";
 //redux
@@ -14,7 +15,7 @@ import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/
 
 const Wrapper = styled.div`
     width: 42%;
-    height: 100vh;
+    height: 900px;
     margin: 15px auto;
 `;
 
@@ -237,6 +238,9 @@ function WritePost(props) {
     const { ishelped } = useParams();
     let type = ishelped === "helping" ? "원정대" : "의뢰인";
 
+    //로딩 중 표시
+    const [loading, setLoading] = useState(false);
+
     // 게시글 작성 OR 수정 여부 판단
     const [isWrite, setIsWrite] = useState(true);
     const { postid } = useParams();
@@ -289,8 +293,6 @@ function WritePost(props) {
                     confirmButtonText: "확인",
                 });
                 navigate("/main");
-            }else{
-                console.log(error);
             }
             return false;
         };
@@ -310,6 +312,7 @@ function WritePost(props) {
                 });
             }
             else if(postid!=='-1') {
+                setLoading(true);
                 if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                     if (!await ReissueToken()) return;
                 }
@@ -323,11 +326,13 @@ function WritePost(props) {
                     setSelectedCategory(response.data.category);
                     type=response.data.type;
                     if(response.data.postImg!=="") setUploading(true);
+                    setLoading(false); 
                 })
                 .catch(function(error){
                     if((error.response.status === 404 && error.response.data.errorMessage === '존재하지 않는 게시글')) {
                         navigate("/error");
                     }
+                    setLoading(false); 
                 });
             }
         }
@@ -406,7 +411,7 @@ function WritePost(props) {
           e.target.value = val.substring(0, start) + "\t" + val.substring(end);
           e.target.selectionStart = e.target.selectionEnd = start + 1;
           handleContent(e);
-          return false; //  prevent focus
+          return false;
         }
       };
 
@@ -429,6 +434,7 @@ function WritePost(props) {
     }
 
     const handleChange = async (e) => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
@@ -454,12 +460,13 @@ function WritePost(props) {
         } else if (files && files.length === 1) {
             const frm = new FormData();
             frm.append('file', files[0]);
-            axios.post(`${BASE_URL}`, frm, {
+            axios.post(`${BASE_URL}/image`, frm, {
                 headers: {'Content-Type' : 'Multipart/form-data',
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }}).then(function(response){
                 handleCurrentImg(response.data.imgUrl);
                 setUploading(true);
+                setLoading(false); 
             }).catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
@@ -471,9 +478,7 @@ function WritePost(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                } else {
-                    console.log(err);
-                }
+                } setLoading(false); 
             })
         }
     }
@@ -487,6 +492,7 @@ function WritePost(props) {
 
     //게시글 업로드
     const handleUpload = async (e) => {
+        setLoading(true);
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
@@ -510,6 +516,7 @@ function WritePost(props) {
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",
                         });
+                        setLoading(false); 
                         navigate(-1);
                     })
                     .catch(function(err){
@@ -531,7 +538,7 @@ function WritePost(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
-                        } else console.log(err);
+                        } setLoading(false); 
                     })
             } else {
                 axios.patch(`${BASE_URL}/posts/${postid}`, {
@@ -545,6 +552,7 @@ function WritePost(props) {
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }}).then(function(response){
                     alert("게시글 수정이 완료되었습니다.");
+                    setLoading(false); 
                     navigate(-1);
                 })
                 .catch(function(err){
@@ -558,7 +566,8 @@ function WritePost(props) {
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",
                         });
-                    } else console.log(err);
+                    }
+                    setLoading(false); 
                 })
             }         
         }else{
@@ -569,8 +578,8 @@ function WritePost(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false); 
         }
-        
     }
 
     //취소
@@ -580,6 +589,7 @@ function WritePost(props) {
 
     return (
         <Wrapper>
+            {(loading)&&<Loading />} 
             <Title>{type}</Title>
             <Container>
                 <Category>
@@ -643,7 +653,7 @@ function WritePost(props) {
             <ButtonContainer>
                 <Button onClick={handleUpload} type="submit">등록</Button>
                 <Button onClick={handleCancel} type="button">취소</Button>
-            </ButtonContainer>
+            </ButtonContainer> 
         </Wrapper>
     )
     

@@ -351,8 +351,6 @@ function Chat(props) {
                     confirmButtonText: "확인",
                 });
                 navigate("/main");
-            }else{
-                console.log(error);
             }
             return false;
         };
@@ -664,6 +662,7 @@ function Chat(props) {
                     }));
                 }
                 getChatList();
+                setLoading(false);
             }).catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
                     ReissueToken();
@@ -675,13 +674,11 @@ function Chat(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                } else {
-                    console.log(err);
                 }
+                setLoading(false);
             })
         }
         fileInput.current.value = "";
-        setLoading(false);
     }
 
     // 이미지 클릭 시, 모달 창
@@ -718,7 +715,7 @@ function Chat(props) {
 
         Swal.fire({
             title: "의뢰 수락",
-            text: `${userInfo.nickname}의 의뢰 요청을 수락하시겠습니까?`,
+            text: `${userInfo.nickname}님의 의뢰 요청을 수락하시겠습니까?`,
             icon: "info",
             confirmButtonColor: "#d33",
             confirmButtonText: "확인",
@@ -792,7 +789,7 @@ function Chat(props) {
 
         Swal.fire({
             title: "의뢰 완료",
-            text: `${userInfo.nickname}과의 의뢰를 완료하시겠습니까? 완료된 의뢰는 취소할 수 없습니다.`,
+            html: `${userInfo.nickname}님과의 의뢰를 완료하시겠습니까?<br>완료된 의뢰는 취소할 수 없습니다.`,
             icon: "info",
             confirmButtonColor: "#d33",
             confirmButtonText: "확인",
@@ -868,7 +865,7 @@ function Chat(props) {
                                             :
                                             <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;의뢰 완료 대기중</ButtonList>
                                     :
-                                    <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;진행중인 의뢰가 없음</ButtonList>
+                                    <ButtonList className="request"><Icon src={check} alt="현재 상태"/>&nbsp;진행 중인 의뢰 없음</ButtonList>
                                 }
                             </ButtonList>
                             <ExitBox onClick={handleExit}>

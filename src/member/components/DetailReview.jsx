@@ -1,7 +1,8 @@
 import styled from "styled-components";
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import profile from "../../common/resources/img/profile.png";
-import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
+
+import Rating from "./Rating";
 
 const Content = styled.div`
     width: 30%;
@@ -16,7 +17,7 @@ const Content = styled.div`
     justify-content: center;
     align-items: center;
     margin-top: 5%;
-    box-shadow: 5px 5px 10px rgba(0,0,0,0.1);
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 `;
 
 const Background = styled.div`
@@ -30,7 +31,6 @@ const Background = styled.div`
     justify-content: center;
     align-items: center;
     margin-top: 6%;
-    background-color: rgba(255, 255, 255, 0.5);
 `;
 
 const Review = styled.div`
@@ -101,6 +101,12 @@ const Detail = styled.div`
 const RatingContainer = styled.div`
     display: flex;
     flex-direction: row;
+    margin-bottom: 1%;
+`;
+
+const RatingScore = styled.div`
+    font-size: 15px;
+    text-align: center;
     margin-bottom: 5%;
 `;
 
@@ -113,18 +119,14 @@ function DetailReview(props) {
     return (
         <Background>
             <Content>
-                <Profile style={{backgroundImage: `url(${profile})`}}/>
-                <Nickname>닉네임</Nickname>
-                <Detail>닉네임님이 남겨주신 리뷰입니다!</Detail>
+                <Profile style={{backgroundImage: `url(${(props.reviews[0].profileImg === null) ? profile : props.reviews[0].profileImg})`}}/>
+                <Nickname>{props.reviews[0].nickName}</Nickname>
+                <Detail>{props.reviews[0].nickName}님이 남겨주신 리뷰입니다!</Detail>
                 <RatingContainer>
-                    <FaStar color="#ffbe04" size="40" />
-                    <FaStar color="#ffbe04" size="40" />
-                    <FaStar color="#ffbe04" size="40" />
-                    <FaStar color="#ffbe04" size="40" />
-                    <FaStar color="#ffbe04" size="40" />
+                    <Rating value={props.reviews[0].score} size="40"></Rating>
                 </RatingContainer>
-                
-                <Review>후기 들어가는 부분</Review>
+                <RatingScore>{props.reviews[0].score}/5 점</RatingScore>
+                <Review>{(props.reviews[0].content===null)?"내용을 입력하지 않은 후기입니다.":props.reviews[0].content}</Review>
                 <Button onClick={reviewCancel}>후기 닫기</Button>
                 
             </Content>

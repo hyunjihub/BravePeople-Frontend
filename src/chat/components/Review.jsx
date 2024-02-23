@@ -20,14 +20,15 @@ const Content = styled.div`
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    border-radius: 18px;
+    border-radius: 15px;
     border : 2px dashed #F3D7CA;
-    background-color: #FCF5ED;
+    background-color: #ffffff;
     padding: 1%;
     justify-content: center;
     align-items: center;
     margin-top: 5%;
     position: relative;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 `;
 
 const Background = styled.div`
@@ -41,7 +42,6 @@ const Background = styled.div`
     justify-content: center;
     align-items: center;
     margin-top: 6%;
-    background-color: rgba(255, 255, 255, 0.5);
 `;
 
 const Input = styled.textarea`
@@ -87,14 +87,14 @@ const ButtonContainer = styled.div`
 `;
 
 const Profile = styled.div`
-    width: 22%;
-    height: 20%;
+    width: 25%;
+    height: 22%;
     border-radius : 50%;
     background-size: cover;
     background-repeat: no-repeat;
     overflow: hidden;
     background-position: center;
-    margin-bottom: 2%;
+    margin-bottom: 4%;
 `;
 
 const Nickname = styled.div`
@@ -112,17 +112,17 @@ const Detail = styled.div`
     margin-bottom: 3%;
 
     &.important {
-        font-size: 20px;
+        font-size: 18px;
         color: #f8332f;
         font-weight: 700;
-        margin-bottom: 10%;
+        margin-bottom: 7%;
     }
 `;
 
 const RatingContainer = styled.div`
     display: flex;
     flex-direction: row;
-    margin-bottom: 5%;
+    margin-bottom: 1%;
 `;
 
 const Range = styled.input`
@@ -130,6 +130,12 @@ const Range = styled.input`
     position: absolute;
     top: 52%;
     opacity: 0;
+`;
+
+const RatingScore = styled.div`
+    font-size: 15px;
+    text-align: center;
+    margin-bottom: 5%;
 `;
 
 function Review(props) {
@@ -143,7 +149,20 @@ function Review(props) {
     const setLog = (bool) => dispatch(setLogin(bool));
 
     const reviewCancel = () => {
-        props.setReviewOpen(false);
+        Swal.fire({
+            title: "입력을 취소하시겠습니까?",
+            text: "입력 취소 시 해당 의뢰에 대한 후기를 작성하실 수 없습니다.",
+            icon: "warning",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                props.setReviewOpen(false);
+            }
+        })
     }
 
     // 토큰 재발급 요청 api
@@ -200,19 +219,12 @@ function Review(props) {
         else setContent(e.target.value);
     };
 
-    // 후기 작성
-    // 후기 담는 변수
-    const review = useState({
-        score: null,
-        contents: null
-    });
-
     // 후기 전송 api
     const sendReview = async() => {
-        if(review.score === null){
+        if(rating === null){
             Swal.fire({
                 title: "별점 미입력",
-                text: "별점이 입력되지 않았습니다. 별점은 드래그를 통해 결정할 수 있습니다.",
+                html: "별점은 필수로 입력되어야 합니다.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
@@ -225,8 +237,8 @@ function Review(props) {
             }
             axios.post(`${BASE_URL}/contact/${props.nowRoomId}/review`,
             {
-                score: review.score,
-                contents: review.contents
+                score: rating,
+                contents: content
             }, 
             {
                 headers: {
@@ -253,9 +265,9 @@ function Review(props) {
         <Background>
             <Content>
                 <Detail className="important">주의 : 이 창을 닫으시면 후기를 남기실 수 없습니다!</Detail>
-                <Profile style={{backgroundImage: `url(${profile})`}}/>
-                <Nickname>닉네임</Nickname>
-                <Detail>의뢰는 만족스러우셨나요? 닉네임분과의 의뢰에 대해 리뷰 남겨주세요! </Detail>
+                <Profile style={{backgroundImage: `url(${(props.userInfo.profileImage === null) ? profile : props.userInfo.profileImage})`}}/>
+                <Nickname>{props.userInfo.nickname}</Nickname>
+                <Detail>의뢰는 만족스러우셨나요? {props.userInfo.nickname}님과의 의뢰에 대해 리뷰 남겨주세요! </Detail>
                 <RatingContainer>
                     <Rating value={rating} size="40"/>
                 </RatingContainer>
@@ -267,7 +279,7 @@ function Review(props) {
                     max="5"
                     step="0.5"
                 />
-                
+                <RatingScore>{(rating===null)?"0":rating}/5 점</RatingScore>
                 <Input cols="30" rows="5" value={content || ""} onChange={handleContent} placeholder="후기를 입력해주세요. 후기는 최대 200글자까지 입력 가능합니다."/>
                 <ButtonContainer>
                     <Button onClick={sendReview}>입력 완료</Button>

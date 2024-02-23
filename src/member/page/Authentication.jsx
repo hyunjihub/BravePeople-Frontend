@@ -14,7 +14,7 @@ import { useDispatch } from "react-redux";
 const Title = styled.div`
     font-size: 40px;
     font-weight: 800;
-    margin: 120px 0 50px;
+    margin: 200px 0 50px;
     text-align: center;
 `;
 
