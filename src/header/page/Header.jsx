@@ -227,18 +227,8 @@ export default function Header(props) {
             }));
             return true;
         } catch(error){
-            console.log(error);
             if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
-                sessionStorage.removeItem('jwt');
-                sessionStorage.removeItem('savedData');
-                sessionStorage.removeItem('savedUserInfo');
-                setLog(false);
-                setId(null);
-                setProfile(null);
-                setLoc({
-                    latitude: null,
-                    longitude: null
-                });
+                logoutProcess();
                 if(!isLogOut) {
                     Swal.fire({
                     title: "로그인 기간 만료",
@@ -249,9 +239,15 @@ export default function Header(props) {
                     });
                 }
                 setIsLogOut(false);
-                navigate("/main");
-            }else{
-                console.log(error);
+            }else if(error.response.status === 401 && error.response.data.errorMessage === "비회원 접근 불가"){
+                logoutProcess();
+                Swal.fire({
+                title: "새로운 사용자 로그인",
+                text: "다른 곳에서 새로운 로그인이 시도되었습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+                });
             }
             return false;
         };
@@ -276,6 +272,7 @@ export default function Header(props) {
     const setupSSE = async() => {
         eventSource.current.onopen = () => {
             // 연결 시 할 일
+            console.log("연결 완료");
         };
       
         eventSource.current.onmessage = async (e) => {
@@ -291,19 +288,23 @@ export default function Header(props) {
                 sessionStorage.setItem('changedStatus', JSON.stringify(Number(parsedData.message)));
             }
         };
-    
+        
         eventSource.current.onerror = (e) => {
             // 종료 또는 에러 발생 시 할 일
-            console.log(e);
-    
-        if (e.error) {
-            // 에러 발생 시 할 일
-        }
-    
-        if (e.target.readyState === EventSource.CLOSED) {
-            // 종료 시 할 일
-            console.log("연결 종료");
-        }
+            if (e.target.readyState === EventSource.CLOSED) {
+                console.log("연결 종료");
+                if(e.status === 401){
+                    console.log(e);
+                    const restartSSE = async() => {
+                        if (!await ReissueToken()) { return; }
+                        if(isLog && JSON.parse(sessionStorage.getItem('savedData')).isLogin) { 
+                            console.log("들어오나?");
+                            fetchSSE(); 
+                        }
+                    }
+                    restartSSE();
+                }                
+            }
         }
     }
 
@@ -315,25 +316,8 @@ export default function Header(props) {
         setIsLogOut(true);
     }
 
-    // 로그아웃
-    const handleLogOut = async (e) => {
-        handleIsLogOut();
-        if(isLog) {
-            // SSE 연결 종료
-            if(eventSource.current){
-                eventSource.current.close();
-                eventSource.current = null;
-            }
-            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                if (!await ReissueToken()) return;
-            }
-            axios.post(`${BASE_URL}/member/logout`, {}, {
-                headers: {
-                    'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-                }
-            })
-            .then(function(response){
-                sessionStorage.removeItem('jwt');
+    const logoutProcess = async() => {
+        sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
                 sessionStorage.removeItem('savedUserInfo');
                 setLog(false);
@@ -343,7 +327,28 @@ export default function Header(props) {
                     latitude: null,
                     longitude: null
                 });
+                // SSE 연결 종료
+                if(eventSource.current){
+                    eventSource.current.close();
+                    eventSource.current = null;
+                }
                 navigate("/main");
+    }
+
+    // 로그아웃
+    const handleLogOut = async (e) => {
+        handleIsLogOut();
+        if(isLog) {  
+            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+                if (!await ReissueToken()) return;
+            }
+            axios.post(`${BASE_URL}/member/logout`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                }
+            })
+            .then(function(response){
+                logoutProcess();
             })
             .catch(function(err){
                 if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){

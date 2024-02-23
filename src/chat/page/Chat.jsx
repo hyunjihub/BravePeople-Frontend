@@ -487,7 +487,6 @@ function Chat(props) {
             }
         })
         .then(function(response){
-            console.log(response);
             setUserInfo({
                 profileImage: response.data.otherProfileImg,
                 nickname: response.data.otherNickname,
@@ -699,7 +698,6 @@ function Chat(props) {
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
         .then(function(response){
-            console.log(response);
             setNowRoomId(null);
             getChatList();
         })
