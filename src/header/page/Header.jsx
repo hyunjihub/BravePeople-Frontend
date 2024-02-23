@@ -238,7 +238,6 @@ export default function Header(props) {
                     confirmButtonText: "확인",
                     });
                 }
-                setIsLogOut(false);
             }else if(error.response.status === 401 && error.response.data.errorMessage === "비회원 접근 불가"){
                 logoutProcess();
                 Swal.fire({
