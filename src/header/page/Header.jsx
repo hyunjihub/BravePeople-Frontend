@@ -272,7 +272,6 @@ export default function Header(props) {
     const setupSSE = async() => {
         eventSource.current.onopen = () => {
             // 연결 시 할 일
-            console.log("연결 완료");
         };
       
         eventSource.current.onmessage = async (e) => {
@@ -292,13 +291,11 @@ export default function Header(props) {
         eventSource.current.onerror = (e) => {
             // 종료 또는 에러 발생 시 할 일
             if (e.target.readyState === EventSource.CLOSED) {
-                console.log("연결 종료");
                 if(e.status === 401){
-                    console.log(e);
                     const restartSSE = async() => {
                         if (!await ReissueToken()) { return; }
                         if(isLog && JSON.parse(sessionStorage.getItem('savedData')).isLogin) { 
-                            console.log("들어오나?");
+                            console.log("재연결");
                             fetchSSE(); 
                         }
                     }
