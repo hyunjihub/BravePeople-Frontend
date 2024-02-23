@@ -294,6 +294,7 @@ export default function Header(props) {
     
         eventSource.current.onerror = (e) => {
             // 종료 또는 에러 발생 시 할 일
+            console.log(e);
     
         if (e.error) {
             // 에러 발생 시 할 일

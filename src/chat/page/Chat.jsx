@@ -487,6 +487,7 @@ function Chat(props) {
             }
         })
         .then(function(response){
+            console.log(response);
             setUserInfo({
                 profileImage: response.data.otherProfileImg,
                 nickname: response.data.otherNickname,
@@ -693,18 +694,18 @@ function Chat(props) {
         if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
             if (!await ReissueToken()) return;
         }
-        await axios.patch(`${BASE_URL}/chats/${nowRoomId}`,
+        axios.patch(`${BASE_URL}/chats/${nowRoomId}`,[],
             {headers:{
                 Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
         .then(function(response){
             console.log(response);
+            setNowRoomId(null);
+            getChatList();
         })
         .catch(function(response){
             console.log(response);
         })
-        setNowRoomId(null);
-        getChatList();
         setLoading(false);
     }
 
