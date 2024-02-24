@@ -55,6 +55,7 @@ html{
 }
 
 body{
+	min-width: 1800px;
 	-ms-overflow-style: none;
     font-family: 'SUITE';
 }

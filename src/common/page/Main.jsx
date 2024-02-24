@@ -22,7 +22,7 @@ import { FaGithub } from "react-icons/fa";
 const Wrapper = styled.div`
   width: 100%;
   min-width: 1400px;
-  height: 4500px;
+  height: 4000px;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
@@ -35,14 +35,14 @@ const Button = styled.button`
     opacity: 0.8;
     border-radius: 18px;
     color: #fff;
-    width: 20%;
+    width: 45%;
     box-sizing: border-box;
     padding: 15px;
     font-size: 20px;
     font-weight: 800;
     letter-spacing:0.5em;
     font-family: 'SUITE';
-    margin: 0 20% 13%;
+    margin: 2% 20% 13%;
 
     &:hover {
         background-color: #ff8f8f;
@@ -65,7 +65,7 @@ const Button = styled.button`
 
 const Landing = styled.div`
     width: 100%;
-    height: 20%;
+    height: 40%;
     background-color: #FFF7F1;
     position: relative;
 
@@ -77,11 +77,11 @@ const Landing = styled.div`
 
 const MainTxt = styled.div`
     width: 60%;
-    height: 20%;
+    height: 50%;
     font-size: 65px;
     font-weight: 900;
     text-align : left;
-    margin: 10% auto 1%;
+    margin: 10% auto 3%;
 `;
 
 const RevealTxt = styled.div`
@@ -201,7 +201,7 @@ const LandingContainer = styled.div`
   height: 75%;
   display: flex;
   flex-direction: row;
-  margin: 10% auto;
+  margin: 5% auto;
 
   &.column {
     width: 100%;
@@ -258,6 +258,7 @@ const FooterContainer = styled.div`
   height: 95%;
   display: flex;
   flex-direction: row;
+  justify-content: center;
 `;
 
 const Made = styled.div`
@@ -312,10 +313,8 @@ const Source = styled.a`
 `;
 
 const MainImg = styled.img`
-  width: 30%;
-  position: absolute;
-  top: 120px;
-  left: 1000px;
+  width: 35%;
+  height: 60%;
   opacity: 0.8;
 
   &.boy {
@@ -325,13 +324,20 @@ const MainImg = styled.img`
 `;
 
 const MainContainer = styled.div`
-  width: 100%;
+  width: 50%;
   display: flex;
   flex-direction: column;
 
   &.left {
     margin-left: 5%;
   }
+`;
+
+const SlideContainer = styled.div`
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  margin: 8% auto 8%;
 `;
 
 function Main(props) {
@@ -393,34 +399,25 @@ function Main(props) {
         <Wrapper>
             <CustomSlider {...settings}>
                 <Landing>
-                  <MainImg src={hero_w} alt="원정대"/>
-                  <MainContainer className="left">
-                    <MainTxt>도움이 필요한 <br />이웃들에게 <br /> 용감한 원정대가 <br />되어주세요!</MainTxt>
-                    <Button onClick={()=>navigate("/notice")}>용감한원정대 이용방법</Button>
-                  </MainContainer>
+                  <SlideContainer>
+                    <MainContainer className="left">
+                      <MainTxt>도움이 필요한 <br />이웃들에게 <br /> 용감한 원정대가 <br />되어주세요!</MainTxt>
+                      <Button onClick={()=>navigate("/notice")}>용감한원정대 이용방법</Button>
+                    </MainContainer>
+                    <MainImg src={hero_w} alt="원정대"/>
+                  </SlideContainer>
                 </Landing>
                 <Landing>
-                  <MainImg className="boy" src={hero_b} alt="원정대"/>
-                  <MainContainer>
-                    <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 <br />불러주세요!</MainTxt>
-                    <Button className="signup" onClick={()=>navigate("/signup")}>원정대 시작하기</Button>
+                  <SlideContainer>
+                  <MainContainer className="left">
+                    <MainTxt>도움이 <br />필요하다면 <br /> 용감한 원정대를 <br />불러주세요!</MainTxt>
+                    <Button onClick={()=>navigate("/signup")}>원정대 시작하기</Button>
                   </MainContainer>
+                    <MainImg src={hero_b} alt="원정대"/>
+                  </SlideContainer>
                 </Landing>
             </CustomSlider>
-            
             <Landing className="introduction">
-                <RevealTxt ref={revealRefs[0]}>용감한원정대</RevealTxt>
-                <DetailTxt ref={detailRefs[0]}>용감한 원정대에서는 일상의 사소하지만 꼭 필요한 일들을 내 근처 '원정대'에게 부탁할 수 있습니다. <br />
-                의뢰인이 되어 부탁을 들어줄 원정대를 찾을 수도 있고, 원정대가 되어 도움이 필요한 의뢰인을 찾을 수도 있습니다. <br />
-                무서운 벌레 잡기, 불편한 전화 걸기, 어려운 환불 등 일상 속의 어려운 일들을 속 시원하게 해결해 보세요!</DetailTxt>
-                <CircleBox ref={circleRefs[0]}>
-                    <Circle><Icon src={bug} alt="벌레 잡기"/></Circle>
-                    <Circle><Icon src={call} alt="대신 전화"/></Circle>
-                    <Circle><Icon src={money_back} alt="대신 환불"/></Circle>
-                    <Circle><Icon src={etc} alt="기타"/></Circle>
-                </CircleBox>
-            </Landing>
-            <Landing>
                 <LandingContainer>
                     <Image src={temp} alt="게시판" ref={detailRefs[1]}/>
                     <DetailContainer ref={circleRefs[1]}>
@@ -434,7 +431,7 @@ function Main(props) {
                 </LandingContainer>
                 
             </Landing>
-            <Landing className="introduction">
+            <Landing >
                 <LandingContainer className="column" ref={revealRefs[2]}>
                     <DetailContainer className="chat" ref={detailRefs[2]}>
                         <RevealTxt className="chat">채팅으로 빠르고 편리하게 의뢰해요!</RevealTxt>
@@ -443,7 +440,7 @@ function Main(props) {
                     <Image className="chat" src={temp} alt="채팅" />
                 </LandingContainer>
             </Landing>
-            <Landing >
+            <Landing className="introduction">
                 <LandingContainer>
                     <Image src={temp} alt="마이페이지" ref={revealRefs[3]} />
                     <DetailContainer ref={detailRefs[3]}>
@@ -458,6 +455,7 @@ function Main(props) {
                 </LandingContainer>
             </Landing>
             <FooterWrapper>
+              <hr></hr>
               <Footer>
                 <FooterContainer>
                   <Logo src={logo} alt="로고"/>
@@ -472,22 +470,17 @@ function Main(props) {
                       </MadeBox>
                       <MadeBox className="row">
                         <Made className="bold">Source&nbsp;&nbsp;</Made>
-                        <Source href="https://www.flaticon.com/kr/free-icons/-" title="아이콘">alkhalifi design & Freepik - Flaticon</Source>
+                        <Source href="https://www.flaticon.com/kr/free-icons/-" target="_blank" title="아이콘">alkhalifi design & Freepik - Flaticon</Source>
                         <Made>&nbsp;외 react-icons</Made>
                       </MadeBox>
                   </MadeBox>
-                  <MadeBox className="nav">
-                      <Made onClick={()=>navigate("./notice")}>공지사항</Made>
-                      <Made onClick={()=>navigate("./postlist/helping")}>원정대</Made>
-                      <Made onClick={()=>navigate("./postlist/helped")}>의뢰인</Made> 
-                  </MadeBox>
                   <Git>
-                     <FaGithub size="35" onClick={() => window.location.href = "https://github.com/kimjiyooniiiii/BravePeople-Backend"}/>
-                     <Source className="git" href="https://github.com/kimjiyooniiiii/BravePeople-Backend" title="backend">Backend</Source>
+                     <FaGithub size="35" onClick={() => window.open("https://github.com/kimjiyooniiiii/BravePeople-Backend")}/>
+                     <Source className="git" href="https://github.com/kimjiyooniiiii/BravePeople-Backend" title="backend" target="_blank">Backend</Source>
                   </Git>
                   <Git>
-                     <FaGithub size="35" onClick={() => window.location.href = "https://github.com/hyunjihub/react_test"}/>
-                     <Source className="git" href="https://github.com/hyunjihub/react_test" title="backend">Frontend</Source>
+                     <FaGithub size="35" onClick={() => window.open("https://github.com/hyunjihub/BravePeople-Frontend")}/>
+                     <Source className="git" href="https://github.com/hyunjihub/BravePeople-Frontend" title="backend" target="_blank">Frontend</Source>
                   </Git>
                 </FooterContainer>
               </Footer>

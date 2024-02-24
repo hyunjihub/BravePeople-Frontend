@@ -71,7 +71,7 @@ const Content = styled.div`
 function Notice(props) {
     return(
         <Wrapper>
-            <Title>공지사항</Title>
+            <Title>이용안내</Title>
             <Line />
             <TitleBox>
                 <Category>방법</Category>
