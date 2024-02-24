@@ -21,7 +21,7 @@ import { FaGithub } from "react-icons/fa";
 
 const Wrapper = styled.div`
   width: 100%;
-  min-width: 1600px;
+  min-width: 1400px;
   height: 4500px;
   display: flex;
   flex-direction: column;
