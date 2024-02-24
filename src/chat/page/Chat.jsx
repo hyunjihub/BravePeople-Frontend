@@ -687,20 +687,32 @@ function Chat(props) {
     // 채팅방 나가기
     const handleExit = async() => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
-        axios.patch(`${BASE_URL}/chats/${nowRoomId}`,[],
-            {headers:{
-                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
-            }})
-        .then(function(response){
-            setNowRoomId(null);
-            getChatList();
-        })
-        .catch(function(response){
-            console.log(response);
-        })
+        Swal.fire({
+            title: "채팅방 나가기",
+            text: "채팅방을 나가시겠습니까? 나간 채팅방은 복구할 수 없습니다.",
+            icon: "warning",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+    
+        }).then(async result => {
+            if (result.isConfirmed) {
+                if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+                    if (!await ReissueToken()) return;
+                }
+                axios.patch(`${BASE_URL}/chats/${nowRoomId}`,[],
+                    {headers:{
+                        Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                    }})
+                .then(function(response){
+                    setNowRoomId(null);
+                    getChatList();
+                })
+                .catch(function(error){
+                })
+        }})
         setLoading(false);
     }
 

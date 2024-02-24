@@ -383,11 +383,20 @@ function SignUp(props) {
             console.log('Geolocation is not supported');
             return;
         }
-        if(window.confirm("위치 정보를 불러오시겠습니까?")){
+        Swal.fire({
+            title: "위치 정보 재설정",
+            text: "위치 정보를 재설정 하시겠습니까?",
+            icon: "warning",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+    
+        }).then(result => {
+            if (result.isConfirmed) {
             geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
-        }else{
-            console.log("위치 정보 저장 취소");
-        }
+        }})
     }
 
     const handleCancel = (e) => {

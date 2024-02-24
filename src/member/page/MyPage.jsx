@@ -399,9 +399,10 @@ function MyPage(props) {
                             }));
                         }
                     )
-                    .catch(function(error){
+                    .catch(async function(error){
                         if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                            ReissueToken();   
+                            if (!await ReissueToken()) return;
+                            loadMypage();
                         } else if (error.response.data.errorMessage ==="존재하지 않는 멤버ID" && error.response.status === 400) {
                             Swal.fire({
                                 title: "존재하지 않는 회원",
@@ -680,12 +681,20 @@ function MyPage(props) {
             console.log('Geolocation is not supported');
             return;
         }
-        if(window.confirm("위치 정보를 새로 저장하시겠습니까?")){
+        Swal.fire({
+            title: "위치 정보 재설정",
+            text: "위치 정보를 재설정 하시겠습니까?",
+            icon: "warning",
+            confirmButtonColor: "#d33",
+            confirmButtonText: "확인",
+            showCancelButton: true, 
+            cancelButtonColor: '#3085d6', 
+            cancelButtonText: '취소',
+    
+        }).then(result => {
+            if (result.isConfirmed) {
             geolocation.getCurrentPosition(handleSuccess, handleError, geolocationOptions);
-        }else{
-            console.log("위치 정보 저장 취소");
-        }
-        
+        }}) 
     }
 
     //글자수 over시 ...처리
@@ -772,7 +781,7 @@ function MyPage(props) {
                     userInfo.reviews.map((review, index) => (
                     <PostBox key={index}>
                         <Icon className="review" src={reviewIcon} alt="리뷰" />
-                        <Post className="review" onClick={()=>handleDetail(index)}>{(review.content===null)?"내용 없음":truncate(review.content, 30)}</Post>
+                        <Post className="review" onClick={()=>handleDetail(index)}>{(review.content===null || review.content==="")?"내용 없음":truncate(review.content, 30)}</Post>
                         <RatingBox><StarRating value={review.score} size="20" /></RatingBox>
                     </PostBox>)))}
                 </Box>

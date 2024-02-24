@@ -166,6 +166,8 @@ export default function Header(props) {
         profile: state.login.profileImg
     }), shallowEqual);
 
+    console.warn = console.error = () => {};
+    
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
     const setLoc = (loc) => dispatch(setLocation(loc)); 
@@ -209,6 +211,11 @@ export default function Header(props) {
             }
             else if(JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog){
                 fetchSSE();
+            }
+            // SSE 연결 종료
+            if(!JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog && eventSource.current){
+                eventSource.current.close();
+                eventSource.current = null;
             }
         }
     },[isLog]);
@@ -294,7 +301,6 @@ export default function Header(props) {
                     const restartSSE = async() => {
                         if (!await ReissueToken()) { return; }
                         if(isLog && JSON.parse(sessionStorage.getItem('savedData')).isLogin) { 
-                            console.log("재연결");
                             fetchSSE(); 
                         }
                     }
@@ -323,11 +329,7 @@ export default function Header(props) {
                     latitude: null,
                     longitude: null
                 });
-                // SSE 연결 종료
-                if(eventSource.current){
-                    eventSource.current.close();
-                    eventSource.current = null;
-                }
+                
                 navigate("/main");
     }
 
