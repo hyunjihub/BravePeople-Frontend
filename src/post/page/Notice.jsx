@@ -2,7 +2,7 @@ import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 
 const Wrapper = styled.div`
-    width: 42%;
+    width: 50%;
     height: 750px;
     margin: 15px auto;
     position: relative;
@@ -63,7 +63,7 @@ const Content = styled.div`
     flex-direction: column;
     overflow-wrap: break-word;
     hyphens: auto; 
-    min-height: 80%;
+    min-height: 30%;
     padding-bottom: 10%;
     white-space: pre-wrap;
 `;
@@ -75,11 +75,20 @@ function Notice(props) {
             <Line />
             <TitleBox>
                 <Category>방법</Category>
-                <ContentTitle>용감한 원정대를 이용하는 방법</ContentTitle>
+                <ContentTitle>용감한 원정대 쉽게 활용하기!</ContentTitle>
             </TitleBox>
             <Line />
             <Content>
-                내용이 들어갈 위치
+                용감한 원정대는
+            </Content>
+            <Content>
+                원정대 이용 방법
+            </Content>
+            <Content>
+                의뢰인 이용 방법
+            </Content>
+            <Content>
+                의뢰 상태
             </Content>
         </Wrapper>
     );

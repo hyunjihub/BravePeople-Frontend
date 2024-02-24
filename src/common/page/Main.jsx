@@ -42,7 +42,7 @@ const Button = styled.button`
     font-weight: 800;
     letter-spacing:0.5em;
     font-family: 'SUITE';
-    margin: 0 20% 20%;
+    margin: 0 20% 13%;
 
     &:hover {
         background-color: #ff8f8f;
@@ -57,11 +57,15 @@ const Button = styled.button`
         margin-right: 1%;
         padding-left: 4%
     }
+
+    &.signup {
+      margin-bottom: 17.2%;
+    }
 `;
 
 const Landing = styled.div`
     width: 100%;
-    height: 55%;
+    height: 20%;
     background-color: #FFF7F1;
     position: relative;
 
@@ -77,7 +81,7 @@ const MainTxt = styled.div`
     font-size: 65px;
     font-weight: 900;
     text-align : left;
-    margin: 15% auto 1%;
+    margin: 10% auto 1%;
 `;
 
 const RevealTxt = styled.div`
@@ -153,7 +157,7 @@ const Square = styled.div`
 
 const SquareBox = styled.div`
     width: 70%;
-    height: 35%;
+    height: 40%;
     display: flex;
     flex-direction: row;
 `;
@@ -237,7 +241,7 @@ const FooterWrapper = styled.div`
 `;
 
 const Footer = styled.div`
-  width: 45%;
+  width: 55%;
   height: 85%;
   margin: 2% auto 2%;
   box-sizing: border-box;
@@ -266,17 +270,20 @@ const Made = styled.div`
 `;
 
 const MadeBox = styled.div`
-  width: 55%;
+  width: 42%;
   display: flex;
   flex-direction: column;
-  margin-left: 5%;
-  margin-right: 4%;
+  margin-left: 3%;
 
   &.row {
     width: 100%;
     flex-direction: row;
     margin-left: 0%;
 
+  }
+
+  &.nav {
+    width: 10%
   }
 `;
 
@@ -307,13 +314,13 @@ const Source = styled.a`
 const MainImg = styled.img`
   width: 30%;
   position: absolute;
-  top: 170px;
+  top: 120px;
   left: 1000px;
   opacity: 0.8;
 
   &.boy {
-    top: 250px;
-    left: 1150px;
+    top: 100px;
+    left: 1000px;
   }
 `;
 
@@ -342,6 +349,9 @@ function Main(props) {
         slidesToShow: 1,
         slidesToScroll: 1,
         centerPadding: '20px',
+        autoplay : true,
+        autoplaySpeed : 5000,
+        pauseOnHover : true, 
     };
 
     useEffect(() => {
@@ -386,20 +396,20 @@ function Main(props) {
                   <MainImg src={hero_w} alt="원정대"/>
                   <MainContainer className="left">
                     <MainTxt>도움이 필요한 <br />이웃들에게 <br /> 용감한 원정대가 <br />되어주세요!</MainTxt>
-                    <Button onClick={()=>navigate("/notice")}>원정대 시작하기</Button>
+                    <Button onClick={()=>navigate("/notice")}>용감한원정대 이용방법</Button>
                   </MainContainer>
                 </Landing>
                 <Landing>
                   <MainImg className="boy" src={hero_b} alt="원정대"/>
                   <MainContainer>
-                    <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 불러주세요!</MainTxt>
-                    <Button onClick={()=>navigate("/login")}>의뢰인 시작하기</Button>
+                    <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 <br />불러주세요!</MainTxt>
+                    <Button className="signup" onClick={()=>navigate("/signup")}>원정대 시작하기</Button>
                   </MainContainer>
                 </Landing>
             </CustomSlider>
             
-            <Landing className="introduction" ref={revealRefs[0]}>
-                <RevealTxt>용감한원정대</RevealTxt>
+            <Landing className="introduction">
+                <RevealTxt ref={revealRefs[0]}>용감한원정대</RevealTxt>
                 <DetailTxt ref={detailRefs[0]}>용감한 원정대에서는 일상의 사소하지만 꼭 필요한 일들을 내 근처 '원정대'에게 부탁할 수 있습니다. <br />
                 의뢰인이 되어 부탁을 들어줄 원정대를 찾을 수도 있고, 원정대가 되어 도움이 필요한 의뢰인을 찾을 수도 있습니다. <br />
                 무서운 벌레 잡기, 불편한 전화 걸기, 어려운 환불 등 일상 속의 어려운 일들을 속 시원하게 해결해 보세요!</DetailTxt>
@@ -410,7 +420,7 @@ function Main(props) {
                     <Circle><Icon src={etc} alt="기타"/></Circle>
                 </CircleBox>
             </Landing>
-            <Landing ref={revealRefs[1]}>
+            <Landing>
                 <LandingContainer>
                     <Image src={temp} alt="게시판" ref={detailRefs[1]}/>
                     <DetailContainer ref={circleRefs[1]}>
@@ -424,22 +434,22 @@ function Main(props) {
                 </LandingContainer>
                 
             </Landing>
-            <Landing className="introduction" ref={revealRefs[2]}>
-                <LandingContainer className="column" ref={detailRefs[2]}>
-                    <DetailContainer className="chat">
+            <Landing className="introduction">
+                <LandingContainer className="column" ref={revealRefs[2]}>
+                    <DetailContainer className="chat" ref={detailRefs[2]}>
                         <RevealTxt className="chat">채팅으로 빠르고 편리하게 의뢰해요!</RevealTxt>
                         <DetailTxt className="chat">실시간 채팅과 알림으로 간단하게 의뢰를 진행할 수 있어요!</DetailTxt>
                     </DetailContainer>
                     <Image className="chat" src={temp} alt="채팅" />
                 </LandingContainer>
             </Landing>
-            <Landing ref={revealRefs[3]}>
+            <Landing >
                 <LandingContainer>
-                    <Image src={temp} alt="마이페이지" ref={detailRefs[3]} />
-                    <DetailContainer ref={circleRefs[3]}>
+                    <Image src={temp} alt="마이페이지" ref={revealRefs[3]} />
+                    <DetailContainer ref={detailRefs[3]}>
                         <RevealTxt className="chapter">믿음직한 원정대를 찾아<br /> 안전하게 의뢰해요!</RevealTxt>
                         <DetailTxt className="chapter">의뢰인은 별점, 뱃지와 후기를 통해<br />신뢰성있는 원정대를 판단할 수 있어요!</DetailTxt>
-                        <SquareBox>
+                        <SquareBox ref={circleRefs[3]}>
                             <Square><ChatIcon><FaMedal size="70" color="#fff" opacity={0.4}/></ChatIcon></Square>
                             <Square><ChatIcon><FaStar size="70" color="#fff" opacity={0.4}/></ChatIcon></Square>
                             <Square><ChatIcon><MdRateReview size="70" color="#fff" opacity={0.4} /></ChatIcon></Square>
@@ -465,6 +475,11 @@ function Main(props) {
                         <Source href="https://www.flaticon.com/kr/free-icons/-" title="아이콘">alkhalifi design & Freepik - Flaticon</Source>
                         <Made>&nbsp;외 react-icons</Made>
                       </MadeBox>
+                  </MadeBox>
+                  <MadeBox className="nav">
+                      <Made onClick={()=>navigate("./notice")}>공지사항</Made>
+                      <Made onClick={()=>navigate("./postlist/helping")}>원정대</Made>
+                      <Made onClick={()=>navigate("./postlist/helped")}>의뢰인</Made> 
                   </MadeBox>
                   <Git>
                      <FaGithub size="35" onClick={() => window.location.href = "https://github.com/kimjiyooniiiii/BravePeople-Backend"}/>
