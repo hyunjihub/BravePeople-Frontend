@@ -231,7 +231,7 @@ const Post = styled.div`
     font-size: 19px;
     font-weight: 500;
     color: #000;
-    margin: 2.5% 0% 0.7% 0%;
+    margin: 2.5% 0% 0.4% 0%;
     cursor: pointer;
 
     &.review {
@@ -708,11 +708,23 @@ function MyPage(props) {
         }
     }
 
+    const [reviewInfo, setReviewInfo] = useState({
+        profileImg: null,
+        nickName: null,
+        score: 0,
+        content: null
+    });
     const [reviewOpen, setReviewOpen] = useState(false);
-    const handleDetail = () => {
+    const handleDetail = (reviewId) => {
+        setReviewInfo({
+            profileImg: userInfo.reviews[reviewId].profileImg,
+            nickName: userInfo.reviews[reviewId].nickName,
+            score: userInfo.reviews[reviewId].score,
+            content: userInfo.reviews[reviewId].content
+        });
         setReviewOpen(true);
     }
-
+    
     return(
         <Container>
             <Profile>
@@ -757,16 +769,16 @@ function MyPage(props) {
                 <BoardName>후기</BoardName>
                 <Box>
                     {userInfo.reviews.length === 0 ? (<NullPost>받은 후기 없음</NullPost>) : (
-                    userInfo.reviews.map((review) => (
-                    <PostBox key={uuid()}>
+                    userInfo.reviews.map((review, index) => (
+                    <PostBox key={index}>
                         <Icon className="review" src={reviewIcon} alt="리뷰" />
-                        <Post className="review" onClick={handleDetail}>{(review.content===null)?"내용 없음":truncate(review.content, 30)}</Post>
+                        <Post className="review" onClick={()=>handleDetail(index)}>{(review.content===null)?"내용 없음":truncate(review.content, 30)}</Post>
                         <RatingBox><StarRating value={review.score} size="20" /></RatingBox>
                     </PostBox>)))}
                 </Box>
             </Board>
-            {(modalOpen===true)&&<Modal img={clickImg} setModal={setModalOpen} setImg={setClickImg}/>}
-            {(reviewOpen===true)&&<Review setModal={setReviewOpen} reviews={userInfo.reviews}/>}
+            {(modalOpen===true)&&<Modal img={clickImg} setModalOpen={setModalOpen} setImg={setClickImg}/>}
+            {(reviewOpen===true)&&<Review setModal={setReviewOpen} reviews={reviewInfo}/>}
             {(loading)&&<Loading />}
         </Container>
     );

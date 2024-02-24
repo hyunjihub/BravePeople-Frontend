@@ -21,7 +21,7 @@ const Content = styled.div`
 `;
 
 const Background = styled.div`
-    width: 100%;
+    width: 1900px;
     height: 100%;
     z-index: 1000;
     position: fixed;
@@ -119,16 +119,15 @@ function DetailReview(props) {
     return (
         <Background>
             <Content>
-                <Profile style={{backgroundImage: `url(${(props.reviews[0].profileImg === null) ? profile : props.reviews[0].profileImg})`}}/>
-                <Nickname>{props.reviews[0].nickName}</Nickname>
-                <Detail>{props.reviews[0].nickName}님이 남겨주신 리뷰입니다!</Detail>
+                <Profile style={{backgroundImage: `url(${(props.reviews.profileImg === null) ? profile : props.reviews.profileImg})`}}/>
+                <Nickname>{props.reviews.nickName}</Nickname>
+                <Detail>{props.reviews.nickName}님이 남겨주신 리뷰입니다!</Detail>
                 <RatingContainer>
-                    <Rating value={props.reviews[0].score} size="40"></Rating>
+                    <Rating value={props.reviews.score} size="40"></Rating>
                 </RatingContainer>
-                <RatingScore>{props.reviews[0].score}/5 점</RatingScore>
-                <Review>{(props.reviews[0].content===null)?"내용을 입력하지 않은 후기입니다.":props.reviews[0].content}</Review>
+                <RatingScore>{props.reviews.score}/5 점</RatingScore>
+                <Review>{(props.reviews.content===null)?"내용을 입력하지 않은 후기입니다.":props.reviews.content}</Review>
                 <Button onClick={reviewCancel}>후기 닫기</Button>
-                
             </Content>
         </Background>
         

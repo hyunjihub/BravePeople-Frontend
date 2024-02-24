@@ -16,6 +16,7 @@ import WritePost from "./post/page/WritePost";
 import MyPage from "./member/page/MyPage";
 import Error from "./common/page/Error";
 import Authentication from "./member/page/Authentication";
+import Notice from "./post/page/Notice";
 
 export default function App(props) {
 
@@ -37,6 +38,7 @@ export default function App(props) {
                     <Route path="/viewpost/:postid" element={<ViewPost />}/>
                     <Route path="/postlist/:ishelped/writepost/:postid" element={<WritePost />}/>
                     <Route path="/error" element={<Error />} />
+                    <Route path="/notice" element={<Notice />} />
                 </Routes>
             </BrowserRouter>
         </div>

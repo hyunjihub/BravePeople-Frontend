@@ -241,8 +241,8 @@ export default function Header(props) {
             }else if(error.response.status === 401 && error.response.data.errorMessage === "비회원 접근 불가"){
                 logoutProcess();
                 Swal.fire({
-                title: "새로운 사용자 로그인",
-                text: "다른 곳에서 새로운 로그인이 시도되었습니다.",
+                title: "중복 로그인",
+                text: "다른 환경에서 로그인되어 현재 사용 중인 환경에서 로그아웃되었습니다.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",

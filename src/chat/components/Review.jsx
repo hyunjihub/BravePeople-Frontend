@@ -32,7 +32,7 @@ const Content = styled.div`
 `;
 
 const Background = styled.div`
-    width: 100%;
+    width: 1900px;
     height: 100%;
     z-index: 1000;
     position: fixed;
@@ -231,7 +231,6 @@ function Review(props) {
             });
         }
         else{
-            
             if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
                 if(!await ReissueToken()) return;
             }
@@ -245,7 +244,7 @@ function Review(props) {
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
             .then(function(response){
-                reviewCancel();
+                props.setReviewOpen(false);
             })
             .catch(function(error){
                 console.log(error);

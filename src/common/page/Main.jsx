@@ -10,17 +10,22 @@ import money_back from "../resources/img/money_back.png";
 import etc from "../resources/img/etc.png";
 import temp from "../resources/img/temp.png";
 import logo from "../../header/resources/img/logo.png";
+import hero_w from "../resources/img/hero_woman.png";
+import hero_b from "../resources/img/hero_man.png";
 import ScrollReveal from 'scrollreveal';
 
 import { FaMedal } from "react-icons/fa6";
 import { FaStar } from "react-icons/fa";
 import { MdRateReview } from "react-icons/md";
+import { FaGithub } from "react-icons/fa";
 
 const Wrapper = styled.div`
-    width: 100vw;
-    height: 5000px;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  min-width: 1600px;
+  height: 4500px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
 `;
 
 const Button = styled.button`
@@ -37,7 +42,7 @@ const Button = styled.button`
     font-weight: 800;
     letter-spacing:0.5em;
     font-family: 'SUITE';
-    margin: 0 auto 20%;
+    margin: 0 20% 20%;
 
     &:hover {
         background-color: #ff8f8f;
@@ -56,8 +61,9 @@ const Button = styled.button`
 
 const Landing = styled.div`
     width: 100%;
-    height: 50%;
+    height: 55%;
     background-color: #FFF7F1;
+    position: relative;
 
     &.introduction{
         background-color: #fff;
@@ -68,14 +74,14 @@ const Landing = styled.div`
 const MainTxt = styled.div`
     width: 60%;
     height: 20%;
-    font-size: 60px;
+    font-size: 65px;
     font-weight: 900;
-    text-align : center;
+    text-align : left;
     margin: 15% auto 1%;
 `;
 
 const RevealTxt = styled.div`
-    width: 60%;
+    width: 70%;
     height: 18%;
     font-size: 60px;
     font-weight: 900;
@@ -118,8 +124,8 @@ const DetailTxt = styled.div`
 `;
 
 const CircleBox = styled.div`
-    width: 80%;
-    height: 38%;
+    width: 75%;
+    height: 30%;
     display: flex;
     flex-direction: row;
     margin: 7% auto 10%;
@@ -128,11 +134,11 @@ const CircleBox = styled.div`
 
 const Circle = styled.div`
     width: 18%;
-    height: 80%;
+    height: 90%;
     border-radius: 50%;
     background-color: #FFF7F1;
     margin: auto;
-    margin-bottom: 5%;
+    padding-bottom: 2%;
 `;
 
 const Square = styled.div`
@@ -146,8 +152,8 @@ const Square = styled.div`
 `;
 
 const SquareBox = styled.div`
-    width: 75%;
-    height: 30%;
+    width: 70%;
+    height: 35%;
     display: flex;
     flex-direction: row;
 `;
@@ -203,7 +209,7 @@ const LandingContainer = styled.div`
 `;
 
 const DetailContainer = styled.div`
-  width: 40%;
+  width: 60%;
   margin-left: 8%;
   display: flex;
   flex-direction: column;
@@ -222,25 +228,25 @@ const ButtonContainer = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
-
 `;
 
 const FooterWrapper = styled.div`
   width: 100%;
-  height: 15%;
+  height: 2.5%;
   background-color: #fff;
 `;
 
 const Footer = styled.div`
-  width: 70%;
+  width: 45%;
   height: 85%;
-  margin: 1% auto;
+  margin: 2% auto 2%;
+  box-sizing: border-box;
 `;
 
 const ChatIcon = styled.div`
   width: 100%;
   margin-left: 14%;
-  margin-top: 10%;
+  margin-top: 14%;
 `;
 
 const FooterContainer = styled.div`
@@ -250,8 +256,75 @@ const FooterContainer = styled.div`
   flex-direction: row;
 `;
 
+const Made = styled.div`
+  font-size: 15px;
+  color: #000;
+
+  &.bold {
+    font-weight: 700;
+  }
+`;
+
+const MadeBox = styled.div`
+  width: 55%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 5%;
+  margin-right: 4%;
+
+  &.row {
+    width: 100%;
+    flex-direction: row;
+    margin-left: 0%;
+
+  }
+`;
+
 const Logo = styled.img`
+  width: 18%;
+  height: 10%;
+`;
+
+const Git = styled.div`
   width: 12%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+
+const Source = styled.a`
+  text-decoration-line: none;
+  color: #000;
+  font-size: 15px;
+
+  &.git {
+    font-weight: 700;
+    font-size: 17px;
+  }
+`;
+
+const MainImg = styled.img`
+  width: 30%;
+  position: absolute;
+  top: 170px;
+  left: 1000px;
+  opacity: 0.8;
+
+  &.boy {
+    top: 250px;
+    left: 1150px;
+  }
+`;
+
+const MainContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &.left {
+    margin-left: 5%;
+  }
 `;
 
 function Main(props) {
@@ -272,125 +345,56 @@ function Main(props) {
     };
 
     useEffect(() => {
-        ScrollReveal().reveal(revealRefs[0].current, {
-          delay: 200,
-          origin: 'bottom',
-          distance: '100px',
-          duration: 1500,
-          easing: 'ease-out', 
-          reset: true,
-        });
+      revealRefs.forEach((ref, index) => {
+          ScrollReveal().reveal(ref.current, {
+              delay: 200 * index,
+              origin: 'bottom',
+              distance: '100px',
+              duration: 900,
+              easing: 'ease-out', 
+              reset: true,
+          });
+      });
 
-        ScrollReveal().reveal(detailRefs[0].current, {
-          delay: 300,
-          origin: 'bottom',
-          distance: '100px',
-          duration: 1500,
-          easing: 'ease-out', 
-          reset: true,
-        });
+      detailRefs.forEach((ref, index) => {
+          ScrollReveal().reveal(ref.current, {
+              delay: 250 * index,
+              origin: 'bottom',
+              distance: '100px',
+              duration: 900,
+              easing: 'ease-out', 
+              reset: true,
+          });
+      });
 
-        ScrollReveal().reveal(circleRefs[0].current, {
-          delay: 400,
-          origin: 'bottom',
-          distance: '100px',
-          duration: 1500,
-          easing: 'ease-out', 
-          reset: true,
-        });
-
-        ScrollReveal().reveal(revealRefs[1].current, {
-            delay: 200,
-            origin: 'bottom',
-            distance: '100px',
-            duration: 1500,
-            easing: 'ease-out', 
-            reset: true,
+      circleRefs.forEach((ref, index) => {
+          ScrollReveal().reveal(ref.current, {
+              delay: 250 * index,
+              origin: 'bottom',
+              distance: '100px',
+              duration: 900,
+              easing: 'ease-out', 
+              reset: true,
           });
-  
-        ScrollReveal().reveal(detailRefs[1].current, {
-        delay: 300,
-        origin: 'bottom',
-        distance: '100px',
-        duration: 1500,
-        easing: 'ease-out', 
-        reset: true,
-        });
-
-        ScrollReveal().reveal(circleRefs[1].current, {
-        delay: 400,
-        origin: 'bottom',
-        distance: '100px',
-        duration: 1500,
-        easing: 'ease-out', 
-        reset: true,
-        });
-
-        ScrollReveal().reveal(revealRefs[2].current, {
-            delay: 200,
-            origin: 'bottom',
-            distance: '100px',
-            duration: 1500,
-            easing: 'ease-out', 
-            reset: true,
-          });
-  
-          ScrollReveal().reveal(detailRefs[2].current, {
-            delay: 300,
-            origin: 'bottom',
-            distance: '100px',
-            duration: 1500,
-            easing: 'ease-out', 
-            reset: true,
-          });
-  
-          ScrollReveal().reveal(circleRefs[2].current, {
-            delay: 400,
-            origin: 'bottom',
-            distance: '100px',
-            duration: 1500,
-            easing: 'ease-out', 
-            reset: true,
-          });
-
-          ScrollReveal().reveal(revealRefs[3].current, {
-            delay: 200,
-            origin: 'bottom',
-            distance: '100px',
-            duration: 1500,
-            easing: 'ease-out', 
-            reset: true,
-          });
-  
-          ScrollReveal().reveal(detailRefs[3].current, {
-            delay: 300,
-            origin: 'bottom',
-            distance: '100px',
-            duration: 1500,
-            easing: 'ease-out', 
-            reset: true,
-          });
-  
-          ScrollReveal().reveal(circleRefs[3].current, {
-            delay: 400,
-            origin: 'bottom',
-            distance: '100px',
-            duration: 1500,
-            easing: 'ease-out', 
-            reset: true,
-          });
-      }, []);
+      });
+  }, []);
 
       return(
         <Wrapper>
             <CustomSlider {...settings}>
                 <Landing>
-                    <MainTxt>도움이 필요한 이웃에게 <br /> 용감한 원정대가 되어주세요!</MainTxt>
-                    <Button onClick={()=>navigate("/login")}>원정대 시작하기</Button>
+                  <MainImg src={hero_w} alt="원정대"/>
+                  <MainContainer className="left">
+                    <MainTxt>도움이 필요한 <br />이웃들에게 <br /> 용감한 원정대가 <br />되어주세요!</MainTxt>
+                    <Button onClick={()=>navigate("/notice")}>원정대 시작하기</Button>
+                  </MainContainer>
                 </Landing>
                 <Landing>
+                  <MainImg className="boy" src={hero_b} alt="원정대"/>
+                  <MainContainer>
                     <MainTxt>도움이 필요하다면 <br /> 용감한 원정대를 불러주세요!</MainTxt>
                     <Button onClick={()=>navigate("/login")}>의뢰인 시작하기</Button>
+                  </MainContainer>
                 </Landing>
             </CustomSlider>
             
@@ -436,9 +440,9 @@ function Main(props) {
                         <RevealTxt className="chapter">믿음직한 원정대를 찾아<br /> 안전하게 의뢰해요!</RevealTxt>
                         <DetailTxt className="chapter">의뢰인은 별점, 뱃지와 후기를 통해<br />신뢰성있는 원정대를 판단할 수 있어요!</DetailTxt>
                         <SquareBox>
-                            <Square><ChatIcon><FaMedal size="65" color="#fff" opacity={0.4}/></ChatIcon></Square>
-                            <Square><ChatIcon><FaStar size="65" color="#fff" opacity={0.4}/></ChatIcon></Square>
-                            <Square><ChatIcon><MdRateReview size="65" color="#fff" opacity={0.4} /></ChatIcon></Square>
+                            <Square><ChatIcon><FaMedal size="70" color="#fff" opacity={0.4}/></ChatIcon></Square>
+                            <Square><ChatIcon><FaStar size="70" color="#fff" opacity={0.4}/></ChatIcon></Square>
+                            <Square><ChatIcon><MdRateReview size="70" color="#fff" opacity={0.4} /></ChatIcon></Square>
                         </SquareBox>
                     </DetailContainer>
                 </LandingContainer>
@@ -447,6 +451,29 @@ function Main(props) {
               <Footer>
                 <FooterContainer>
                   <Logo src={logo} alt="로고"/>
+                  <MadeBox>
+                    <MadeBox className="row">
+                        <Made className="bold">Created by&nbsp;&nbsp;</Made>
+                        <Made>이름</Made>
+                      </MadeBox>
+                      <MadeBox className="row">
+                        <Made className="bold">Contact Us&nbsp;&nbsp;</Made>
+                        <Made>brave.knu@gmail.com</Made>
+                      </MadeBox>
+                      <MadeBox className="row">
+                        <Made className="bold">Source&nbsp;&nbsp;</Made>
+                        <Source href="https://www.flaticon.com/kr/free-icons/-" title="아이콘">alkhalifi design & Freepik - Flaticon</Source>
+                        <Made>&nbsp;외 react-icons</Made>
+                      </MadeBox>
+                  </MadeBox>
+                  <Git>
+                     <FaGithub size="35" onClick={() => window.location.href = "https://github.com/kimjiyooniiiii/BravePeople-Backend"}/>
+                     <Source className="git" href="https://github.com/kimjiyooniiiii/BravePeople-Backend" title="backend">Backend</Source>
+                  </Git>
+                  <Git>
+                     <FaGithub size="35" onClick={() => window.location.href = "https://github.com/hyunjihub/react_test"}/>
+                     <Source className="git" href="https://github.com/hyunjihub/react_test" title="backend">Frontend</Source>
+                  </Git>
                 </FooterContainer>
               </Footer>
             </FooterWrapper>
