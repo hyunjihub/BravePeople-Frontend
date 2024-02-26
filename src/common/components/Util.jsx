@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://bravepeople.site:8080';
+export const BASE_URL = 'https://api.bravepeople.site';

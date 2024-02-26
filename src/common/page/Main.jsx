@@ -4,10 +4,6 @@ import styled from "styled-components";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import bug from "../resources/img/bug.png";
-import call from "../resources/img/call.png";
-import money_back from "../resources/img/money_back.png";
-import etc from "../resources/img/etc.png";
 import temp from "../resources/img/temp.png";
 import logo from "../../header/resources/img/logo.png";
 import hero_w from "../resources/img/hero_woman.png";
@@ -21,7 +17,6 @@ import { FaGithub } from "react-icons/fa";
 
 const Wrapper = styled.div`
   width: 100%;
-  min-width: 1400px;
   height: 4000px;
   display: flex;
   flex-direction: column;

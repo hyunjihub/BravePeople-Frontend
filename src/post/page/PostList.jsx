@@ -78,18 +78,17 @@ const DonerMenu = styled.button`
 `;
 
 const DropdownMenu = styled.ul`
-    width: 5%;
-    height: 15%;
+    width: 150%;
+    height: 290%;
     list-style: none;
     position: absolute;
-    top: 29%;
-    left: 62%;
+    top: 80%;
     z-index: 99;
     border: 1px solid #d1d1d1;
     border-radius: 10px;
     font-weight: 500;
     background-color: #fff;
-    padding: 0.5% 0.5% 0.5% 0.7%;
+    padding: 0.5% 0.5% 0.5% 0.5%;
     box-sizing: border-box;
     box-shadow: 0px 0px 3px 1px rgba(190, 190, 190, 0.3);
 `;
@@ -101,10 +100,9 @@ const Current = styled.div`
 `;
 
 const DropdownOption = styled.li`
-    margin : 0% 5% 17% 0%;
+    margin : 10% 5% 17% 5%;
     font-size: 17px;
     cursor: pointer;
-
     &:hover {
         background-color: #f8332f;
         color: #fff;
@@ -281,8 +279,7 @@ function PostList(props) {
             <ButtonContainer>
                 {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ?<Current>{(selectedOption==="0")? "모든 게시글" : selectedOption + "km 내 게시글"}</Current>:null}
                 {(JSON.parse(sessionStorage.getItem('savedData')).isLogin) ? 
-                <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/></DonerMenu> : <div></div>}
-                {isOpen&& (<DropdownMenu>
+                <DonerMenu onClick={() => setIsOpen(!isOpen)}><BiMenuAltRight size="55" color="#f8332f"/>{isOpen&& (<DropdownMenu>
                     {options.map((option) => (
                     <DropdownOption
                         key={option}
@@ -290,7 +287,7 @@ function PostList(props) {
                         {(option === '0') ? "전역" : `${option}km`}
                     </DropdownOption>
                     ))}
-                </DropdownMenu>)}
+                </DropdownMenu>)}</DonerMenu> : <div></div>}
                 <WriteButton onClick={handleWrite}>글쓰기</WriteButton>
             </ButtonContainer>
             
