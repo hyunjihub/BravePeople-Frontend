@@ -21,7 +21,7 @@ const Content = styled.div`
 `;
 
 const Background = styled.div`
-    width: 1500px;
+    width: 100%;
     height: 100%;
     z-index: 1000;
     position: fixed;
@@ -126,7 +126,7 @@ function DetailReview(props) {
                     <Rating value={props.reviews.score} size="40"></Rating>
                 </RatingContainer>
                 <RatingScore>{props.reviews.score}/5 점</RatingScore>
-                <Review>{(props.reviews.content===null)?"내용을 입력하지 않은 후기입니다.":props.reviews.content}</Review>
+                <Review>{(props.reviews.content===null || props.reviews.content==="")?"내용을 입력하지 않은 후기입니다.":props.reviews.content}</Review>
                 <Button onClick={reviewCancel}>후기 닫기</Button>
             </Content>
         </Background>

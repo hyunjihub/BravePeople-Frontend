@@ -1,10 +1,15 @@
 import styled from "styled-components";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
-import bug from "../resources/bug.png";
-import call from "../resources/call.png";
-import etc from "../resources/etc.png";
-import money_back from "../resources/money_back.png";
+import bug from "../resources/img/bug.png";
+import call from "../resources/img/call.png";
+import etc from "../resources/img/etc.png";
+import money_back from "../resources/img/money_back.png";
+import request1 from "../resources/img/request1.jpg";
+import request2 from "../resources/img/request2.jpg";
+import badge from "../resources/img/badge.jpg";
+import status from "../resources/img/status.jpg";
+import review from "../resources/img/review.jpg";
 
 const Wrapper = styled.div`
     width: 50%;
@@ -159,6 +164,19 @@ const Icon = styled.img`
     margin-left: 15%;
 `;
 
+const ContentImg = styled.img`
+
+`;
+
+const ImgBox = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-left: 5%;
+    margin-bottom: 3%;
+`;
+
 function Notice(props) {
     const navigate = useNavigate();
 
@@ -239,10 +257,13 @@ function Notice(props) {
             </Content>
             <Bold>의뢰 진행 방법</Bold>
             <ContentBox>
-                <Content>의뢰는 </Content>
+                <Content>의뢰는</Content>
                 <Content className="bold nonmargin"> “의뢰 수락-의뢰 진행-의뢰 완료”</Content>
                 <Content className="nonmargin"> 로 진행됩니다.</Content>
             </ContentBox>
+            <ImgBox>
+                <ContentImg src={status} alt="의뢰버튼"/>
+            </ImgBox>
             <ContentBox>
                  <Content className="bold nonbottom">의뢰 수락</Content>
                 <Content className="nonmargin nonbottom">은 의뢰/원정을 요청받은 게시글 작성자만 할 수 있으며, 수락 시 진행 단계로 넘어갑니다.</Content>
@@ -253,9 +274,8 @@ function Notice(props) {
             </ContentBox>
             <ContentBox>
                  <Content className="bold nonbottom">의뢰 취소</Content>
-                <Content className="nonmargin nonbottom">는 두 사람 중 한 사람이라도 취소할 경우, 해당 의뢰는 취소처리가 되며 해당 의뢰는 다시 진행할 수 없습니다.</Content>
+                <Content className="nonmargin nonbottom">는 두 사람 중 한 사람이라도 취소할 경우, 해당 의뢰는 취소처리가 됩니다.</Content>
             </ContentBox>
-            <Content className="small nonbottom">(※ 다른 게시글로의 재의뢰는 가능합니다.)</Content>
             <ContentBox>
                  <Content className="bold nonbottom">의뢰 완료</Content>
                 <Content className="nonmargin nonbottom">는 작성하신 후기와 별점이 상대방 프로필 페이지에 나타나게 되고, 원정대의 원정 횟수가 1회 추가됩니다.</Content>
@@ -267,9 +287,13 @@ function Notice(props) {
             의뢰를 완료되지 않았을 때 채팅방을 나가게 된다면, 해당 의뢰는 취소처리 됩니다.<br />
             단, 채팅을 나간 사용자가 의뢰 완료를 누르고 나갔을 경우 기존 의뢰 상태 그대로 유지됩니다. 
             </Content>
+            <ImgBox>
+                <ContentImg src={request1} alt="의뢰진행방법"/>
+                <ContentImg src={request2} alt="의뢰진행방법"/>
+            </ImgBox>
             <Bold className="semi">의뢰 불가능 상황</Bold>
             <Content>
-            의뢰는 기본적으로 여러 사람과 동시에 의뢰가 가능하지만, 의뢰가 불가능한 상황이 있습니다.
+            의뢰는 기본적으로 여러 사람과 동시에 의뢰가 가능하지만, 특정 상황에 한해 동시 의뢰가 불가능합니다.
             </Content>
             <Content className="bold nonbottom">
             1.	같은 게시글에서는 동시 의뢰가 불가능합니다.
@@ -283,12 +307,6 @@ function Notice(props) {
             <Content className="nonbottom">
             다른 게시글의 의뢰가 완료/취소된 이후 같은 사용자와 의뢰를 진행할 수 있습니다.<br /><br />
             </Content>
-            <Content className="bold nonbottom">
-            3.	같은 사용자와 게시글의 의뢰가 완료/취소된 기록이 있다면, 해당 게시글에서 의뢰가 불가능합니다.
-            </Content>
-            <Content>
-            다른 게시글을 통해 같은 사용자와 의뢰를 진행할 수 있습니다.<br />
-            </Content>
             <Bold>신뢰도 있는 원정대를 찾는 방법</Bold>
             <ContentBox>
                 <Content className="nonbottom">용감한 원정대에서는 신뢰도 있는 원정대와의 의뢰를 위해  </Content>
@@ -298,16 +316,19 @@ function Notice(props) {
             <Content>뱃지, 별점, 후기는 모두 사용자의 프로필 페이지에서 확인 가능합니다.</Content>
             <Bold className="semi">뱃지</Bold>
             <Content>
-            원정대의 원정 횟수를 나타냅니다. 10회 이하 : 동, 20회 이하 : 은, 20회 이후 : 금 메달
+            뱃지는 원정대의 원정 횟수를 나타냅니다.
             </Content>
-            <Bold className="semi">별점</Bold>
+            <ImgBox>
+                <ContentImg src={badge} alt="뱃지획득조건"/>
+            </ImgBox>
+            <Bold className="semi">후기와 별점</Bold>
             <Content>
-            사용자의 평균 의뢰 점수입니다. 만점은 5점이며, 0.5점 단위로 표시됩니다.
+            후기는 이전 원정/의뢰인의 평가입니다. 최근 5개의 후기가 프로필 페이지의 표시됩니다.<br />
+            별점은 의뢰 완료 후, 사용자가 받은 평균 의뢰 점수입니다. 만점은 5점이며, 0.5점 단위로 표시됩니다.<br />
             </Content>
-            <Bold className="semi">후기</Bold>
-            <Content className="last">
-            이전 원정/의뢰인의 평가입니다. 최근 5개의 후기가 프로필 페이지의 표시됩니다.
-            </Content>
+            <ImgBox>
+                <ContentImg src={review} alt="후기와별점"/>
+            </ImgBox>
             <Button onClick={()=>navigate("../signup")}>용감한 원정대&nbsp;&nbsp;&nbsp;회원가입</Button>
             <Content className="last" />
         </Wrapper>

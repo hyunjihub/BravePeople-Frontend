@@ -39,10 +39,8 @@ const UploadTime = styled.div`
 
 const Price = styled.div`
     width: 15%;
-    height: 100%;
     font-size: 100%;
     color: #868e96;
-    flex: flex-end;
 `;
 
 const Category = styled.div`

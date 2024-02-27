@@ -61,11 +61,11 @@ const ChatContainer = styled.div`
 
 const Unread = styled.div`
   position: absolute;
-  left: 11%;
-  top: 10%;
+  left: 9%;
+  top: 13%;
   border-radius: 50%;
   background-color: #f8332f;
-  width: 4%;
+  width: 3%;
   height: 23%;
   color: #fff;
   padding: 0% 1.8%;

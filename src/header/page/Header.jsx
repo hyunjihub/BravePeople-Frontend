@@ -285,7 +285,9 @@ export default function Header(props) {
             // 받아오는 data로 할 일
             if(parsedData.type === 'NEW_CHAT' || parsedData.type === 'NEW_CONTACT'){
                 setIsNewChat(true); 
-                toast(parsedData.message);
+                toast(parsedData.message, {
+                    onClick: () => navigate("/chat"),
+                });
             }else if(parsedData.type === 'NEW_STATUS'){
                 setIsNewChanged(true);
                 sessionStorage.setItem('changedStatus', JSON.stringify(Number(parsedData.message)));

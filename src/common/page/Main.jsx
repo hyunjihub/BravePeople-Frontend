@@ -4,7 +4,9 @@ import styled from "styled-components";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import temp from "../resources/img/temp.png";
+import post from "../resources/img/post.png";
+import chat from "../resources/img/chat.png";
+import people from "../resources/img/people.png";
 import logo from "../../header/resources/img/logo.png";
 import hero_w from "../resources/img/hero_woman.png";
 import hero_b from "../resources/img/hero_man.png";
@@ -122,24 +124,6 @@ const DetailTxt = styled.div`
     }
 `;
 
-const CircleBox = styled.div`
-    width: 75%;
-    height: 30%;
-    display: flex;
-    flex-direction: row;
-    margin: 7% auto 10%;
-    box-sizing: border-box;
-`;
-
-const Circle = styled.div`
-    width: 18%;
-    height: 90%;
-    border-radius: 50%;
-    background-color: #FFF7F1;
-    margin: auto;
-    padding-bottom: 2%;
-`;
-
 const Square = styled.div`
     width: 30%;
     height: 100%;
@@ -177,18 +161,20 @@ const CustomSlider = styled(Slider)`
   }
 `;
 
-const Icon = styled.img`
-  width: 70%;
-  margin-top: 13%;
-  margin-left: 15%;
-`;
 
 const Image = styled.img`
-  width: 45%;
+  width: 40%;
 
   &.chat {
-    width: 30%;
+    width: 60%;
   }
+`;
+
+const Icon = styled.div`
+  width: 55%;
+  background-image: url(${people}); 
+  background-repeat: no-repeat;
+  background-position: center;
 `;
 
 const LandingContainer = styled.div`
@@ -236,7 +222,7 @@ const FooterWrapper = styled.div`
 `;
 
 const Footer = styled.div`
-  width: 55%;
+  width: 60%;
   height: 85%;
   margin: 2% auto 2%;
   box-sizing: border-box;
@@ -266,7 +252,7 @@ const Made = styled.div`
 `;
 
 const MadeBox = styled.div`
-  width: 42%;
+  width: 50%;
   display: flex;
   flex-direction: column;
   margin-left: 3%;
@@ -414,7 +400,7 @@ function Main(props) {
             </CustomSlider>
             <Landing className="introduction">
                 <LandingContainer>
-                    <Image src={temp} alt="게시판" ref={detailRefs[1]}/>
+                    <Image src={post} alt="게시판" ref={detailRefs[1]}/>
                     <DetailContainer ref={circleRefs[1]}>
                         <RevealTxt className="chapter">이웃들과 손쉽게<br />도움을 주고 받기!</RevealTxt>
                         <DetailTxt className="chapter">도움이 필요할 땐, 의뢰인!<br />도움을 주고싶을 땐, 원정대!<br />내 근처의 게시글만 볼 수 있어 더욱 편리해요.</DetailTxt>
@@ -430,14 +416,15 @@ function Main(props) {
                 <LandingContainer className="column" ref={revealRefs[2]}>
                     <DetailContainer className="chat" ref={detailRefs[2]}>
                         <RevealTxt className="chat">채팅으로 빠르고 편리하게 의뢰해요!</RevealTxt>
-                        <DetailTxt className="chat">실시간 채팅과 알림으로 간단하게 의뢰를 진행할 수 있어요!</DetailTxt>
+                        <DetailTxt className="chat">채팅으로 간단하게 의뢰를 진행할 수 있어요!<br />알림 서비스를 통해 새로운 의뢰 요청과 채팅을 놓치지 않게 받아보실 수 있습니다!
+                        </DetailTxt>
                     </DetailContainer>
-                    <Image className="chat" src={temp} alt="채팅" />
+                    <Image className="chat" src={chat} alt="채팅" />
                 </LandingContainer>
             </Landing>
             <Landing className="introduction">
                 <LandingContainer>
-                    <Image src={temp} alt="마이페이지" ref={revealRefs[3]} />
+                    <Icon ref={revealRefs[3]} />
                     <DetailContainer ref={detailRefs[3]}>
                         <RevealTxt className="chapter">믿음직한 원정대를 찾아<br /> 안전하게 의뢰해요!</RevealTxt>
                         <DetailTxt className="chapter">의뢰인은 별점, 뱃지와 후기를 통해<br />신뢰성있는 원정대를 판단할 수 있어요!</DetailTxt>
@@ -465,9 +452,10 @@ function Main(props) {
                       </MadeBox>
                       <MadeBox className="row">
                         <Made className="bold">Source&nbsp;&nbsp;</Made>
-                        <Source href="https://www.flaticon.com/kr/free-icons/-" target="_blank" title="아이콘">alkhalifi design & Freepik - Flaticon</Source>
-                        <Made>&nbsp;외 react-icons</Made>
+                        <Source href="https://www.flaticon.com/kr/free-icons/-" target="_blank" title="아이콘">alkhalifi design & Freepik & June Design - Flaticon</Source>
+                        <Made>&nbsp;, React-icons, いらすとや</Made>
                       </MadeBox>
+                      
                   </MadeBox>
                   <Git>
                      <FaGithub size="35" onClick={() => window.open("https://github.com/kimjiyooniiiii/BravePeople-Backend")}/>
@@ -483,5 +471,4 @@ function Main(props) {
         </Wrapper>
     );
 }
-
 export default Main;

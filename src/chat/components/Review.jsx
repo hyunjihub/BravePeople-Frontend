@@ -32,7 +32,7 @@ const Content = styled.div`
 `;
 
 const Background = styled.div`
-    width: 1500px;
+    width: 100%;
     height: 100%;
     z-index: 1000;
     position: fixed;

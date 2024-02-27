@@ -344,7 +344,7 @@ function WritePost(props) {
     }, [])
 
     //가격
-    const [number, setNumber] = useState();
+    const [number, setNumber] = useState("");
 
     const handleInputChange = (e) => {
         const value = e.target.value.replace(/\D/g, "").replace(/\B(?=(\d{3})+(?!\d))/g, ",");

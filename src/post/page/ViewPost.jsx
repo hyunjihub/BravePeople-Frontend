@@ -71,7 +71,7 @@ const Category = styled.div`
 
 const ProfileBox = styled.div`
     width: 90%;
-    height: 7%;
+    height: 7.5%;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -79,7 +79,7 @@ const ProfileBox = styled.div`
 `;
 
 const Profile = styled.img`
-    width: 8%;
+    width: 8.3%;
     height: 100%;
     border-radius: 50%;
     border: none;
@@ -343,12 +343,12 @@ function ViewPost(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
-                    navigate(-1);
+                    {(postData.type==="원정대")? navigate("/postlist/helping"):navigate("/postlist/helped")}
                 })
                 .catch(function(error){
                     if(error.response.status === 404 && error.response.data.errorMessage === "게시글 없음"){
                         navigate("/error"); 
-                    } else if(error.response.status === 401 && error.response.data.errorMessage === "진행중인 의뢰 존재") {
+                    } else if(error.response.status === 400 && error.response.data.errorMessage === "진행중인 의뢰 존재") {
                         Swal.fire({
                             title: "삭제 불가",
                             text: "해당 게시글은 의뢰가 진행 중입니다. 의뢰 완료/취소 후 삭제해주세요.",
@@ -401,6 +401,16 @@ function ViewPost(props) {
             });
             return;
         }
+        if(postData.disabled) {
+            Swal.fire({
+                title: "비활성화된 게시글",
+                text: "해당 게시글은 의뢰/원정 요청이 중지된 게시글입니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
+            return;
+        }
         setLoading(true);
         axios.get(`${BASE_URL}/posts/${postid}/request`,
         {
@@ -434,8 +444,8 @@ function ViewPost(props) {
                 });
             } else if(error.response.status === 400 && error.response.data.errorMessage === "이미 신청한 의뢰") {
                 Swal.fire({
-                    title: "의뢰를 진행할 수 없습니다.",
-                    html: "현 게시글로 의뢰를 진행했습니다. <br>한 게시글로 사용자가 의뢰를 요청할 수 있는 횟수는 1회입니다.",
+                    title: "의뢰 요청 중입니다.",
+                    html: "현 게시글로 의뢰 요청 중입니다.<br>작성자의 의뢰 수락 후, 의뢰를 진행하실 수 있습니다.",
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",

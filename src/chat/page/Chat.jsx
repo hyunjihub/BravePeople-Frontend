@@ -504,9 +504,9 @@ function Chat(props) {
 
     // 소켓 연결 & 구독
     const subHandler = async() => {
-        // if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-        //     if(!await ReissueToken()) return;
-        // }
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if (!await ReissueToken()) return;
+        }
         const socket = new WebSocket('wss://api.bravepeople.site/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
         client.current.debug = () => {};
