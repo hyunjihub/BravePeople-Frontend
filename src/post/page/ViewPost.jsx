@@ -288,7 +288,7 @@ function ViewPost(props) {
             }));
             return true;
         } catch(error){
-            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+            const logoutProcess = (title, text) => {
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
                 sessionStorage.removeItem('savedUserInfo');
@@ -300,15 +300,18 @@ function ViewPost(props) {
                     longitude: null
                 });
                 Swal.fire({
-                    title: "로그인 기간 만료",
-                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    title: title,
+                    text: text,
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
                 navigate("/main");
+            }
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                logoutProcess("로그인 기간 만료", "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.");
             }else{
-                console.log(error);
+                logoutProcess("비정상 접근 감지", "비정상적인 접근이 감지되어 로그아웃합니다.");
             }
             return false;
         };
@@ -317,9 +320,6 @@ function ViewPost(props) {
     //삭제 버튼 클릭시 삭제 API
     const handleDelete = async (e) => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
         Swal.fire({
             title: "삭제하시겠습니까?",
             text: "삭제된 게시글은 복구할 수 없습니다. 정말 삭제하시겠습니까?",
@@ -346,9 +346,7 @@ function ViewPost(props) {
                     navigate(-1);
                 })
                 .catch(function(error){
-                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken();   
-                    } else if(error.response.status === 404 && error.response.data.errorMessage === "게시글 없음"){
+                    if(error.response.status === 404 && error.response.data.errorMessage === "게시글 없음"){
                         navigate("/error"); 
                     } else if(error.response.status === 401 && error.response.data.errorMessage === "진행중인 의뢰 존재") {
                         Swal.fire({
@@ -358,6 +356,9 @@ function ViewPost(props) {
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",
                         });
+                    } else if(error.response.status === 401){
+                        if(!ReissueToken()) { return; }
+                        else { handleDelete(e); }
                     }
                 });
             }
@@ -401,9 +402,6 @@ function ViewPost(props) {
             return;
         }
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if(!await ReissueToken()) return;
-        }
         axios.get(`${BASE_URL}/posts/${postid}/request`,
         {
             headers :{
@@ -415,8 +413,9 @@ function ViewPost(props) {
             navigate("/chat");
         })
         .catch(function(error){
-            if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                ReissueToken();
+            if(error.response.status === 401){
+                if(!ReissueToken()) {return;}
+                else { handleRequestButton(); }
             } else if(error.response.status === 400 && error.response.data.errorMessage === "글 작성자가 의뢰 진행 중") {
                 Swal.fire({
                     title: "의뢰를 진행할 수 없습니다.",

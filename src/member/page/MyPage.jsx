@@ -321,7 +321,7 @@ function MyPage(props) {
             }));
             return true;
         } catch(error){
-            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+            const logoutProcess = (title, text) => {
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
                 sessionStorage.removeItem('savedUserInfo');
@@ -333,15 +333,18 @@ function MyPage(props) {
                     longitude: null
                 });
                 Swal.fire({
-                    title: "로그인 기간 만료",
-                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    title: title,
+                    text: text,
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
                 navigate("/main");
+            }
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                logoutProcess("로그인 기간 만료", "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.");
             }else{
-                console.log(error);
+                logoutProcess("비정상 접근 감지", "비정상적인 접근이 감지되어 로그아웃합니다.");
             }
             return false;
         };
@@ -364,11 +367,7 @@ function MyPage(props) {
                 navigate("/main");
                 return;
             }
-            else{
-                if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                    if (!await ReissueToken()) return;
-                }
-                
+            else{                
                 //마이페이지에 처음 접근할 때
                 if(JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname === null){
                     setLoading(true);
@@ -378,7 +377,6 @@ function MyPage(props) {
                         }
                     })
                     .then(function(response){
-                        console.log(response);
                             setUserInfo({
                                 profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
                                 nickname: response.data.nickname,
@@ -399,10 +397,10 @@ function MyPage(props) {
                             }));
                         }
                     )
-                    .catch(async function(error){
-                        if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
-                            if (!await ReissueToken()) return;
-                            loadMypage();
+                    .catch(function(error){
+                        if(error.response.status === 401){
+                            if (!ReissueToken()) return;
+                            else { loadMypage(); }
                         } else if (error.response.data.errorMessage ==="존재하지 않는 멤버ID" && error.response.status === 400) {
                             Swal.fire({
                                 title: "존재하지 않는 회원",
@@ -417,15 +415,62 @@ function MyPage(props) {
                     setLoading(false);
                 }else{
                     // 마이페이지에 처음 접근하는 것이 아닐 때
-                    setUserInfo({
-                        profileImage: JSON.parse(sessionStorage.getItem('savedUserInfo')).profileImage,
-                        nickname: JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname,
-                        intro: JSON.parse(sessionStorage.getItem('savedUserInfo')).intro,
-                        score: JSON.parse(sessionStorage.getItem('savedUserInfo')).score,
-                        medalCount: JSON.parse(sessionStorage.getItem('savedUserInfo')).medalCount,
-                        posts: JSON.parse(sessionStorage.getItem('savedUserInfo')).posts,
-                        reviews: JSON.parse(sessionStorage.getItem('savedUserInfo')).reviews
-                    });
+                    if(memberid === id){
+                        setUserInfo({
+                            profileImage: JSON.parse(sessionStorage.getItem('savedUserInfo')).profileImage,
+                            nickname: JSON.parse(sessionStorage.getItem('savedUserInfo')).nickname,
+                            intro: JSON.parse(sessionStorage.getItem('savedUserInfo')).intro,
+                            score: JSON.parse(sessionStorage.getItem('savedUserInfo')).score,
+                            medalCount: JSON.parse(sessionStorage.getItem('savedUserInfo')).medalCount,
+                            posts: JSON.parse(sessionStorage.getItem('savedUserInfo')).posts,
+                            reviews: JSON.parse(sessionStorage.getItem('savedUserInfo')).reviews
+                        });
+                    }else{
+                        setLoading(true);
+                        axios.get(`${BASE_URL}/member/profile/${memberid}`,{
+                            headers:{
+                                Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
+                            }
+                        })
+                        .then(function(response){
+                                setUserInfo({
+                                    profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
+                                    nickname: response.data.nickname,
+                                    intro: response.data.introduction,
+                                    score: response.data.score,
+                                    medalCount: response.data.medalCount,
+                                    posts: response.data.postListVo,
+                                    reviews: response.data.reviews
+                                });
+                                sessionStorage.setItem('savedUserInfo', JSON.stringify({
+                                    profileImage: (response.data.profileImage === null) ? profile : response.data.profileImage,
+                                    nickname: response.data.nickname,
+                                    intro: response.data.introduction,
+                                    score: response.data.score,
+                                    medalCount: response.data.medalCount,
+                                    posts: response.data.postListVo,
+                                    reviews: response.data.reviews
+                                }));
+                            }
+                        )
+                        .catch(function(error){
+                            if(error.response.status === 401){
+                                if (!ReissueToken()) return;
+                                else { loadMypage(); }
+                            } else if (error.response.data.errorMessage ==="존재하지 않는 멤버ID" && error.response.status === 400) {
+                                Swal.fire({
+                                    title: "존재하지 않는 회원",
+                                    html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
+                                    icon: "error",
+                                    confirmButtonColor: "#d33",
+                                    confirmButtonText: "확인",
+                                });
+                                navigate("/main");
+                            }
+                        });
+                        setLoading(false);
+                    }
+                    
                 }
             };
         }
@@ -477,9 +522,6 @@ function MyPage(props) {
     // 수정 완료 버튼
     const handleModify = async (e) => {       
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
         if((currentName === userInfo.nickname) && (currentIntro === userInfo.intro) && (currentImg === userInfo.profileImage)){
             setIsClicked(false);
         }else{
@@ -531,8 +573,9 @@ function MyPage(props) {
                     setCurrentName(null);
                     setIsClicked(false);
                 }).catch(function(err) {
-                    if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken();
+                    if(err.response.status === 401){
+                        if(!ReissueToken()) { return; }
+                        else { handleModify(e) }
                     } else if((err.response.status === 400 && err.response.data.errorMessage === '닉네임 중복')) {
                         Swal.fire({
                             title: "닉네임 중복",
@@ -562,9 +605,7 @@ function MyPage(props) {
 
     const fileInput = React.createRef();
     const handleProfile = async (e) => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
+        if (!await ReissueToken()) return;
         fileInput.current.click();
     }
     const frm = new FormData();
@@ -572,9 +613,6 @@ function MyPage(props) {
     //프로필 이미지 불러오기
     const handleChange = async (e) => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
 
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
@@ -605,8 +643,9 @@ function MyPage(props) {
                 handleCurrentImg(response.data.imgUrl);
                 setLoading(false);
             }).catch(function(err){
-                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();
+                if(err.response.status === 401){
+                    if(!ReissueToken()) { return; }
+                    else (handleChange(e));
                 } else if((err.response.status === 400 && err.response.data.errorMessage === '파일 업로드 실패')) {
                     Swal.fire({
                         title: "파일 업로드 오류",
@@ -636,9 +675,6 @@ function MyPage(props) {
     const SetLocation = async () => {
         const handleSuccess = async (pos) => {
             setLoading(true);
-            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                if (!await ReissueToken()) return;
-            }
             axios.patch(`${BASE_URL}/member/location`, {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
@@ -662,14 +698,9 @@ function MyPage(props) {
                     }
                 }));
             }).catch(function(err){
-                if (err.response.status === 401 && err.response.data.errorMessage === "존재하지 않는 멤버ID") {
-                    Swal.fire({
-                        title: "존재하지 않는 회원",
-                        html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
-                        icon: "error",
-                        confirmButtonColor: "#d33",
-                        confirmButtonText: "확인",
-                    });
+                if (err.response.status === 401) {
+                    if(!ReissueToken) { return; }
+                    else (handleSuccess(pos));
                 }
             });
             setLoading(false);

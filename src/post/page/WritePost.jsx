@@ -274,7 +274,7 @@ function WritePost(props) {
             }));
             return true;
         } catch(error){
-            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+            const logoutProcess = (title, text) => {
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
                 sessionStorage.removeItem('savedUserInfo');
@@ -286,13 +286,18 @@ function WritePost(props) {
                     longitude: null
                 });
                 Swal.fire({
-                    title: "로그인 기간 만료",
-                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    title: title,
+                    text: text,
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
                 navigate("/main");
+            }
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                logoutProcess("로그인 기간 만료", "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.");
+            }else{
+                logoutProcess("비정상 접근 감지", "비정상적인 접근이 감지되어 로그아웃합니다.");
             }
             return false;
         };
@@ -301,7 +306,6 @@ function WritePost(props) {
     // 게시글 수정일 때 데이터 불러오기
     useEffect(()=>{
         const loadModify = async () => {
-            
             if(!isLog) {
                 Swal.fire({
                     title: "비정상적인 접속",
@@ -313,9 +317,6 @@ function WritePost(props) {
             }
             else if(postid!=='-1') {
                 setLoading(true);
-                if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                    if (!await ReissueToken()) return;
-                }
                 axios.get(`${BASE_URL}/posts/${postid}`)
                 .then(function(response){
                     setContent(response.data.contents);
@@ -329,8 +330,11 @@ function WritePost(props) {
                     setLoading(false); 
                 })
                 .catch(function(error){
-                    if((error.response.status === 404 && error.response.data.errorMessage === '존재하지 않는 게시글')) {
+                    if(error.response.status === 404 && error.response.data.errorMessage === '존재하지 않는 게시글') {
                         navigate("/error");
+                    }else if(error.response.status === 401){
+                        if(!ReissueToken) { return; }
+                        else {loadModify();}
                     }
                     setLoading(false); 
                 });
@@ -425,9 +429,6 @@ function WritePost(props) {
 
     const fileInput = React.createRef();
     const handleImg = async (e) => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
         if (!uploading) {
             fileInput.current.click();
         }
@@ -435,9 +436,6 @@ function WritePost(props) {
 
     const handleChange = async (e) => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
         if (!files[0].name.match(reg)) {
@@ -468,8 +466,9 @@ function WritePost(props) {
                 setUploading(true);
                 setLoading(false); 
             }).catch(function(err){
-                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken("토큰기한 만료로 수정이 취소되었습니다. 메인 페이지로 이동합니다.");
+                if(err.response.status === 401){
+                    if(!ReissueToken()) { return; }
+                    else{ handleChange(); }
                 } else if((err.response.status === 400 && err.response.data.errorMessage === '파일 업로드 실패')) {
                     Swal.fire({
                         title: "파일 업로드 오류",
@@ -493,9 +492,6 @@ function WritePost(props) {
     //게시글 업로드
     const handleUpload = async (e) => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
         if((title !== "") && (number !== "") && (content !== "")){
             if(postid==='-1') {
                 axios.post(`${BASE_URL}/posts`,{
@@ -520,8 +516,9 @@ function WritePost(props) {
                         navigate(-1);
                     })
                     .catch(function(err){
-                        if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                            ReissueToken();
+                        if(err.response.status === 401){
+                            if(!ReissueToken()){ return; }
+                            else { handleUpload(); }
                         }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
                             Swal.fire({
                                 title: "게시글 양식 오류",
@@ -556,8 +553,9 @@ function WritePost(props) {
                     navigate(-1);
                 })
                 .catch(function(err){
-                    if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                        ReissueToken();
+                    if(err.response.status === 401){
+                        if(!ReissueToken()){ return; }
+                        else { handleUpload(); }
                     }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
                         Swal.fire({
                             title: "게시글 양식 오류",

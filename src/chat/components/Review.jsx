@@ -179,7 +179,7 @@ function Review(props) {
             }));
             return true;
         } catch(error){
-            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+            const logoutProcess = (title, text) => {
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
                 sessionStorage.removeItem('savedUserInfo');
@@ -191,15 +191,18 @@ function Review(props) {
                     longitude: null
                 });
                 Swal.fire({
-                    title: "로그인 기간 만료",
-                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    title: title,
+                    text: text,
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
                 navigate("/main");
+            }
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                logoutProcess("로그인 기간 만료", "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.");
             }else{
-                console.log(error);
+                logoutProcess("비정상 접근 감지", "비정상적인 접근이 감지되어 로그아웃합니다.");
             }
             return false;
         };
@@ -231,9 +234,6 @@ function Review(props) {
             });
         }
         else{
-            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                if(!await ReissueToken()) return;
-            }
             axios.post(`${BASE_URL}/contact/${props.nowRoomId}/review`,
             {
                 score: rating,
@@ -247,7 +247,10 @@ function Review(props) {
                 props.setReviewOpen(false);
             })
             .catch(function(error){
-                console.log(error);
+                if(error.response.status === 401){
+                    if(!ReissueToken()) { return; }
+                    else { sendReview(); }
+                }
             })                   
         }
     };

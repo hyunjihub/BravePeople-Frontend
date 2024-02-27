@@ -332,7 +332,7 @@ function Chat(props) {
             }));
             return true;
         } catch(error){
-            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+            const logoutProcess = (title, text) => {
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
                 sessionStorage.removeItem('savedUserInfo');
@@ -344,13 +344,18 @@ function Chat(props) {
                     longitude: null
                 });
                 Swal.fire({
-                    title: "로그인 기간 만료",
-                    text: "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.",
+                    title: title,
+                    text: text,
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
                 navigate("/main");
+            }
+            if(error.response.status === 401 && error.response.data.errorMessage === "Refresh Token 만료"){
+                logoutProcess("로그인 기간 만료", "로그인 유지 기간이 만료되었습니다. 재로그인 해주세요.");
+            }else{
+                logoutProcess("비정상 접근 감지", "비정상적인 접근이 감지되어 로그아웃합니다.");
             }
             return false;
         };
@@ -422,9 +427,6 @@ function Chat(props) {
     // 채팅방 리스트
     const getChatList = async () => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if(!await ReissueToken()) return;
-        }
         axios.get(`${BASE_URL}/chats`,
         {
             headers :{
@@ -442,7 +444,10 @@ function Chat(props) {
             setChatList(response.data);
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401){
+                if(!ReissueToken()) {return;}
+                else { getChatList(); }
+            }
         })
         setLoading(false);
     }
@@ -450,9 +455,6 @@ function Chat(props) {
     // 의뢰 status 불러오기
     const getContactInfo = async() => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if(!await ReissueToken()) return;
-        }
         axios.get(`${BASE_URL}/contact/${nowRoomId}/status`,
         {
             headers :{
@@ -460,14 +462,16 @@ function Chat(props) {
             }
         })
         .then(function(response){
-            console.log(response);
             setContact({
                 status: response.data.status,
                 isActive: response.data.isActive
             })
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401){
+                if(!ReissueToken()) {return;}
+                else { getContactInfo(); }
+            }   
         })
         setLoading(false);
     }
@@ -475,9 +479,6 @@ function Chat(props) {
     // 채팅내역 불러오기
     const getPrevChat = async () => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if(!await ReissueToken()) return;
-        }
         axios.get(`${BASE_URL}/chats/${nowRoomId}`,
         {
             headers :{
@@ -493,17 +494,20 @@ function Chat(props) {
             setChatMessage(response.data.messages);
         })
         .catch(function(error){
-            console.log(error);
+            if(error.response.status === 401){
+                if(!ReissueToken()) {return;}
+                else { getPrevChat(); }
+            }
         })
         setLoading(false);
     }
 
     // 소켓 연결 & 구독
     const subHandler = async() => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
-        const socket = new WebSocket('wss://bravepeople.site:8080/ws-stomp');
+        // if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+        //     if(!await ReissueToken()) return;
+        // }
+        const socket = new WebSocket('wss://api.bravepeople.site/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
         client.current.debug = () => {};
         client.current.onWebSocketClose = (e) => { 
@@ -562,7 +566,9 @@ function Chat(props) {
     const [msg, setMsg] = useState("");
 
     const sendHandler = async () => {
-
+        // if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+        //     if(!await ReissueToken()) return;
+        // }
         // 빈 메시지 무시
         if (msg.trim() === "") {
             return;
@@ -608,9 +614,7 @@ function Chat(props) {
 
     const fileInput = React.createRef();
     const handleProfile = async (e) => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
+        if(!ReissueToken()) {return;}
         fileInput.current.click();
     }
     const frm = new FormData();
@@ -618,10 +622,6 @@ function Chat(props) {
     //이미지 전송
     const handleImage = async (e) => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
-
         const files = e.target.files;
         var reg = /(.*?)\.(jpg|jpeg|png)$/;
 
@@ -663,8 +663,9 @@ function Chat(props) {
                 getChatList();
                 setLoading(false);
             }).catch(function(err){
-                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                    ReissueToken();
+                if(err.response.status === 401){
+                    if(!ReissueToken()) {return;}
+                    else { handleImage(e); }
                 } else if((err.response.status === 400 && err.response.data.errorMessage === '파일 업로드 실패')) {
                     Swal.fire({
                         title: "파일 업로드 오류",
@@ -699,9 +700,6 @@ function Chat(props) {
     
         }).then(async result => {
             if (result.isConfirmed) {
-                if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                    if (!await ReissueToken()) return;
-                }
                 axios.patch(`${BASE_URL}/chats/${nowRoomId}`,[],
                     {headers:{
                         Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -711,6 +709,10 @@ function Chat(props) {
                     getChatList();
                 })
                 .catch(function(error){
+                    if(error.response.status === 401){
+                        if(!ReissueToken()) {return;}
+                        else { handleExit(); }
+                    } 
                 })
         }})
         setLoading(false);
@@ -719,9 +721,6 @@ function Chat(props) {
     // 의뢰 수락하기
     const acceptContact = async() => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
 
         Swal.fire({
             title: "의뢰 수락",
@@ -746,7 +745,10 @@ function Chat(props) {
                     getChatList();
                 })
                 .catch(function(error){
-                    console.log(error);
+                    if(error.response.status === 401){
+                        if(!ReissueToken()) {return;}
+                        else { acceptContact(); }
+                    } 
                 });
             }
         })
@@ -756,9 +758,6 @@ function Chat(props) {
     // 의뢰 취소하기
     const cancelContact = async() => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
 
         Swal.fire({
             title: "의뢰 취소",
@@ -783,7 +782,10 @@ function Chat(props) {
                     getChatList();
                 })
                 .catch(function(error){
-                    console.log(error);
+                    if(error.response.status === 401){
+                        if(!ReissueToken()) {return;}
+                        else { cancelContact(); }
+                    } 
                 });
             }
         })
@@ -793,9 +795,6 @@ function Chat(props) {
     // 의뢰 완료하기
     const finishContact = async() => {
         setLoading(true);
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
 
         Swal.fire({
             title: "의뢰 완료",
@@ -821,7 +820,10 @@ function Chat(props) {
                     setReviewOpen(true);
                 })
                 .catch(function(error){
-                    console.log(error);
+                    if(error.response.status === 401){
+                        if(!ReissueToken()) {return;}
+                        else { finishContact(); }
+                    }  
                 });
             }}) 
         setLoading(false);

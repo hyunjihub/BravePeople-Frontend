@@ -166,7 +166,7 @@ export default function Header(props) {
         profile: state.login.profileImg
     }), shallowEqual);
 
-    console.warn = console.error = () => {};
+    // console.warn = console.error = () => {};
     
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
@@ -245,7 +245,7 @@ export default function Header(props) {
                     confirmButtonText: "확인",
                     });
                 }
-            }else if(error.response.status === 401 && error.response.data.errorMessage === "비회원 접근 불가"){
+            }else{
                 logoutProcess();
                 Swal.fire({
                 title: "중복 로그인",
@@ -263,9 +263,7 @@ export default function Header(props) {
     const eventSource = useRef();
 
     const fetchSSE = async() => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
+        if (!await ReissueToken()) return;
         eventSource.current = new EventSourcePolyfill(`${BASE_URL}/stream/${id}`,
             {
                 headers:{
@@ -337,9 +335,6 @@ export default function Header(props) {
     const handleLogOut = async (e) => {
         handleIsLogOut();
         if(isLog) {  
-            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                if (!await ReissueToken()) return;
-            }
             axios.post(`${BASE_URL}/member/logout`, {}, {
                 headers: {
                     'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
@@ -348,29 +343,11 @@ export default function Header(props) {
             .then(function(response){
                 logoutProcess();
             })
-            .catch(function(err){
-                if(err.response.status === 401 && err.response.data.errorMessage === "Access Token 만료"){
-                    sessionStorage.removeItem('jwt');
-                    sessionStorage.removeItem('savedData');
-                    sessionStorage.removeItem('savedUserInfo');
-                    setLog(false);
-                    setId(null);
-                    setProfile(null);
-                    setLoc({
-                        latitude: null,
-                        longitude: null
-                    });
-                    navigate("/main");
+            .catch(function(error){
+                if(error.response.status === 401){
+                    if(!ReissueToken()) { return; }
+                    else { handleLogOut(); }
                 }
-                else if(err.response.status === 401 && err.response.data.errorMessage === "비회원 접근 불가") {
-                    Swal.fire({
-                        title: "비정상적인 접속",
-                        text: "이미 로그아웃 처리 되셨거나, 로그인이 되지 않은 회원입니다.",
-                        icon: "error",
-                        confirmButtonColor: "#d33",
-                        confirmButtonText: "확인",
-                    });
-                } else console.log(err);
             });
         }else{
             navigate("/login")
@@ -399,9 +376,6 @@ export default function Header(props) {
 
     const SetLocation = async () => {
         const handleSuccess = async (pos) => {
-            if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-                if (!await ReissueToken()) return;
-            }
             axios.patch(`${BASE_URL}/member/location`, {
                 lat:pos.coords.latitude,
                 lng:pos.coords.longitude
@@ -424,15 +398,10 @@ export default function Header(props) {
                         longitude: response.data.lng
                     }
                 }));
-            }).catch(function(err){
-                if (err.response.status === 401 && err.response.data.errorMessage === "존재하지 않는 멤버ID") {
-                    Swal.fire({
-                        title: "존재하지 않는 회원",
-                        html: "존재하지 않은 회원입니다. 다시 확인해주세요.",
-                        icon: "error",
-                        confirmButtonColor: "#d33",
-                        confirmButtonText: "확인",
-                    });
+            }).catch(function(error){
+                if(error.response.status === 401){
+                    if(!ReissueToken()) { return; }
+                    else { handleSuccess(pos); }
                 }
             });
         }
