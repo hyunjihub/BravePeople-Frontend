@@ -450,6 +450,16 @@ function ViewPost(props) {
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
                 });
+            }  else if(error.response.status === 404 && error.response.data.errorMessage === "존재하지 않는 게시글"){
+                navigate("/error"); 
+            } else if(error.response.status === 404 && error.response.data.errorMessage === "본인의 게시글") {
+                Swal.fire({
+                    title: "본인이 작성한 게시글",
+                    text: "본인의 게시글로 원정 또는 의뢰를 진행할 수 없습니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
             }
         })
         setLoading(false);

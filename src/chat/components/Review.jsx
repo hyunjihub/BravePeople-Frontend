@@ -244,13 +244,47 @@ function Review(props) {
                 'Authorization': `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
             }})
             .then(function(response){
+                Swal.fire({
+                    title: "후기 작성 완료",
+                    html: "후기가 작성됐습니다. 후기는 의뢰 완료 처리 후, 활성화됩니다.",
+                    icon: "success",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
                 props.setReviewOpen(false);
             })
             .catch(function(error){
                 if(error.response.status === 401){
                     if(!ReissueToken()) { return; }
                     else { sendReview(); }
-                }
+                } else if(error.response.status === 400 && error.response.data.errorMessage === "미완료된 의뢰") {
+                    Swal.fire({
+                        title: "완료되지 않은 의뢰",
+                        html: "의뢰 완료가 되지 않아 후기를 작성할 수 없습니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                    props.setReviewOpen(false);
+                } else if(error.response.status === 400 && error.response.data.errorMessage === "나의 의뢰가 아님") {
+                    Swal.fire({
+                        title: "후기 작성 권한 없음",
+                        html: "사용자의 의뢰가 아닙니다. 후기를 작성할 수 없습니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                    props.setReviewOpen(false);
+                } else if(error.response.status === 400 && error.response.data.errorMessage === "이미 리뷰 존재") {
+                    Swal.fire({
+                        title: "작성된 후기 존재",
+                        html: "이미 후기가 존재합니다. 한 의뢰는 1회의 후기만 작성할 수 있습니다.",
+                        icon: "error",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
+                    props.setReviewOpen(false);
+                }   
             })                   
         }
     };

@@ -522,7 +522,7 @@ function WritePost(props) {
                         }else if(err.response.status === 400 && err.response.data.errorMessage === "Invalid request content."){
                             Swal.fire({
                                 title: "게시글 양식 오류",
-                                text: "작성하지 않은 항목이 있는지, 최대 글자수를 넘어가지 않았는지 확인해주세요.",
+                                text: "작성하지 않은 항목이 있는지 확인해주세요.",
                                 icon: "error",
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",

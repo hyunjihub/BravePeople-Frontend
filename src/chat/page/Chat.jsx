@@ -497,6 +497,15 @@ function Chat(props) {
             if(error.response.status === 401){
                 if(!ReissueToken()) {return;}
                 else { getPrevChat(); }
+            } else if (error.response.status === 400  && error.response.data.errorMessage === '채팅방 참여자가 아님') {
+                Swal.fire({
+                    title: "비정상적인 접근",
+                    text: "해당 채팅방 접근 권한이 없습니다. 메인페이지로 이동합니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
+                });
+                navigate("/main");
             }
         })
         setLoading(false);
@@ -566,9 +575,9 @@ function Chat(props) {
     const [msg, setMsg] = useState("");
 
     const sendHandler = async () => {
-        // if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-        //     if(!await ReissueToken()) return;
-        // }
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+             if(!await ReissueToken()) return;
+        }
         // 빈 메시지 무시
         if (msg.trim() === "") {
             return;
@@ -823,7 +832,25 @@ function Chat(props) {
                     if(error.response.status === 401){
                         if(!ReissueToken()) {return;}
                         else { finishContact(); }
-                    }  
+                    }  else if(error.response.status === 400 && error.response.data.errorMessage === "취소된 의뢰") {
+                        Swal.fire({
+                            title: "의뢰를 완료할 수 없습니다.",
+                            text: "이미 취소된 의뢰로, 의뢰를 완료할 수 없습니다.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                        getContactInfo();
+                    } else if(error.response.status === 400 && error.response.data.errorMessage === "대기중인 의뢰") {
+                        Swal.fire({
+                            title: "의뢰를 완료할 수 없습니다.",
+                            text: "아직 대기중인 의뢰로, 의뢰를 완료할 수 없습니다.",
+                            icon: "error",
+                            confirmButtonColor: "#d33",
+                            confirmButtonText: "확인",
+                        });
+                        getContactInfo();
+                    }
                 });
             }}) 
         setLoading(false);

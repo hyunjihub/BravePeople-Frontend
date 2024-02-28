@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import React, { useEffect, useState } from "react";
+import React, { useRef } from 'react';
 import { useNavigate } from "react-router";
 import bug from "../resources/img/bug.png";
 import call from "../resources/img/call.png";
@@ -129,7 +129,7 @@ const Button = styled.button`
 
 const Bold = styled.div`
     font-weight: 900;
-    font-size: 28px;
+    font-size: 35px;
     margin-left: 5%;
     margin-bottom: 1%;
     margin-top: 5%;
@@ -177,8 +177,42 @@ const ImgBox = styled.div`
     margin-bottom: 3%;
 `;
 
+const SignUpTxt = styled.div`
+    text-align: center;
+    font-size: 25px;
+    font-weight: 800;
+    margin: 10% 0 1%;
+`;
+
+const Method = styled.h1`
+    cursor: pointer;
+    margin : 1% 0 1% 5%;
+    font-size: 22px;
+    font-weight: 800;
+`;
+
+const MethodBox = styled.div`
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+`;
+
 function Notice(props) {
     const navigate = useNavigate();
+
+    const contentRefs = useRef({
+        description1: null,
+        description2: null,
+        description3: null,
+        description4: null,
+        description5: null,
+      });
+    
+    const scrollToContent = (contentId) => {
+        if (contentRefs.current[contentId]) {
+            contentRefs.current[contentId].scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     return(
         <Wrapper>
@@ -189,7 +223,17 @@ function Notice(props) {
                 <ContentTitle>용감한 원정대를 이용하는 방법!</ContentTitle>
             </TitleBox>
             <Line />
-            <Bold>용감한 원정대는</Bold>
+            <Bold>원하는 이용방법 바로 찾기</Bold>
+            <Content className="small nonbottom">찾으시는 이용방법을 클릭하시면 해당 위치로 이동합니다.</Content>
+            <MethodBox>
+                <Method onClick={() => scrollToContent('description1')}>1. 용감한 원정대</Method>
+                <Method onClick={() => scrollToContent('description2')}>2. 원정대가 되는 방법</Method>
+                <Method onClick={() => scrollToContent('description3')}>3. 의뢰인이 되는 방법</Method>
+                <Method onClick={() => scrollToContent('description4')}>4. 의뢰 진행 방법</Method>
+                <Method onClick={() => scrollToContent('description5')}>5. 신뢰도 있는 원정대를 찾는 방법</Method>
+            </MethodBox>
+            
+            <Bold ref={ref => contentRefs.current['description1'] = ref}>용감한 원정대</Bold>
             <Content className="bold">
             무서운 벌레를 대신 잡아줄 사람이 없을 때! 전화공포증이 심해 전화를 하기 겁날 때! 무서워서 환불하지 못하고 있을 때!
             </Content>
@@ -205,7 +249,7 @@ function Notice(props) {
             이웃들과 서로 도움을 주고받으며 더 좋은 사회를 만들어가요!
             </Content>
            
-            <Bold>원정대가 되는 방법</Bold>
+            <Bold ref={ref => contentRefs.current['description2'] = ref}>원정대가 되는 방법</Bold>
             <ContentBox>
                 <Content>
                 원정대는 용감한 원정대의&nbsp;
@@ -234,7 +278,7 @@ function Notice(props) {
             4.	원정이 완료되면 “의뢰 완료”를 눌러 의뢰인의 후기를 작성합니다.<br />
             5.	의뢰인도 의뢰 완료를 눌렀다면, 프로필 페이지의 작성한 후기가 등록되고, 원정 횟수가 1회 증가하게 됩니다.<br />
             </Content>
-            <Bold>의뢰인이 되는 방법</Bold>
+            <Bold ref={ref => contentRefs.current['description3'] = ref}>의뢰인이 되는 방법</Bold>
             <Bold className="semi">1. 원정대 찾아가기</Bold>
             <Content>
             1.	원정대 게시판에서 여러분이 도움받고 싶은 게시글을 선택합니다.<br />
@@ -255,7 +299,7 @@ function Notice(props) {
             (※ 비활성화된 게시글 : 게시판에 나타나지 않으며, 프로필 페이지의 작성한 게시글에서만 열람이 가능한 게시글입니다. <br />
             비활성화된 게시글은 게시글 내 달려가기 버튼이 비활성화되며, 게시글의 수정이 불가능합니다.)
             </Content>
-            <Bold>의뢰 진행 방법</Bold>
+            <Bold ref={ref => contentRefs.current['description4'] = ref}>의뢰 진행 방법</Bold>
             <ContentBox>
                 <Content>의뢰는</Content>
                 <Content className="bold nonmargin"> “의뢰 수락-의뢰 진행-의뢰 완료”</Content>
@@ -299,7 +343,7 @@ function Notice(props) {
             1.	같은 게시글에서는 동시 의뢰가 불가능합니다.
             </Content>
             <Content className="nonbottom">
-            해당 게시글의 의뢰가 완료/취소된 이후 다른사람의 의뢰를 수락할 수 있습니다.<br /><br />
+            해당 게시글의 의뢰가 완료/취소된 이후 다른 사용자의 의뢰를 수락할 수 있습니다.<br /><br />
             </Content>
             <Content className="bold nonbottom">
             2.	같은 사용자끼리는 동시 의뢰가 불가능합니다.
@@ -307,7 +351,7 @@ function Notice(props) {
             <Content className="nonbottom">
             다른 게시글의 의뢰가 완료/취소된 이후 같은 사용자와 의뢰를 진행할 수 있습니다.<br /><br />
             </Content>
-            <Bold>신뢰도 있는 원정대를 찾는 방법</Bold>
+            <Bold ref={ref => contentRefs.current['description5'] = ref}>신뢰도 있는 원정대를 찾는 방법</Bold>
             <ContentBox>
                 <Content className="nonbottom">용감한 원정대에서는 신뢰도 있는 원정대와의 의뢰를 위해  </Content>
                 <Content className="bold nonmargin nonbottom">뱃지, 별점, 후기</Content>
@@ -329,6 +373,7 @@ function Notice(props) {
             <ImgBox>
                 <ContentImg src={review} alt="후기와별점"/>
             </ImgBox>
+            <SignUpTxt>용감한 원정대에 아직 가입하지 않았다면?</SignUpTxt>
             <Button onClick={()=>navigate("../signup")}>용감한 원정대&nbsp;&nbsp;&nbsp;회원가입</Button>
             <Content className="last" />
         </Wrapper>
