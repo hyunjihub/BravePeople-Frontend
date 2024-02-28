@@ -29,7 +29,6 @@
 
 #### Communication
 ![](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)
-### &nbsp;
 <img alt="whale" src ="https://img.shields.io/badge/whale-000000.svg?&style=for-the-badge"/>
 
 ### &nbsp;
