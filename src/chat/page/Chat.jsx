@@ -49,7 +49,6 @@ const Container = styled.div`
     display: flex;
     border-radius: 18px;
     flex-direction: row;
-    flex: space-between;
     margin: 120px auto;
 `;
 
@@ -203,7 +202,7 @@ const Filter = styled.button`
 `;
 
 const Null = styled.div`
-    width: 160%;
+    width: 200%;
     font-size: 50px;
     text-align: center;
     margin: 10% auto 2%;
@@ -434,6 +433,7 @@ function Chat(props) {
             }
         })
         .then(async function(response){
+            console.log(response);
             if(nowRoomId){
                 await response.data.map((item)=>{
                     if(item.roomId === nowRoomId){
@@ -870,7 +870,7 @@ function Chat(props) {
 
     return(
         <Container>
-            {(chatList===null)?<NullContainer>
+            {(chatList.length===0 || chatList===null)?<NullContainer>
                 <Null>대화중인 채팅방이 없습니다.</Null>
                 <Null className="detail">의뢰/원정을 통해 새로운 채팅을 시작하세요.</Null>
             </NullContainer>:

@@ -155,10 +155,9 @@ function FindId(props) {
                         }
                     })
                     .then(function(response){
-                        console.log(response);
                         Swal.fire({
                             title: "비밀번호 재설정 링크 전송",
-                            text: "입력하신 이메일로 재설정 링크가 전송되었습니다. 메일함을 확인해주세요.",
+                            html: "입력하신 이메일로 재설정 링크가 전송되었습니다. <br>메일함을 확인해주세요.",
                             icon: "success",
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",

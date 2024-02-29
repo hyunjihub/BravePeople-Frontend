@@ -133,10 +133,10 @@ function Chatlist(props) {
           <Time>{list.lastSendAt}</Time>
         </Container>
       ))}
-      {list.filter(list => list.status === "대기중" || list.status === "진행중").length === 0 && (
+      {props.filter === "대기/진행" && list.filter(list => list.status === "대기중" || list.status === "진행중").length === 0 && (
         <DefaultPage>대기중이거나 진행중인 채팅이 없습니다.</DefaultPage>
       )}
-      {list.filter(list => list.status === "완료" || list.status === "취소").length === 0 && (
+      {props.filter === "완료/취소" && list.filter(list => list.status === "완료" || list.status === "취소").length === 0 && (
         <DefaultPage>완료됐거나 취소된 채팅이 없습니다.</DefaultPage>
       )}
     </Chat>

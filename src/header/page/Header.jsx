@@ -166,7 +166,7 @@ export default function Header(props) {
         profile: state.login.profileImg
     }), shallowEqual);
 
-    // console.warn = console.error = () => {};
+    console.warn = console.error = () => {};
     
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
@@ -245,14 +245,13 @@ export default function Header(props) {
                     confirmButtonText: "확인",
                     });
                 }
-            }else{
-                logoutProcess();
+            } else {
                 Swal.fire({
-                title: "비정상적인 접근",
-                text: "비정상적인 접근이 확인되었습니다.",
-                icon: "error",
-                confirmButtonColor: "#d33",
-                confirmButtonText: "확인",
+                    title: "비정상적인 현상 발생",
+                    text: "비정상적인 현상이 발생하였습니다.",
+                    icon: "error",
+                    confirmButtonColor: "#d33",
+                    confirmButtonText: "확인",
                 });
             }
             return false;
@@ -344,6 +343,10 @@ export default function Header(props) {
             })
             .then(function(response){
                 logoutProcess();
+                if (eventSource.current) {
+                    eventSource.current.close();
+                    eventSource.current = null;
+                }
             })
             .catch(function(error){
                 if(error.response.status === 401){

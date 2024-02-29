@@ -114,6 +114,8 @@ const System = styled.div`
   font-weight: 600;
   text-align: center;
   color: #808080;
+  margin-top: 1%;
+  margin-bottom: 1%;
 `;
 
 

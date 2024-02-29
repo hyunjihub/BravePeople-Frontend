@@ -548,7 +548,13 @@ function WritePost(props) {
                 }, {headers:{
                     Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('jwt')).access}`
                 }}).then(function(response){
-                    alert("게시글 수정이 완료되었습니다.");
+                    Swal.fire({
+                        title: "게시글 수정 완료",
+                        html: "게시글 수정이 완료되었습니다.",
+                        icon: "success",
+                        confirmButtonColor: "#d33",
+                        confirmButtonText: "확인",
+                    });
                     setLoading(false); 
                     navigate(-1);
                 })

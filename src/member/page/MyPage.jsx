@@ -642,6 +642,7 @@ function MyPage(props) {
             }}).then(function(response){
                 handleCurrentImg(response.data.imgUrl);
                 setLoading(false);
+                e.target.value = "";
             }).catch(function(err){
                 if(err.response.status === 401){
                     if(!ReissueToken()) { return; }
