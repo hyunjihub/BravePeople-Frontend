@@ -35,13 +35,86 @@
 
 ### &nbsp;
 ## 👦🏻 팀원 및 역할 👧🏻
-* ### [김한수](https://github.com/1soo)
-1. 기능 개발
+###### 중요도 높은 개발 내용들을 우선 기재하였음으로 일부 역할이 생략됐을 수 있습니다.
+### [김한수](https://github.com/1soo)
+<details>
+  <summary><strong>기능 개발</strong></summary>
   
-* ### [장현지](https://github.com/hyunjihub)
-1. UI 및 기능 개발
+  1. 로그인, 로그아웃
+  
+  2. Web Storage를 이용한 데이터 유지
 
-* ### 김지윤, 임태호, 유나영
+  3. Redux를 이용한 상태 관리
+     
+  4. Token Reissue
+
+  5. 회원 페이지 비회원 접근 방지
+
+  6. 카카오 지도 API를 이용한 위치 정보 불러오기
+
+  7. 무한스크롤 게시판 List 
+
+  8. 게시글 수정 
+
+  9. 실시간 알림 
+
+  10. 의뢰 진행 
+
+  11. 채팅 수신 
+
+  12. 채팅 나가기 
+
+  13. 후기 작성 
+</details>
+  
+### [장현지](https://github.com/hyunjihub)
+<details>
+  <summary><strong>기능 개발</strong></summary>
+  
+  1. 헤더 (메뉴)
+
+  2. 회원가입 
+
+  3. 계정 찾기 
+
+  4. 비밀번호 재설정 
+
+  5. 프로필 페이지 
+
+  6. 프로필 정보 변경 
+
+  7. 이미지 업로더 
+
+  8. 이미지 확대 모달 
+
+  9. 각종 유효성 검사 및 Alert 
+
+  10. 로딩 스피너 
+
+  11. 게시글 작성, 삭제 
+
+  12. 채팅 발신 
+
+  13. 채팅 날짜/시간 표시 구현
+
+  15. 채팅 필터링 기능 구현
+
+  16. 후기 상세보기 구현
+
+  17. 별점 및 뱃지 구현
+
+</details>
+<details>
+  <summary><strong>디자인</strong></summary>
+  
+  1. 모든 페이지 디자인 구상 및 CSS
+  
+  2. 랜딩 페이지 제작
+
+  3. 이용 안내 이미지 및 Github 이미지 제작
+</details>
+
+### 김지윤, 임태호, 유나영
   [백엔드 Github](https://github.com/kimjiyooniiiii/BravePeople-Backend)
   
 ### &nbsp;
