@@ -1,72 +1,108 @@
-# Getting Started with Create React App
+![github](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/a0acebdf-2c03-438b-897a-00878d730100)
+# 🏃🏻‍♀️용감한 원정대🏃🏻‍♂️
+### Springboot + React - 의뢰 해결 웹 사이트 (React Github)
+##### 무서운 벌레를 대신 잡아줄 사람이 없을 때! 전화공포증이 심해 전화를 하기 겁날 때! 무서워서 환불하지 못하고 있을 때!
+###### 일상에는 누군가에게는 사소할 수 있지만, 누군가에게는 어려운 문제들이 많습니다. 용감한 원정대는 그런 분들을 위해 내 근처 이웃에게 부탁할 수 있는 방법을 제시합니다. 간편하게 게시글을 올림으로써 누군가에게 원정대가 되어줄 수도 있고, 누군가에게 원정을 요청할 수도 있습니다. 
+[용감한 원정대 바로가기](https://bravepeople.site )
+### &nbsp;
+## 🖥️ 개발 기간 🖥️
+### 2023.12.21 ~ 2024.02.29
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### &nbsp;
+## 🪄 개발 환경 및 기술 스택 🪄
+#### Environment
+![](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
+![](https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white) 
+![](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
 
-## Available Scripts
+#### Development
+![](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=JavaScript&logoColor=white)
+![](https://img.shields.io/badge/styled--components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white)
+![](https://img.shields.io/badge/Redux-593D88?style=for-the-badge&logo=redux&logoColor=white)
+![](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
 
-In the project directory, you can run:
+#### REST API
+![](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=notion&logoColor=white)
+![](https://img.shields.io/badge/Axios-5A29E4?style=for-the-badge)
+![](https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white)
 
-### `npm start`
+#### Communication
+![](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)
+<img alt="whale" src ="https://img.shields.io/badge/whale-000000.svg?&style=for-the-badge"/>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### &nbsp;
+## 👦🏻 팀원 👧🏻
+### 김한수
+### 장현지
+### &nbsp;
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## ❓ 용감한 원정대 이용 방법 ❓
+### 자세한 내용은 아래 링크를 이용해주세요.
+https://bravepeople.site/notice
+### &nbsp;
+### 1. 원정대/의뢰인 찾아가기
+1. 원정대/의뢰인 게시판에서 원하는 게시글을 선택합니다.
+2. 게시글 내의 원정/달려가기 버튼을 클릭하여 의뢰인/원정대와 채팅을 진행할 수 있습니다.
+3. 의뢰인/원정대의 원정 수락 메시지를 받은 후, 원정을 진행합니다.
+4. 원정이 완료되면 채팅방의 “의뢰 완료”를 눌러 의뢰인/원정대의 후기를 작성합니다.
+5. 상대방도 의뢰 완료를 눌렀다면, 프로필 페이지에 작성한 후기가 등록되고, 원정이 마무리됩니다.
+### 2. 게시글 작성하기
+1. 원정대/의뢰인 게시판에 게시글을 작성합니다.
+2. 원정을 원하는 상대방이 여러분에게 채팅을 전송합니다.
+3. 의뢰인/원정대의 원정을 수락할 경우, “의뢰 수락”을 눌러 원정을 진행합니다.
+4. 원정이 완료되면 “의뢰 완료”를 눌러 의뢰인/원정대의 후기를 작성합니다.
+5. 상대방도 의뢰 완료를 눌렀다면, 프로필 페이지의 작성한 후기가 등록되고, 원정대의 원정 횟수가 1회 증가하게 됩니다.
+### &nbsp;
+   
+### 의뢰는 “의뢰 수락-의뢰 진행-의뢰 완료”로 진행됩니다.
+![status](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/0aae68d6-2292-453d-be90-a483f937b53c)
+### &nbsp;
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+![request1](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/96309ad4-e9c1-4783-840d-183c75261cce)
+![request2](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/828f63e4-e3c1-4676-85d1-526cae98ca52)
 
-### `npm run build`
+### &nbsp;
+##  ✨ 주요 기능 ✨
+###  1. 로그인
+* **JWT Token으로 사용자 식별 및 헤더 인증**
+* **Access Toekn 만료 시, Reissue / Refresh Toekn 만료 시, 로그아웃**
+* **로그인 시 Token 발급 및 Session Storage 생성**
+### &nbsp;
+###  2. 회원가입
+* **입력 field 유효성 검증 : 아이디/닉네임 중복 검사 및 형식 검사**
+* **이메일 인증을 통한 회원가입**
+### &nbsp;
+###  3. 위치정보 설정
+* **카카오 지도 API를 이용한 위치정보 설정**
+### &nbsp;
+###  4. 계정 찾기 및 재설정
+* **이메일 인증을 통한 비로그인 시 재설정**
+* **본인 인증을 통한 로그인 시 재설정**
+### &nbsp;
+###  5. 프로필 페이지
+* **닉네임, 자기소개 문구 및 프로필 이미지 변경**
+* **사용자가 작성한 게시글 List 확인**
+* **사용자가 받은 후기 확인**
+### &nbsp;
+###  6. 채팅 및 알림
+* **WebSocket과 STOMP를 이용한 텍스트와 이미지 실시간 송수신**
+* **SSE를 이용한 실시간 채팅 알림 서비스**
+* **SSE를 이용한 사용자 간 의뢰 상태 실시간 반영**
+### &nbsp;
+###  7. 게시판
+* **무한스크롤을 이용한 게시글 List 불러오기 (React-Intersection-Observer 이용)**
+* **게시글 필터링을 통한 반경 km 내 게시글 불러오기**
+* **게시글 작성 시 입력 field 유효성 검사**
+* **게시글 내 작성자 정보 및 프로필 페이지 이동**
+* **게시글 내 의뢰 요청을 통한 의뢰 생성 및 채팅 방 이동**
+* **게시글 삭제 및 수정**
+### &nbsp;
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-"# BravePeople-Frontend" 
-"# BravePeople-Frontend" 
+### &nbsp;
+##  Contact
+brave.knu@gmail.com
