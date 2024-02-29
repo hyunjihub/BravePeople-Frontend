@@ -384,9 +384,9 @@ function SignUp(props) {
             return;
         }
         Swal.fire({
-            title: "위치 정보 재설정",
-            text: "위치 정보를 재설정 하시겠습니까?",
-            icon: "warning",
+            title: "위치 정보 불러오기",
+            text: "위치 정보를 불러오시겠습니까?",
+            icon: "info",
             confirmButtonColor: "#d33",
             confirmButtonText: "확인",
             showCancelButton: true, 

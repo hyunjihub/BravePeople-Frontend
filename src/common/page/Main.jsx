@@ -164,9 +164,10 @@ const CustomSlider = styled(Slider)`
 
 const Image = styled.img`
   width: 40%;
-
+  margin-left: 5%;
   &.chat {
-    width: 60%;
+    width: 70%;
+    margin: 0;
   }
 `;
 

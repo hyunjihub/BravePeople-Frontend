@@ -13,7 +13,7 @@ import review from "../resources/img/review.jpg";
 
 const Wrapper = styled.div`
     width: 50%;
-    height: 750px;
+    height: auto;
     margin: 15px auto;
     position: relative;
 `;
@@ -115,6 +115,7 @@ const Button = styled.button`
     height: 10%;
     box-sizing: border-box;
     padding-left: 2%;
+    padding: 2%;
     font-size: 23px;
     font-weight: 800;
     letter-spacing:0.2em;
@@ -224,7 +225,7 @@ function Notice(props) {
             </TitleBox>
             <Line />
             <Bold>원하는 이용방법 바로 찾기</Bold>
-            <Content className="small nonbottom">찾으시는 이용방법을 클릭하시면 해당 위치로 이동합니다.</Content>
+            <Content className="small nonbottom">아래의 원하시는 설명 주제를 클릭하시면 해당 위치로 이동할 수 있습니다.</Content>
             <MethodBox>
                 <Method onClick={() => scrollToContent('description1')}>1. 용감한 원정대</Method>
                 <Method onClick={() => scrollToContent('description2')}>2. 원정대가 되는 방법</Method>
@@ -375,7 +376,7 @@ function Notice(props) {
             </ImgBox>
             <SignUpTxt>용감한 원정대에 아직 가입하지 않았다면?</SignUpTxt>
             <Button onClick={()=>navigate("../signup")}>용감한 원정대&nbsp;&nbsp;&nbsp;회원가입</Button>
-            <Content className="last" />
+            <Content className="last">&nbsp;<br /><br /><br /><br /><br /><br /></Content>
         </Wrapper>
     );
 }

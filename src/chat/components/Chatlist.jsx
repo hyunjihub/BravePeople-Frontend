@@ -73,6 +73,17 @@ const Unread = styled.div`
   font-size: 15px;
 `;
 
+const DefaultPage = styled.div`
+  font-size: 25px;
+  font-weight: 800;
+  text-align: center;
+  margin: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+`;
+
 function Chatlist(props) {
 
   const list = props.value;
@@ -122,6 +133,12 @@ function Chatlist(props) {
           <Time>{list.lastSendAt}</Time>
         </Container>
       ))}
+      {list.filter(list => list.status === "대기중" || list.status === "진행중").length === 0 && (
+        <DefaultPage>대기중이거나 진행중인 채팅이 없습니다.</DefaultPage>
+      )}
+      {list.filter(list => list.status === "완료" || list.status === "취소").length === 0 && (
+        <DefaultPage>완료됐거나 취소된 채팅이 없습니다.</DefaultPage>
+      )}
     </Chat>
   );   
 } 

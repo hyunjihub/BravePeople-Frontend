@@ -248,8 +248,8 @@ export default function Header(props) {
             }else{
                 logoutProcess();
                 Swal.fire({
-                title: "중복 로그인",
-                text: "다른 환경에서 로그인되어 현재 사용 중인 환경에서 로그아웃되었습니다.",
+                title: "비정상적인 접근",
+                text: "비정상적인 접근이 확인되었습니다.",
                 icon: "error",
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
@@ -299,9 +299,9 @@ export default function Header(props) {
             if (e.target.readyState === EventSource.CLOSED) {
                 if(e.status === 401){
                     const restartSSE = async() => {
-                        if (!await ReissueToken()) { return; }
                         if(isLog && JSON.parse(sessionStorage.getItem('savedData')).isLogin) { 
                             fetchSSE(); 
+                            if (!await ReissueToken()) { return; }
                         }
                     }
                     restartSSE();
