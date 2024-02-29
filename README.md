@@ -14,6 +14,8 @@
 ![](https://img.shields.io/badge/Amazon_AWS-232F3E?style=for-the-badge&logo=amazon-aws&logoColor=white)
 ![](https://img.shields.io/badge/Visual_Studio_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white) 
 ![](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)
+![](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+
 
 #### Development
 ![](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
@@ -32,22 +34,26 @@
 <img alt="whale" src ="https://img.shields.io/badge/whale-000000.svg?&style=for-the-badge"/>
 
 ### &nbsp;
-## 👦🏻 팀원 👧🏻
-### 김한수
-### 장현지
+## 👦🏻 팀원 및 역할 👧🏻
+* ### [김한수](https://github.com/1soo)
+1. 기능 개발
+  
+* ### [장현지](https://github.com/hyunjihub)
+1. UI 및 기능 개발
+  
 ### &nbsp;
 
 ## ❓ 용감한 원정대 이용 방법 ❓
 ### 자세한 내용은 아래 링크를 이용해주세요.
 https://bravepeople.site/notice
 ### &nbsp;
-### 1. 원정대/의뢰인 찾아가기
+### ㄱ. 원정대/의뢰인 찾아가기
 1. 원정대/의뢰인 게시판에서 원하는 게시글을 선택합니다.
 2. 게시글 내의 원정/달려가기 버튼을 클릭하여 의뢰인/원정대와 채팅을 진행할 수 있습니다.
 3. 의뢰인/원정대의 원정 수락 메시지를 받은 후, 원정을 진행합니다.
 4. 원정이 완료되면 채팅방의 “의뢰 완료”를 눌러 의뢰인/원정대의 후기를 작성합니다.
 5. 상대방도 의뢰 완료를 눌렀다면, 프로필 페이지에 작성한 후기가 등록되고, 원정이 마무리됩니다.
-### 2. 게시글 작성하기
+### ㄴ. 게시글 작성하기
 1. 원정대/의뢰인 게시판에 게시글을 작성합니다.
 2. 원정을 원하는 상대방이 여러분에게 채팅을 전송합니다.
 3. 의뢰인/원정대의 원정을 수락할 경우, “의뢰 수락”을 눌러 원정을 진행합니다.
@@ -66,25 +72,36 @@ https://bravepeople.site/notice
 ### &nbsp;
 ##  ✨ 주요 기능 ✨
 ###  1. 로그인
+
 * **JWT Token으로 사용자 식별 및 헤더 인증**
 * **Access Toekn 만료 시, Reissue / Refresh Toekn 만료 시, 로그아웃**
 * **로그인 시 Token 발급 및 Session Storage 생성**
-### &nbsp;
+  
+  ![로그인](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/44e77433-e977-4952-beb3-74bbc6cfe170)
 ###  2. 회원가입
 * **입력 field 유효성 검증 : 아이디/닉네임 중복 검사 및 형식 검사**
 * **이메일 인증을 통한 회원가입**
-### &nbsp;
+
+  ![회원가입](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/ad05e3ce-9494-4e2b-be32-a0e00f1589a9)
+###### 영상 내 회원가입 시, 이메일 인증 과정은 생략하였습니다.
 ###  3. 위치정보 설정
 * **카카오 지도 API를 이용한 위치정보 설정**
 ### &nbsp;
 ###  4. 계정 찾기 및 재설정
-* **이메일 인증을 통한 비로그인 시 재설정**
+* **이메일과 이이디를 이용하여 계정 찾기**
+  
+  ![계정찾기](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/fbe28803-71f5-4d59-ad51-83df9d5e392f)
+  
+* **이메일 인증을 통한 비밀번호 찾기 시 재설정**
 * **본인 인증을 통한 로그인 시 재설정**
-### &nbsp;
+
+  ![재설정](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/15af0607-3169-42f0-abc7-9611e12721d4)
+  ###### 이메일 인증을 통한 재설정 과정은 본인 인증 과정과 이메일 인증 과정 외 동일하므로, 생략하였습니다.
 ###  5. 프로필 페이지
 * **닉네임, 자기소개 문구 및 프로필 이미지 변경**
-* **사용자가 작성한 게시글 List 확인**
-* **사용자가 받은 후기 확인**
+
+  ![프로필 수정](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/df8e7a71-e585-4824-b26a-6fe6785a9f63)
+* **사용자가 작성한 게시글 목록과 받은 후기 확인**
 ### &nbsp;
 ###  6. 채팅 및 알림
 * **WebSocket과 STOMP를 이용한 텍스트와 이미지 실시간 송수신**
