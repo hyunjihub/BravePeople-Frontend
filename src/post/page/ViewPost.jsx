@@ -346,7 +346,14 @@ function ViewPost(props) {
                     {(postData.type==="원정대")? navigate("/postlist/helping"):navigate("/postlist/helped")}
                 })
                 .catch(function(error){
+<<<<<<< Updated upstream
                     if(error.response.status === 404 && error.response.data.errorMessage === "게시글 없음"){
+=======
+                    console.log(error);
+                    if(error.response.status === 401 && error.response.data.errorMessage === "Access Token 만료"){
+                        ReissueToken();   
+                    } else if(error.response.status === 404 && error.response.data.errorMessage === "게시글 없음"){
+>>>>>>> Stashed changes
                         navigate("/error"); 
                     } else if(error.response.status === 400 && error.response.data.errorMessage === "진행중인 의뢰 존재") {
                         Swal.fire({

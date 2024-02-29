@@ -4,9 +4,16 @@ import styled from "styled-components";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+<<<<<<< Updated upstream
 import post from "../resources/img/post.png";
 import chat from "../resources/img/chat.png";
 import people from "../resources/img/people.png";
+=======
+import temp from "../resources/img/temp.png";
+import post from "../resources/img/post.png";
+import chat from "../resources/img/chat.png";
+import profilepage from "../resources/img/profilepage.png";
+>>>>>>> Stashed changes
 import logo from "../../header/resources/img/logo.png";
 import hero_w from "../resources/img/hero_woman.png";
 import hero_b from "../resources/img/hero_man.png";
@@ -164,10 +171,16 @@ const CustomSlider = styled(Slider)`
 
 const Image = styled.img`
   width: 40%;
+<<<<<<< Updated upstream
   margin-left: 5%;
   &.chat {
     width: 70%;
     margin: 0;
+=======
+
+  &.chat {
+    width: 60%;
+>>>>>>> Stashed changes
   }
 `;
 
@@ -425,7 +438,11 @@ function Main(props) {
             </Landing>
             <Landing className="introduction">
                 <LandingContainer>
+<<<<<<< Updated upstream
                     <Icon ref={revealRefs[3]} />
+=======
+                    <Image src={profilepage} alt="마이페이지" ref={revealRefs[3]} />
+>>>>>>> Stashed changes
                     <DetailContainer ref={detailRefs[3]}>
                         <RevealTxt className="chapter">믿음직한 원정대를 찾아<br /> 안전하게 의뢰해요!</RevealTxt>
                         <DetailTxt className="chapter">의뢰인은 별점, 뱃지와 후기를 통해<br />신뢰성있는 원정대를 판단할 수 있어요!</DetailTxt>
@@ -454,7 +471,11 @@ function Main(props) {
                       <MadeBox className="row">
                         <Made className="bold">Source&nbsp;&nbsp;</Made>
                         <Source href="https://www.flaticon.com/kr/free-icons/-" target="_blank" title="아이콘">alkhalifi design & Freepik & June Design - Flaticon</Source>
+<<<<<<< Updated upstream
                         <Made>&nbsp;, React-icons, いらすとや</Made>
+=======
+                        <Made>&nbsp;외 react-icons</Made>
+>>>>>>> Stashed changes
                       </MadeBox>
                       
                   </MadeBox>
