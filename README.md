@@ -40,6 +40,9 @@
   
 * ### [장현지](https://github.com/hyunjihub)
 1. UI 및 기능 개발
+
+* ### 김지윤, 임태호, 유나영
+  [백엔드 Github](https://github.com/kimjiyooniiiii/BravePeople-Backend)
   
 ### &nbsp;
 
@@ -102,19 +105,25 @@ https://bravepeople.site/notice
 
   ![프로필 수정](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/df8e7a71-e585-4824-b26a-6fe6785a9f63)
 * **사용자가 작성한 게시글 목록과 받은 후기 확인**
+* **프로필 이미지 클릭 시 해당 사용자의 프로필 페이지로 이동 (후기 제외)**
 ### &nbsp;
 ###  6. 채팅 및 알림
 * **WebSocket과 STOMP를 이용한 텍스트와 이미지 실시간 송수신**
 * **SSE를 이용한 실시간 채팅 알림 서비스**
 * **SSE를 이용한 사용자 간 의뢰 상태 실시간 반영**
+  ![의뢰생성](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/1102e934-bcb0-4a37-94d7-b4d3b279c9db)
 ### &nbsp;
 ###  7. 게시판
 * **무한스크롤을 이용한 게시글 List 불러오기 (React-Intersection-Observer 이용)**
 * **게시글 필터링을 통한 반경 km 내 게시글 불러오기**
+  ![게시글 필터링](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/128faff9-6b9e-4f18-a8c1-7206fdff25ba)
 * **게시글 작성 시 입력 field 유효성 검사**
-* **게시글 내 작성자 정보 및 프로필 페이지 이동**
+  ![게시글 작성](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/b576ab86-a13e-4858-9658-d5719e992fb7)
 * **게시글 내 의뢰 요청을 통한 의뢰 생성 및 채팅 방 이동**
+  ![의뢰요청](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/156f3d38-097f-4a49-9389-6e7c70e37c55)
 * **게시글 삭제 및 수정**
+  
+  ![게시글 수정삭제](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/b6fded11-3eef-4199-b4f6-76b163ec0734)
 ### &nbsp;
 
 
