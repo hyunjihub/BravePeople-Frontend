@@ -7,6 +7,7 @@ import "slick-carousel/slick/slick-theme.css";
 import post from "../resources/img/post.png";
 import chat from "../resources/img/chat.png";
 import people from "../resources/img/people.png";
+
 import logo from "../../header/resources/img/logo.png";
 import hero_w from "../resources/img/hero_woman.png";
 import hero_b from "../resources/img/hero_man.png";
@@ -165,10 +166,16 @@ const CustomSlider = styled(Slider)`
 const Image = styled.img`
   width: 40%;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   margin-left: 5%;
   &.chat {
     width: 70%;
     margin: 0;
+=======
+
+  &.chat {
+    width: 60%;
+>>>>>>> Stashed changes
 =======
 
   &.chat {
