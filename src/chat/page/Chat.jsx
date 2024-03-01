@@ -925,11 +925,11 @@ function Chat(props) {
                     </Footer>
                 </ChatPage>
             }
+            </>
+        }
             {(modalOpen)&&<ImageModal img={clickImg} setModalOpen={setModalOpen} setImg={setClickImg}/>}
             {(reviewOpen)&&<Review setReviewOpen={setReviewOpen} nowRoomId={nowRoomId} userInfo={userInfo}/>}
             {(loading)&&<Loading />}
-            </>
-        }
         </Container>
         
     );

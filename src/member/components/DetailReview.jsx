@@ -5,8 +5,8 @@ import profile from "../../common/resources/img/profile.png";
 import Rating from "./Rating";
 
 const Content = styled.div`
-    width: 30%;
-    height: 65%;
+    width: 600px;
+    height: 600px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;

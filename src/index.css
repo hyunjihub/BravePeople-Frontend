@@ -14,56 +14,63 @@
 }
 
 @font-face {
-	font-family: 'SUITE';
-	font-weight: 800;
-	src: url('./common/resources/fonts/SUITE-ExtraBold.woff2') format('woff2');
+   font-family: 'SUITE';
+   font-weight: 800;
+   src: url('./common/resources/fonts/SUITE-ExtraBold.woff2') format('woff2');
 }
 
 @font-face {
-	font-family: 'SUITE';
-	font-weight: 500;
-	src: url('./common/resources/fonts/SUITE-Medium.woff2') format('woff2');
+   font-family: 'SUITE';
+   font-weight: 500;
+   src: url('./common/resources/fonts/SUITE-Medium.woff2') format('woff2');
 }
 
 @font-face {
-	font-family: 'SUITE';
-	font-weight: 300;
-	src: url('./common/resources/fonts/SUITE-Light.woff2') format('woff2');
+   font-family: 'SUITE';
+   font-weight: 300;
+   src: url('./common/resources/fonts/SUITE-Light.woff2') format('woff2');
 }
 
 @font-face {
-	font-family: 'SUITE';
-	font-weight: 600;
-	src: url('./common/resources/fonts/SUITE-SemiBold.woff2') format('woff2');
+   font-family: 'SUITE';
+   font-weight: 600;
+   src: url('./common/resources/fonts/SUITE-SemiBold.woff2') format('woff2');
 }
 
 @font-face {
-	font-family: 'SUITE';
-	font-weight: 700;
-	src: url('./common/resources/fonts/SUITE-Bold.woff2') format('woff2');
+   font-family: 'SUITE';
+   font-weight: 700;
+   src: url('./common/resources/fonts/SUITE-Bold.woff2') format('woff2');
 }
 
 @font-face {
-	font-family: 'SUITE';
-	font-weight: 900;
-	src: url('./common/resources/fonts/SUITE-Heavy.woff2') format('woff2');
+   font-family: 'SUITE';
+   font-weight: 900;
+   src: url('./common/resources/fonts/SUITE-Heavy.woff2') format('woff2');
 }
 
-html{
-    min-width: 100%;
-	height: 1000px;
+html {
+   min-width: 1450px;
 }
 
 body{
-	min-width: 1800px;
-	-ms-overflow-style: none;
+   -ms-overflow-style: none;
     font-family: 'SUITE';
 }
 
 button {
-	font-family: 'SUITE';
+   font-family: 'SUITE';
 }
 
 &::-webkit-scrollbar{
-	display: none;
+   display: none;
+}
+
+.some-element {
+   width: 100%;
+  }
+  
+/* DPI가 125% 이상인 경우에만 적용되는 스타일 */
+.high-dpi .some-element {
+   width: 80%;
 }

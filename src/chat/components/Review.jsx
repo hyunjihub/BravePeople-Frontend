@@ -15,19 +15,18 @@ import { BASE_URL } from "../../common/components/Util";
 
 
 const Content = styled.div`
-    width: 30%;
-    height: 65%;
+    width: 600px;
+    height: 700px;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    border-radius: 15px;
+    border-radius: 18px;
     border : 2px dashed #F3D7CA;
-    background-color: #ffffff;
+    background-color: #FFF;
     padding: 1%;
     justify-content: center;
     align-items: center;
     margin-top: 5%;
-    position: relative;
     box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 `;
 
@@ -126,9 +125,9 @@ const RatingContainer = styled.div`
 `;
 
 const Range = styled.input`
-    width: 37%;
+    width: 210px;
     position: absolute;
-    top: 52%;
+    top: 55%;
     opacity: 0;
 `;
 

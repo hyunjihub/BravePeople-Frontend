@@ -33,14 +33,14 @@ const Button = styled.button`
     opacity: 0.8;
     border-radius: 18px;
     color: #fff;
-    width: 45%;
+    width: 50%;
     box-sizing: border-box;
     padding: 15px;
     font-size: 20px;
     font-weight: 800;
     letter-spacing:0.5em;
     font-family: 'SUITE';
-    margin: 2% 20% 13%;
+    margin: 1% 15% 13%;
 
     &:hover {
         background-color: #ff8f8f;
@@ -74,8 +74,7 @@ const Landing = styled.div`
 `;
 
 const MainTxt = styled.div`
-    width: 60%;
-    height: 50%;
+    width: 70%;
     font-size: 65px;
     font-weight: 900;
     text-align : left;

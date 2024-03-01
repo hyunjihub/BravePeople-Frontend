@@ -245,14 +245,6 @@ export default function Header(props) {
                     confirmButtonText: "확인",
                     });
                 }
-            } else {
-                Swal.fire({
-                    title: "비정상적인 현상 발생",
-                    text: "비정상적인 현상이 발생하였습니다.",
-                    icon: "error",
-                    confirmButtonColor: "#d33",
-                    confirmButtonText: "확인",
-                });
             }
             return false;
         };

@@ -52,12 +52,18 @@ const Button = styled.button`
 `;
 
 const Background = styled.div`
-    width: 80%;
-    height: 120%;
-    background-color: rgba(255, 255, 255, 0.9);
-    z-index: 999999;
-    border-radius: 15px;
-    margin: auto;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    position: fixed;
+    top: -15%;
+    left: 0%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 6%;
+    background-color: rgba(255, 255, 255, 0.7);
+    overflow-y : auto;
 `;
 
 function Modal(props) {
