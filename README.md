@@ -6,7 +6,7 @@
 [용감한 원정대 바로가기](https://bravepeople.site )
 ### &nbsp;
 ## 🖥️ 개발 기간 🖥️
-### 2023.12.21 ~ 2024.02.29
+### 2023.12.21 ~ 2024.03.03
 
 ### &nbsp;
 ## 🪄 개발 환경 및 기술 스택 🪄
@@ -187,7 +187,9 @@ https://bravepeople.site/notice
 ### &nbsp;
 ###  6. 채팅 및 알림
 * **WebSocket과 STOMP를 이용한 텍스트와 이미지 실시간 송수신**
+  ![채팅](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/bcfe65a6-5d32-4946-838a-9ad89f8420a2)
 * **SSE를 이용한 실시간 채팅 알림 서비스**
+  ![채팅알림](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/debbc31a-6a11-498d-8e2d-c11bdd8504ce)
 * **SSE를 이용한 사용자 간 의뢰 상태 실시간 반영**
   ![의뢰생성](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/1102e934-bcb0-4a37-94d7-b4d3b279c9db)
 ### &nbsp;
