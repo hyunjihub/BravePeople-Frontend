@@ -458,7 +458,7 @@ function Main(props) {
                   <MadeBox>
                     <MadeBox className="row">
                         <Made className="bold">Created by&nbsp;&nbsp;</Made>
-                        <Made>이름</Made>
+                        <Made>용감한 원정대</Made>
                       </MadeBox>
                       <MadeBox className="row">
                         <Made className="bold">Contact Us&nbsp;&nbsp;</Made>
