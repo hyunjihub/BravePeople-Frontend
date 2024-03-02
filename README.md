@@ -114,6 +114,8 @@
   2. 랜딩 페이지 제작
 
   3. 이용 안내 이미지 및 Github 이미지 제작
+
+  4. DPR을 이용한 디스플레이 배율에 따른 UI 조정
 </details>
 
 ### 김지윤, 임태호, 유나영
@@ -152,23 +154,25 @@ https://bravepeople.site/notice
 
 ### &nbsp;
 ##  ✨ 주요 기능 ✨
-###  1. 로그인
+###  1. [로그인](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/member/page/LogIn.jsx)
 
 * **JWT Token으로 사용자 식별 및 헤더 인증**
 * **Access Toekn 만료 시, Reissue / Refresh Toekn 만료 시, 로그아웃**
 * **로그인 시 Token 발급 및 Session Storage 생성**
   
   ![로그인](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/44e77433-e977-4952-beb3-74bbc6cfe170)
-###  2. 회원가입
+###  2. [회원가입](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/member/page/SignUp.jsx)
 * **입력 field 유효성 검증 : 아이디/닉네임 중복 검사 및 형식 검사**
 * **이메일 인증을 통한 회원가입**
 
   ![회원가입](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/ad05e3ce-9494-4e2b-be32-a0e00f1589a9)
 ###### 영상 내 회원가입 시, 이메일 인증 과정은 생략하였습니다.
-###  3. 위치정보 설정
+###  3. [위치정보 설정](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/header/page/Header.jsx)
 * **카카오 지도 API를 이용한 위치정보 설정**
+* **회원가입 시 위치정보 설정**
+* **프로필 페이지와 헤더를 통해 위치정보 재설정**
 ### &nbsp;
-###  4. 계정 찾기 및 재설정
+###  4. [계정 찾기](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/member/page/FindId.jsx) 및 [재설정](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/member/page/ResetPw.jsx)
 * **이메일과 이이디를 이용하여 계정 찾기**
   
   ![계정찾기](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/fbe28803-71f5-4d59-ad51-83df9d5e392f)
@@ -178,14 +182,14 @@ https://bravepeople.site/notice
 
   ![재설정](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/15af0607-3169-42f0-abc7-9611e12721d4)
   ###### 이메일 인증을 통한 재설정 과정은 본인 인증 과정과 이메일 인증 과정 외 동일하므로, 생략하였습니다.
-###  5. 프로필 페이지
+###  5. [프로필 페이지](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/member/page/MyPage.jsx)
 * **닉네임, 자기소개 문구 및 프로필 이미지 변경**
 
   ![프로필 수정](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/df8e7a71-e585-4824-b26a-6fe6785a9f63)
 * **사용자가 작성한 게시글 목록과 받은 후기 확인**
 * **프로필 이미지 클릭 시 해당 사용자의 프로필 페이지로 이동 (후기 제외)**
 ### &nbsp;
-###  6. 채팅 및 알림
+###  6. [채팅](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/chat/page/Chat.jsx) 및 [알림](https://github.com/hyunjihub/BravePeople-Frontend/blob/main/src/header/page/Header.jsx)
 * **WebSocket과 STOMP를 이용한 텍스트와 이미지 실시간 송수신**
   ![채팅](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/bcfe65a6-5d32-4946-838a-9ad89f8420a2)
 * **SSE를 이용한 실시간 채팅 알림 서비스**
@@ -193,7 +197,7 @@ https://bravepeople.site/notice
 * **SSE를 이용한 사용자 간 의뢰 상태 실시간 반영**
   ![의뢰생성](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/1102e934-bcb0-4a37-94d7-b4d3b279c9db)
 ### &nbsp;
-###  7. 게시판
+###  7. [게시판](https://github.com/hyunjihub/BravePeople-Frontend/tree/main/src/post/page)
 * **무한스크롤을 이용한 게시글 List 불러오기 (React-Intersection-Observer 이용)**
 * **게시글 필터링을 통한 반경 km 내 게시글 불러오기**
   ![게시글 필터링](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/128faff9-6b9e-4f18-a8c1-7206fdff25ba)
