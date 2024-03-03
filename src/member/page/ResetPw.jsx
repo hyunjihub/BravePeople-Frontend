@@ -173,8 +173,6 @@ function ResetPw(props) {
                                     confirmButtonColor: "#d33",
                                     confirmButtonText: "확인",
                                 }); 
-                            } else {
-                                console.log(error);
                             }
                         });
                     }
@@ -231,8 +229,6 @@ function ResetPw(props) {
                                     confirmButtonColor: "#d33",
                                     confirmButtonText: "확인",
                                 }); 
-                            } else {
-                                console.log(error);
                             }
                         });
                     }

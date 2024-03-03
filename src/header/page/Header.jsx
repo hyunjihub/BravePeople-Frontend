@@ -407,7 +407,6 @@ export default function Header(props) {
         }
 
         const handleError = (err) => {
-            console.log(err);
         }
         if(!geolocation){
             console.log('Geolocation is not supported');
@@ -448,7 +447,13 @@ export default function Header(props) {
             }
         })
         .catch(function(error){
-            console.log(error);
+            Swal.fire({
+                title: "위치정보 설정 오류",
+                text: "위치정보를 불러오던 중 오류가 발생했습니다.",
+                icon: "error",
+                confirmButtonColor: "#d33",
+                confirmButtonText: "확인",
+            });
         })
     }
 

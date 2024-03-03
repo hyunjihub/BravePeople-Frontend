@@ -76,10 +76,10 @@ const Footer = styled.div`
 `;
 
 const Profile = styled.img`
-    width: 15%;
+    width: 16%;
     height: 100%;
     margin: 4% 2.5% 0 5%;
-    z-index: 90;
+    z-index: 80;
     cursor: pointer;
     border-radius : 50%;
     background-repeat: no-repeat;
@@ -103,7 +103,7 @@ const Nickname = styled.div`
 
 const ButtonList = styled.div`
     width: 13%;
-    height: 100%;
+    height: 112%;
     display: flex;
     flex-direction: column;
     margin-top: 3%;
@@ -112,7 +112,7 @@ const ButtonList = styled.div`
     &.request {
         flex-direction: row;
         width: 70%;
-        height: 50%;
+        height: 80%;
         margin-top: 1%;
     }
 
@@ -378,8 +378,9 @@ function Chat(props) {
             if(nowRoomId)
             {
                 if(client.current && client.current.connected) { await client.current.disconnect(); }
-                if(!await getPrevChat()) {console.log("이전채팅 내역 불러오기 실패"); return;}
-                if(!await getContactInfo()) {console.log("의뢰 정보 불러오기 실패"); return;}
+                if(!await getPrevChat()) return;
+                if(!await getChatList()) return;
+                if(!await getContactInfo()) return;
                 subHandler();
             }  
         }
@@ -854,7 +855,7 @@ function Chat(props) {
                     <Filter onClick={() => handleFilterSelect("대기/진행")} selected={selectedFilter === "대기/진행"}>대기/진행</Filter>
                     <Filter onClick={() => handleFilterSelect("완료/취소")} selected={selectedFilter === "완료/취소"}>완료/취소</Filter>
                 </Header>
-                <List value={chatList} filter={selectedFilter} setState={setNowRoomId}/>
+                <List value={chatList} filter={selectedFilter} nowRoomId={nowRoomId} setState={setNowRoomId}/>
             </ChatList>
             {(nowRoomId===null)?<Unselected>선택된 채팅방이 없습니다.</Unselected>:
                 <ChatPage>

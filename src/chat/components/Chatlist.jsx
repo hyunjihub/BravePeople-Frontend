@@ -41,6 +41,8 @@ const Profile = styled.div`
     background-repeat: no-repeat;
     overflow: hidden;
     background-position: center;
+    border: none;
+    box-sizing: border-box;
 `;
 
 const Time = styled.div`
@@ -52,7 +54,7 @@ const Time = styled.div`
 `;
 
 const ChatContainer = styled.div`
-  width: 68%;
+  width: 70%;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -60,17 +62,17 @@ const ChatContainer = styled.div`
 `;
 
 const Unread = styled.div`
-  position: absolute;
-  left: 9%;
-  top: 13%;
   border-radius: 50%;
   background-color: #f8332f;
-  width: 3%;
+  width: 5.5%;
   height: 23%;
   color: #fff;
-  padding: 0% 1.8%;
+  padding: 0% 0% 0% 1.9%;
   box-sizing: border-box;
   font-size: 15px;
+  font-weight: 700;
+  margin-left: 1.5%;
+  margin-top: 0.5%;
 `;
 
 const DefaultPage = styled.div`
@@ -82,6 +84,11 @@ const DefaultPage = styled.div`
   justify-content: center;
   align-items: center;
   height: 50vh;
+`;
+
+const NickContainer = styled.div`
+  display: flex;
+  flex-direction: row;
 `;
 
 function Chatlist(props) {
@@ -125,9 +132,11 @@ function Chatlist(props) {
       .map(list => (
         <Container key={uuid()} onClick={() => handleChat(list.roomId)}>
           <Profile onClick={handlePage} value={list.otherId} style={{backgroundImage: `url(${(list.otherProfileImg === null) ? profile : list.otherProfileImg})`}}/>
-          {(!list.isRead)?<Unread></Unread>:null}
           <ChatContainer>
-            <Nickname>{list.otherNickname}</Nickname>
+            <NickContainer>
+              <Nickname>{list.otherNickname}</Nickname>
+              {(!list.isRead || props.nowRoomId===list.otherId)?<Unread>!</Unread>:null}
+            </NickContainer>
             <LastChat>{truncate(list.lastChat, 30)}</LastChat>
           </ChatContainer>
           <Time>{list.lastSendAt}</Time>

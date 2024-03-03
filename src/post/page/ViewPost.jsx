@@ -269,7 +269,6 @@ function ViewPost(props) {
             }
         })
         .catch(function(error){
-            console.log(error);
         });
         setLoading(false);
     }, []);

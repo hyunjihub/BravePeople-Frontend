@@ -142,9 +142,6 @@ function Authentication(props) {
                         if(!ReissueToken()) { return; }
                         else{ handleAuth(e); }   
                     }
-                else {
-                    console.log(error);
-                }
             });
         } else {
             Swal.fire({

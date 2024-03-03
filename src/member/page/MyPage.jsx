@@ -593,8 +593,6 @@ function MyPage(props) {
                             confirmButtonText: "확인",
                         });
                         setIsClicked(true);
-                    } else {
-                        console.log(err);
                     }
                 })
             }
@@ -706,7 +704,6 @@ function MyPage(props) {
             setLoading(false);
         }
         const handleError = (err) => {
-            console.log(err);
         }
         if(!geolocation){
             console.log('Geolocation is not supported');
