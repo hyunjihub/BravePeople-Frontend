@@ -21,7 +21,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 
 const Wrapper = styled.div`
-    width : 100vw;
+    width : 100%;
     height : 70px;
     min-width: 1300px;
     border-bottom: 1px solid #efefef;
