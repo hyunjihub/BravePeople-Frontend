@@ -331,6 +331,7 @@ function Chat(props) {
             }));
             return true;
         } catch(error){
+            console.log(error);
             const logoutProcess = (title, text) => {
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -371,13 +372,11 @@ function Chat(props) {
                 confirmButtonText: "확인",
             });
             navigate("/main");
-        }else if((JSON.parse(sessionStorage.getItem('savedData')).isLogin && isLog)
-        || (JSON.parse(sessionStorage.getItem('savedData')).isLogin && !isLog)){
+        }else if(JSON.parse(sessionStorage.getItem('savedData')).isLogin){
             if(sessionStorage.getItem('nowRoomId'))  { 
                 setNowRoomId(JSON.parse(sessionStorage.getItem('nowRoomId')));
-            }else{
-                getChatList();
             }
+            getChatList();
         }
         
         return async() => {
@@ -396,9 +395,8 @@ function Chat(props) {
             if(nowRoomId)
             {
                 if(client.current && client.current.connected) { await client.current.disconnect(); }
-                await getChatList();
-                await getPrevChat();
-                await getContactInfo();
+                if(!await getPrevChat()) {return;}
+                if(!await getContactInfo()) {return;}
                 subHandler();
             }  
         }
@@ -415,7 +413,6 @@ function Chat(props) {
 
     // SSE 통신으로 새로운 의뢰 상태 변화가 있을 때 의뢰 상태 불러오기 api 호출
     useEffect(()=>{
-        if(JSON.parse(sessionStorage.getItem('changedStatus'))) { console.log(JSON.parse(sessionStorage.getItem('changedStatus'))) }
         if(isNewChanged && nowRoomId && (JSON.parse(sessionStorage.getItem('changedStatus')) === nowRoomId)){
             getContactInfo();
             setIsNewChanged(false);
@@ -425,7 +422,6 @@ function Chat(props) {
 
     // 채팅방 리스트
     const getChatList = async () => {
-        setLoading(true);
         axios.get(`${BASE_URL}/chats`,
         {
             headers :{
@@ -433,7 +429,6 @@ function Chat(props) {
             }
         })
         .then(async function(response){
-            console.log(response);
             if(nowRoomId){
                 await response.data.map((item)=>{
                     if(item.roomId === nowRoomId){
@@ -442,19 +437,18 @@ function Chat(props) {
                 })
             }
             setChatList(response.data);
+            return true;
         })
         .catch(function(error){
             if(error.response.status === 401){
-                if(!ReissueToken()) {return;}
-                else { getChatList(); }
+                if(ReissueToken()) {getChatList();}
             }
+            return false;
         })
-        setLoading(false);
     }
 
     // 의뢰 status 불러오기
     const getContactInfo = async() => {
-        setLoading(true);
         axios.get(`${BASE_URL}/contact/${nowRoomId}/status`,
         {
             headers :{
@@ -462,23 +456,23 @@ function Chat(props) {
             }
         })
         .then(function(response){
+            console.log(response);
             setContact({
                 status: response.data.status,
                 isActive: response.data.isActive
-            })
+            });
+            return true;
         })
         .catch(function(error){
             if(error.response.status === 401){
-                if(!ReissueToken()) {return;}
-                else { getContactInfo(); }
-            }   
+                if(ReissueToken()) {getContactInfo();}
+            }
+            return false;
         })
-        setLoading(false);
     }
 
     // 채팅내역 불러오기
     const getPrevChat = async () => {
-        setLoading(true);
         axios.get(`${BASE_URL}/chats/${nowRoomId}`,
         {
             headers :{
@@ -492,11 +486,11 @@ function Chat(props) {
                 memberId: response.data.otherId,
             });
             setChatMessage(response.data.messages);
+            return true;
         })
         .catch(function(error){
             if(error.response.status === 401){
-                if(!ReissueToken()) {return;}
-                else { getPrevChat(); }
+                if(ReissueToken()) {getPrevChat();}
             } else if (error.response.status === 400  && error.response.data.errorMessage === '채팅방 참여자가 아님') {
                 Swal.fire({
                     title: "비정상적인 접근",
@@ -507,18 +501,15 @@ function Chat(props) {
                 });
                 navigate("/main");
             }
+            return false;
         })
-        setLoading(false);
     }
 
     // 소켓 연결 & 구독
     const subHandler = async() => {
-        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
-            if (!await ReissueToken()) return;
-        }
         const socket = new WebSocket('wss://api.bravepeople.site/ws-stomp');
         client.current = Stomp.over(()=>{ return socket });
-        client.current.debug = () => {};
+        // client.current.debug = () => {};
         client.current.onWebSocketClose = (e) => { 
             if(!e.wasClean && e.code === 1006){
                 subHandler();

@@ -166,7 +166,8 @@ export default function Header(props) {
         profile: state.login.profileImg
     }), shallowEqual);
 
-    console.warn = console.error = () => {};
+    // 콘솔 에러 안띄우기
+    // console.warn = console.error = () => {};
     
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
@@ -254,7 +255,9 @@ export default function Header(props) {
     const eventSource = useRef();
 
     const fetchSSE = async() => {
-        if (!await ReissueToken()) return;
+        if((JSON.parse(sessionStorage.getItem('jwt')).expirationTime)-60000 <= Date.now()){
+            if(!await ReissueToken()) return;
+       }
         eventSource.current = new EventSourcePolyfill(`${BASE_URL}/stream/${id}`,
             {
                 headers:{
@@ -295,7 +298,7 @@ export default function Header(props) {
                             if (!await ReissueToken()) { return; }
                         }
                     }
-                    restartSSE();
+                    //restartSSE();
                 }                
             }
         }

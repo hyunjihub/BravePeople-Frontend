@@ -233,8 +233,8 @@ function PostList(props) {
             })
             .catch(function(error){
                 if(error.response.status === 401){
-                    if(!ReissueToken()) {return;}
-                    else { loadPost(); }
+                    ReissueToken();
+                    setLoading(false);
                 } 
             })
         }
