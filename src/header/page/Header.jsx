@@ -167,7 +167,7 @@ export default function Header(props) {
     }), shallowEqual);
 
     // 콘솔 에러 안띄우기
-    // console.warn = console.error = () => {};
+    console.warn = console.error = () => {};
     
     const setLog = (isLogin) => dispatch(setLogin(isLogin));
     const setId = (memberId) => dispatch(setMemberId(memberId));
@@ -298,7 +298,7 @@ export default function Header(props) {
                             if (!await ReissueToken()) { return; }
                         }
                     }
-                    //restartSSE();
+                    restartSSE();
                 }                
             }
         }
