@@ -302,7 +302,6 @@ function Chat(props) {
     // 토큰 재발급 요청 api
     const ReissueToken = async () => {
         try {
-            console.log("access 재발급");
             const response = await axios.post(`${BASE_URL}/auth/reissue`,{
                 accessToken: JSON.parse(sessionStorage.getItem('jwt')).access,
                 refreshToken: JSON.parse(sessionStorage.getItem('jwt')).refresh
@@ -314,7 +313,6 @@ function Chat(props) {
             }));
             return true;
         } catch(error){
-            console.log(error);
             const logoutProcess = (title, text) => {
                 sessionStorage.removeItem('jwt');
                 sessionStorage.removeItem('savedData');
@@ -622,6 +620,7 @@ function Chat(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         }
         else if (files[0].size>1024 ** 2 * 10){
             Swal.fire({
@@ -631,6 +630,7 @@ function Chat(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         } else if (files && files.length === 1) {
             frm.append('file', files[0]);
             axios.post(`${BASE_URL}/image`, frm, {

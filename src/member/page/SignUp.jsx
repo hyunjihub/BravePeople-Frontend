@@ -217,6 +217,7 @@ function SignUp(props) {
                                 confirmButtonColor: "#d33",
                                 confirmButtonText: "확인",
                             });
+                            setLoading(false);
                         }   
                     } else {
                         Swal.fire({
@@ -226,6 +227,7 @@ function SignUp(props) {
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",
                         });
+                        setLoading(false);
                     }
                     } else {
                         Swal.fire({
@@ -235,6 +237,7 @@ function SignUp(props) {
                             confirmButtonColor: "#d33",
                             confirmButtonText: "확인",
                         });
+                        setLoading(false);
                     }
                 } else {
                     Swal.fire({
@@ -244,6 +247,7 @@ function SignUp(props) {
                         confirmButtonColor: "#d33",
                         confirmButtonText: "확인",
                     });
+                    setLoading(false);
                 }  
             }else{
                 Swal.fire({
@@ -252,8 +256,8 @@ function SignUp(props) {
                     icon: "error",
                     confirmButtonColor: "#d33",
                     confirmButtonText: "확인",
-            
                 });
+                setLoading(false);
             }
             e.preventDefault();
         }
@@ -274,6 +278,7 @@ function SignUp(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         } else if (!emailCheck(email)) {
             Swal.fire({
                 title: "이메일 형식 오류",
@@ -282,6 +287,7 @@ function SignUp(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         } else {
             Swal.fire({
                 title: "이메일 주소 수정 불가",

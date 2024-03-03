@@ -446,6 +446,7 @@ function WritePost(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         }
         else if (files[0].size>1024 ** 2 * 10){
             Swal.fire({
@@ -455,6 +456,7 @@ function WritePost(props) {
                 confirmButtonColor: "#d33",
                 confirmButtonText: "확인",
             });
+            setLoading(false);
         } else if (files && files.length === 1) {
             const frm = new FormData();
             frm.append('file', files[0]);
