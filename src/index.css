@@ -50,7 +50,7 @@
 }
 
 html {
-   min-width: 1450px;
+   min-width: 1500px;
 }
 
 body{
@@ -70,7 +70,6 @@ button {
    width: 100%;
   }
   
-/* DPI가 125% 이상인 경우에만 적용되는 스타일 */
-.high-dpi .some-element {
+.high-dpr .some-element {
    width: 80%;
 }

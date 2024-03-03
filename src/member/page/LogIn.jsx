@@ -10,7 +10,7 @@ import axios from 'axios';
 
 // redux
 import { useDispatch } from "react-redux";
-import { setLogin, setMemberId, setLocation, setProfileImg, setIsNew } from "../redux/modules/login";
+import { setLogin, setMemberId, setLocation, setProfileImg } from "../redux/modules/login";
 
 const Form = styled.form`
     width: 400px;
@@ -67,13 +67,18 @@ const Title = styled.div`
 
 const LinkText = styled(Link)`
     text-decoration: none;
-    color: inherit;
+    color: #191919;
+    &:hover {
+        color: #000;
+        font-weigh: 500;
+    }
 `;
 
 const Text = styled.div`
     display: flex;
     justify-content: center;
     gap: 10px;
+    align-items: center;
 `;
 
 const Caps = styled.div`
@@ -84,6 +89,12 @@ const Caps = styled.div`
     color: rgb(255, 0, 0);
 `;
 
+const Line = styled.div`
+    border-left : 2px solid #191919;
+    height : 15px;
+    opacity: 0.5;
+`;
+
 export default function LogIn(props) {
     const navigate = useNavigate();
 
@@ -92,7 +103,6 @@ export default function LogIn(props) {
     const setId = (id) => dispatch(setMemberId(id));
     const setLoc = (loc) => dispatch(setLocation(loc));
     const setProfile = (profileImg) => dispatch(setProfileImg(profileImg));
-    const setisNewChat = (isNew) => dispatch(setIsNew(isNew));
 
     const handleLogin = (e) => {
         e.preventDefault();
@@ -174,6 +184,7 @@ export default function LogIn(props) {
             <Button type="submit">로그인</Button>
             <Text>
                 <LinkText to="/signUp">회원가입</LinkText>
+                <Line></Line>
                 <LinkText to="/findId">계정 찾기 </LinkText>
             </Text>  
         </Form>

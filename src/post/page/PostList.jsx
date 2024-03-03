@@ -273,7 +273,6 @@ function PostList(props) {
         } 
     }, [inView])
 
-    // postItem에 들어갈 데이터 - postId, category, gender, title, createdAt, price
     return(
         <Wrapper>
             <Title>{type}</Title>

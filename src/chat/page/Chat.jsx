@@ -78,7 +78,7 @@ const Footer = styled.div`
 const Profile = styled.img`
     width: 15%;
     height: 100%;
-    margin: 5% 2.5% 0 5%;
+    margin: 4% 2.5% 0 5%;
     z-index: 90;
     cursor: pointer;
     border-radius : 50%;
@@ -87,18 +87,18 @@ const Profile = styled.img`
 `;
 
 const User = styled.div`
-    width: 430px;
-    height: 65%;
+    width: 90%;
+    height: 70%;
     display: flex;
     flex-direction: row;
 `;
 
 const Nickname = styled.div`
     width: 50%;
-    font-size: 22px;
+    font-size: 23px;
     color: #000;
     font-weight: 700;
-    margin-top: 6%;
+    margin-top: 5%;
 `;
 
 const ButtonList = styled.div`
@@ -106,18 +106,17 @@ const ButtonList = styled.div`
     height: 100%;
     display: flex;
     flex-direction: column;
-    margin-top: 4%;
+    margin-top: 3%;
     align-items: center;
 
     &.request {
         flex-direction: row;
         width: 70%;
         height: 50%;
-        margin: 0;
+        margin-top: 1%;
     }
 
     &.user {
-        height: 120%;
         width: 70%;
         margin-top: 1.5%;
         align-items: flex-start;
@@ -256,26 +255,9 @@ const Icon = styled.img`
 function Chat(props) {
 
     const navigate = useNavigate();
-    const today = new Date();
-
-    //시간 앞에 0 붙이기 위함
-    function addZero(num) {
-        return num < 10 ? `0${num}` : num;
-    }
 
     //로딩 중 표시
     const [loading, setLoading] = useState(false);
-
-    //시간 변환
-    function formatAMPM(date) {
-        let hours = date.getHours();
-        let minutes = date.getMinutes();
-        const ampm = hours >= 12 ? '오후' : '오전';
-        hours = hours % 12;
-        hours = hours ? hours : 12; // 0시는 12시로 표시로 해놓음
-        minutes = addZero(minutes);
-        return `${ampm} ${hours}:${minutes}`;
-    }
 
     // redux 변수, 함수 연결하기
     const { id, isLog, isNewChat, isNewChanged } = useSelector((state)=>({
@@ -916,11 +898,11 @@ function Chat(props) {
                     </Footer>
                 </ChatPage>
             }
-            </>
-        }
             {(modalOpen)&&<ImageModal img={clickImg} setModalOpen={setModalOpen} setImg={setClickImg}/>}
             {(reviewOpen)&&<Review setReviewOpen={setReviewOpen} nowRoomId={nowRoomId} userInfo={userInfo}/>}
             {(loading)&&<Loading />}
+            </>
+        }
         </Container>
         
     );
