@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./header/page/Header";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.css";
@@ -20,8 +20,16 @@ import Notice from "./post/page/Notice";
 
 export default function App(props) {
 
+    const [isHighDpr, setIsHighDpr] = useState(false);
+
+    useEffect(() => {
+        // DPR 감지
+        const dpr = window.devicePixelRatio;
+        setIsHighDpr(dpr >= 1.25);
+    }, []);
+
     return(
-        <div id="App">
+        <div id="App" className={isHighDpr ? 'high-dpr' : ''}>
            <BrowserRouter>
                 <Header />
                 <Routes>

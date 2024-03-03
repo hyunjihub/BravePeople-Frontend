@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import Slider from "react-slick";
@@ -19,7 +19,7 @@ import { MdRateReview } from "react-icons/md";
 import { FaGithub } from "react-icons/fa";
 
 const Wrapper = styled.div`
-  width: 100%;
+  min-width: 1600px;
   height: 4000px;
   display: flex;
   flex-direction: column;
@@ -164,22 +164,10 @@ const CustomSlider = styled(Slider)`
 
 const Image = styled.img`
   width: 40%;
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
   margin-left: 5%;
-  &.chat {
-    width: 70%;
-    margin: 0;
-=======
-
+  
   &.chat {
     width: 60%;
->>>>>>> Stashed changes
-=======
-
-  &.chat {
-    width: 60%;
->>>>>>> Stashed changes
   }
 `;
 
@@ -265,7 +253,7 @@ const Made = styled.div`
 `;
 
 const MadeBox = styled.div`
-  width: 50%;
+  width: 55%;
   display: flex;
   flex-direction: column;
   margin-left: 3%;
@@ -274,7 +262,7 @@ const MadeBox = styled.div`
     width: 100%;
     flex-direction: row;
     margin-left: 0%;
-
+    align-items: center;
   }
 
   &.nav {
@@ -298,7 +286,7 @@ const Git = styled.div`
 const Source = styled.a`
   text-decoration-line: none;
   color: #000;
-  font-size: 15px;
+  font-size: 13px;
 
   &.git {
     font-weight: 700;
@@ -355,6 +343,8 @@ function Main(props) {
     };
 
     useEffect(() => {
+      window.scrollTo(0, 0);
+
       revealRefs.forEach((ref, index) => {
           ScrollReveal().reveal(ref.current, {
               delay: 200 * index,
@@ -387,7 +377,7 @@ function Main(props) {
               reset: true,
           });
       });
-  }, []);
+  }, [revealRefs, detailRefs, circleRefs]);
 
       return(
         <Wrapper>
@@ -465,8 +455,9 @@ function Main(props) {
                       </MadeBox>
                       <MadeBox className="row">
                         <Made className="bold">Source&nbsp;&nbsp;</Made>
-                        <Source href="https://www.flaticon.com/kr/free-icons/-" target="_blank" title="아이콘">alkhalifi design & Freepik & June Design - Flaticon</Source>
-                        <Made>&nbsp;, React-icons, いらすとや</Made>
+                        <Source href="https://www.flaticon.com/kr/free-icons/-" target="_blank">alkhalifi design & Freepik & June Design - Flaticon,</Source>
+                        <Source href="https://react-icons.github.io/react-icons/" target="_blank">&nbsp;React-icons,</Source>
+                        <Source href="https://www.irasutoya.com/" target="_blank">&nbsp;いらすとや</Source>
                       </MadeBox>
                       
                   </MadeBox>

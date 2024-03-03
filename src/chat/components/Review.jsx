@@ -1,15 +1,14 @@
 import styled from "styled-components";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import profile from "../../common/resources/img/profile.png";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { useNavigate } from "react-router";
-import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 
 import Rating from "../../member/components/Rating";
 
 //redux
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { setLocation, setProfileImg, setLogin, setMemberId } from "../../member/redux/modules/login";
 import { BASE_URL } from "../../common/components/Util";
 

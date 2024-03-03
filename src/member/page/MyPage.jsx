@@ -5,7 +5,6 @@ import { FaTrashAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router";
 import { FaCamera } from "react-icons/fa";
 import { IoSettings } from "react-icons/io5";
-import { FcRules } from "react-icons/fc";
 import document from "../resources/img/document.png";
 import reviewIcon from "../resources/img/review.png";
 import uuid from 'react-uuid';

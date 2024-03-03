@@ -79,7 +79,7 @@ const ProfileBox = styled.div`
 `;
 
 const Profile = styled.img`
-    width: 8.3%;
+    width: 8%;
     height: 100%;
     border-radius: 50%;
     border: none;
