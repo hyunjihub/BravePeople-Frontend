@@ -115,7 +115,7 @@
 
   3. 이용 안내 이미지 및 Github 이미지 제작
 
-  4. DPR을 이용한 디스플레이 배율에 따른 UI 조정
+  4. 디스플레이 배율에 따른 UI 조정
 </details>
 
 ### 김지윤, 임태호, 유나영
@@ -199,6 +199,8 @@ https://bravepeople.site/notice
 ### &nbsp;
 ###  7. [게시판](https://github.com/hyunjihub/BravePeople-Frontend/tree/main/src/post/page)
 * **무한스크롤을 이용한 게시글 List 불러오기 (React-Intersection-Observer 이용)**
+  ![무한스크롤](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/9ca5be2e-2156-46e9-81de-559b4cb8073e)
+
 * **게시글 필터링을 통한 반경 km 내 게시글 불러오기**
   ![게시글 필터링](https://github.com/hyunjihub/BravePeople-Frontend/assets/97017935/128faff9-6b9e-4f18-a8c1-7206fdff25ba)
 * **게시글 작성 시 입력 field 유효성 검사**
